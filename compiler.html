@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Compiler — Digital Shadow</title>
+  <meta name="description" content="C code playground for Digital Shadow. View the complete source code, run simulated output, and learn how malloc, pointers, and linked list operations work step by step.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>◈</text></svg>">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/navbar.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/cards.css">
+  <link rel="stylesheet" href="css/timeline.css">
+  <link rel="stylesheet" href="css/compiler.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <link rel="stylesheet" href="css/darktheme.css">
+  <style>
+    .compiler-layout {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 3rem;
+    }
+    .code-editor-panel {
+      background: #0c0c18;
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-lg, 16px);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .editor-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      background: rgba(255,255,255,0.02);
+      border-bottom: 1px solid var(--surface-border);
+    }
+    .editor-toolbar .toolbar-dots {
+      display: flex;
+      gap: 6px;
+    }
+    .toolbar-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+    .toolbar-dot.red { background: #ff5f57; }
+    .toolbar-dot.yellow { background: #ffbd2e; }
+    .toolbar-dot.green { background: #28c840; }
+    .toolbar-filename {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin-left: 0.75rem;
+    }
+    .toolbar-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-left: auto;
+    }
+    .toolbar-btn {
+      padding: 0.4rem 1rem;
+      border-radius: var(--radius-md, 12px);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 500;
+      border: 1px solid var(--surface-border);
+      background: transparent;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .toolbar-btn:hover {
+      border-color: var(--primary);
+      color: var(--text-primary);
+      background: rgba(124,92,255,0.08);
+    }
+    .toolbar-btn.run-btn {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+    }
+    .toolbar-btn.run-btn:hover {
+      background: var(--primary-glow, #9d7dff);
+      box-shadow: 0 0 16px rgba(124,92,255,0.4);
+    }
+    .code-editor {
+      flex: 1;
+      overflow: auto;
+      max-height: 520px;
+    }
+    .code-editor pre {
+      margin: 0;
+      padding: 1rem;
+      font-family: 'Courier New', Consolas, monospace;
+      font-size: 0.82rem;
+      line-height: 1.7;
+      color: #c9d1d9;
+      counter-reset: line;
+      white-space: pre;
+    }
+    .code-editor pre .line {
+      display: block;
+      padding-left: 3.5rem;
+      position: relative;
+    }
+    .code-editor pre .line::before {
+      counter-increment: line;
+      content: counter(line);
+      position: absolute;
+      left: 0;
+      width: 2.5rem;
+      text-align: right;
+      color: #444466;
+      font-size: 0.75rem;
+      user-select: none;
+    }
+    .code-editor .kw { color: #ff7b72; }
+    .code-editor .type { color: #79c0ff; }
+    .code-editor .str { color: #a5d6ff; }
+    .code-editor .num { color: #ffa657; }
+    .code-editor .fn { color: #d2a8ff; }
+    .code-editor .pp { color: #ff7b72; }
+    .code-editor .cmt { color: #555577; font-style: italic; }
+
+    .code-output-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .panel-section {
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-lg, 16px);
+      overflow: hidden;
+      backdrop-filter: blur(20px);
+      flex: 1;
+    }
+    .panel-header {
+      padding: 0.6rem 1rem;
+      background: rgba(255,255,255,0.02);
+      border-bottom: 1px solid var(--surface-border);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .code-input-area {
+      width: 100%;
+      min-height: 80px;
+      background: transparent;
+      border: none;
+      padding: 1rem;
+      font-family: 'Courier New', monospace;
+      font-size: 0.85rem;
+      color: var(--text-primary);
+      resize: vertical;
+      outline: none;
+    }
+    .code-input-area::placeholder { color: var(--text-tertiary); }
+    .code-output-area {
+      padding: 1rem;
+      font-family: 'Courier New', monospace;
+      font-size: 0.82rem;
+      color: #33ff99;
+      background: #050510;
+      min-height: 200px;
+      max-height: 320px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      line-height: 1.6;
+    }
+    .output-notice {
+      color: #ffb800;
+      font-style: italic;
+      margin-bottom: 1rem;
+      display: block;
+    }
+
+    .logic-section h2 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(1.5rem, 3vw, 2rem);
+      font-weight: 600;
+      color: var(--text-primary);
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .logic-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 1.25rem;
+    }
+    .logic-card {
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-lg, 16px);
+      overflow: hidden;
+      backdrop-filter: blur(20px);
+      transition: all 0.3s ease;
+    }
+    .logic-card:hover { border-color: var(--surface-border-hover); }
+    .logic-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.25rem;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+    .logic-card-header:hover { background: var(--surface-hover); }
+    .logic-card-header h4 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .logic-card-header h4 span { margin-right: 0.5rem; }
+    .logic-chevron { color: var(--text-tertiary); transition: transform 0.3s ease; }
+    .logic-card.expanded .logic-chevron { transform: rotate(180deg); }
+    .logic-card-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease;
+    }
+    .logic-card.expanded .logic-card-body {
+      max-height: 800px;
+    }
+    .logic-card-body-inner {
+      padding: 0 1.25rem 1.25rem;
+    }
+    .logic-card-body pre {
+      background: #0c0c18;
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-md, 12px);
+      padding: 1rem;
+      font-size: 0.8rem;
+      line-height: 1.7;
+      color: #c9d1d9;
+      overflow-x: auto;
+      margin-bottom: 1rem;
+    }
+    .logic-card-body p {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      margin-bottom: 0.75rem;
+    }
+    .logic-card-body ol {
+      padding-left: 1.25rem;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      line-height: 1.9;
+    }
+    .pointer-diagram {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 1rem;
+      background: rgba(124,92,255,0.05);
+      border-radius: var(--radius-md, 12px);
+      margin-top: 0.75rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .ptr-box {
+      padding: 0.4rem 0.8rem;
+      border: 1.5px solid var(--primary);
+      border-radius: 6px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.8rem;
+      color: var(--text-primary);
+      background: rgba(124,92,255,0.08);
+    }
+    .ptr-arrow { color: var(--primary); font-size: 1.2rem; }
+
+    @media (max-width: 900px) {
+      .compiler-layout { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar" id="navbar"><div class="nav-container"><a href="index.html" class="nav-logo"><span class="logo-icon">◈</span><span class="logo-text">Digital Shadow</span></a><button class="nav-toggle" id="navToggle" aria-label="Toggle navigation"><span></span><span></span><span></span></button><div class="nav-menu" id="navMenu"><div class="nav-links"><a href="index.html" class="nav-link">Home</a><a href="about.html" class="nav-link">About</a><a href="problem.html" class="nav-link">Problem</a><a href="features.html" class="nav-link">Features</a><a href="architecture.html" class="nav-link">Architecture</a><div class="nav-dropdown"><button class="nav-link dropdown-trigger">Data Structures <span class="dropdown-arrow">▾</span></button><div class="dropdown-menu"><a href="linkedlist.html" class="dropdown-link">Linked List</a><a href="stack.html" class="dropdown-link">Stack</a></div></div><a href="flowchart.html" class="nav-link">Flowchart</a><a href="algorithm.html" class="nav-link">Algorithm</a><a href="visualization.html" class="nav-link">Visualization</a><a href="compiler.html" class="nav-link">Compiler</a><a href="statistics.html" class="nav-link">Statistics</a><a href="future.html" class="nav-link">Future</a><a href="viva.html" class="nav-link">Viva</a><a href="report.html" class="nav-link">Report</a><a href="ppt.html" class="nav-link">PPT</a><a href="contact.html" class="nav-link">Contact</a></div><button class="theme-toggle" id="themeToggle" aria-label="Toggle theme"><span class="theme-icon">🌙</span></button></div></div></nav>
+
+  <div id="particles-container" class="particles-container"></div>
+
+  <main>
+    <section class="page-hero">
+      <div class="container">
+        <span class="section-badge">Compiler</span>
+        <h1 class="page-title">C Code Playground</h1>
+        <p class="page-subtitle">Explore the complete Digital Shadow source code, run simulated output, and learn how every C operation works.</p>
+      </div>
+    </section>
+
+    <section class="section" id="compiler-section">
+      <div class="container">
+        <div class="compiler-layout">
+          <div class="code-editor-panel">
+            <div class="editor-toolbar">
+              <div class="toolbar-dots"><span class="toolbar-dot red"></span><span class="toolbar-dot yellow"></span><span class="toolbar-dot green"></span></div>
+              <span class="toolbar-filename">main.c</span>
+              <div class="toolbar-actions">
+                <button class="toolbar-btn run-btn" id="runBtn" onclick="runCode()">▶ Run</button>
+                <button class="toolbar-btn" id="clearBtn" onclick="clearOutput()">Clear</button>
+                <button class="toolbar-btn" id="resetBtn" onclick="resetCode()">Reset</button>
+              </div>
+            </div>
+            <div class="code-editor">
+              <pre id="codeContent"><span class="line"><span class="pp">#include</span> <span class="str">&lt;stdio.h&gt;</span></span>
+<span class="line"><span class="pp">#include</span> <span class="str">&lt;stdlib.h&gt;</span></span>
+<span class="line"><span class="pp">#include</span> <span class="str">&lt;string.h&gt;</span></span>
+<span class="line"><span class="pp">#include</span> <span class="str">&lt;time.h&gt;</span></span>
+<span class="line"></span>
+<span class="line"><span class="pp">#define</span> MAX_NAME <span class="num">50</span></span>
+<span class="line"><span class="pp">#define</span> MAX_CATEGORY <span class="num">20</span></span>
+<span class="line"></span>
+<span class="line"><span class="kw">struct</span> <span class="type">Event</span> {</span>
+<span class="line">    <span class="type">int</span> id;</span>
+<span class="line">    <span class="type">char</span> name[MAX_NAME];</span>
+<span class="line">    <span class="type">char</span> category[MAX_CATEGORY];</span>
+<span class="line">    <span class="type">char</span> date[<span class="num">11</span>];</span>
+<span class="line">    <span class="type">char</span> time_stamp[<span class="num">9</span>];</span>
+<span class="line">    <span class="kw">struct</span> <span class="type">Event</span> *next;</span>
+<span class="line">};</span>
+<span class="line"></span>
+<span class="line"><span class="kw">struct</span> <span class="type">StackNode</span> {</span>
+<span class="line">    <span class="kw">struct</span> <span class="type">Event</span> *event_data;</span>
+<span class="line">    <span class="kw">struct</span> <span class="type">StackNode</span> *next;</span>
+<span class="line">};</span>
+<span class="line"></span>
+<span class="line"><span class="kw">struct</span> <span class="type">Event</span> *head = <span class="num">NULL</span>;</span>
+<span class="line"><span class="kw">struct</span> <span class="type">StackNode</span> *stack_top = <span class="num">NULL</span>;</span>
+<span class="line"><span class="type">int</span> event_count = <span class="num">0</span>;</span>
+<span class="line"><span class="type">int</span> next_id = <span class="num">1</span>;</span>
+<span class="line"></span>
+<span class="line"><span class="type">void</span> <span class="fn">addEvent</span>() {</span>
+<span class="line">    <span class="kw">struct</span> <span class="type">Event</span> *newNode = (<span class="kw">struct</span> <span class="type">Event</span>*)<span class="fn">malloc</span>(<span class="kw">sizeof</span>(<span class="kw">struct</span> <span class="type">Event</span>));</span>
+<span class="line">    <span class="kw">if</span> (newNode == <span class="num">NULL</span>) {</span>
+<span class="line">        <span class="fn">printf</span>(<span class="str">"Memory allocation failed!\n"</span>);</span>
+<span class="line">        <span class="kw">return</span>;</span>
+<span class="line">    }</span>
+<span class="line">    <span class="fn">printf</span>(<span class="str">"Enter event name: "</span>);</span>
+<span class="line">    <span class="fn">scanf</span>(<span class="str">" %[^\n]"</span>, newNode-&gt;name);</span>
+<span class="line">    <span class="fn">printf</span>(<span class="str">"Enter category: "</span>);</span>
+<span class="line">    <span class="fn">scanf</span>(<span class="str">" %s"</span>, newNode-&gt;category);</span>
+<span class="line">    <span class="fn">getCurrentDate</span>(newNode-&gt;date);</span>
+<span class="line">    <span class="fn">getCurrentTime</span>(newNode-&gt;time_stamp);</span>
+<span class="line">    newNode-&gt;id = next_id++;</span>
+<span class="line">    newNode-&gt;next = <span class="num">NULL</span>;</span>
+<span class="line"></span>
+<span class="line">    <span class="kw">if</span> (head == <span class="num">NULL</span>) {</span>
+<span class="line">        head = newNode;</span>
+<span class="line">    } <span class="kw">else</span> {</span>
+<span class="line">        <span class="kw">struct</span> <span class="type">Event</span> *temp = head;</span>
+<span class="line">        <span class="kw">while</span> (temp-&gt;next != <span class="num">NULL</span>)</span>
+<span class="line">            temp = temp-&gt;next;</span>
+<span class="line">        temp-&gt;next = newNode;</span>
+<span class="line">    }</span>
+<span class="line">    <span class="fn">pushToStack</span>(newNode);</span>
+<span class="line">    event_count++;</span>
+<span class="line">    <span class="fn">printf</span>(<span class="str">"Event added successfully!\n"</span>);</span>
+<span class="line">}</span>
+<span class="line"></span>
+<span class="line"><span class="type">void</span> <span class="fn">deleteEvent</span>() {</span>
+<span class="line">    <span class="kw">if</span> (head == <span class="num">NULL</span>) {</span>
+<span class="line">        <span class="fn">printf</span>(<span class="str">"Timeline is empty.\n"</span>);</span>
+<span class="line">        <span class="kw">return</span>;</span>
+<span class="line">    }</span>
+<span class="line">    <span class="type">int</span> id;</span>
+<span class="line">    <span class="fn">printf</span>(<span class="str">"Enter event ID to delete: "</span>);</span>
+<span class="line">    <span class="fn">scanf</span>(<span class="str">"%d"</span>, &amp;id);</span>
+<span class="line"></span>
+<span class="line">    <span class="kw">if</span> (head-&gt;id == id) {</span>
+<span class="line">        <span class="kw">struct</span> <span class="type">Event</span> *temp = head;</span>
+<span class="line">        head = head-&gt;next;</span>
+<span class="line">        <span class="fn">free</span>(temp);</span>
+<span class="line">        event_count--;</span>
+<span class="line">        <span class="fn">printf</span>(<span class="str">"Event deleted.\n"</span>);</span>
+<span class="line">        <span class="kw">return</span>;</span>
+<span class="line">    }</span>
+<span class="line">    <span class="kw">struct</span> <span class="type">Event</span> *prev = head, *curr = head-&gt;next;</span>
+<span class="line">    <span class="kw">while</span> (curr != <span class="num">NULL</span>) {</span>
+<span class="line">        <span class="kw">if</span> (curr-&gt;id == id) {</span>
+<span class="line">            prev-&gt;next = curr-&gt;next;</span>
+<span class="line">            <span class="fn">free</span>(curr);</span>
+<span class="line">            event_count--;</span>
+<span class="line">            <span class="fn">printf</span>(<span class="str">"Event deleted.\n"</span>);</span>
+<span class="line">            <span class="kw">return</span>;</span>
+<span class="line">        }</span>
+<span class="line">        prev = curr;</span>
+<span class="line">        curr = curr-&gt;next;</span>
+<span class="line">    }</span>
+<span class="line">    <span class="fn">printf</span>(<span class="str">"Event not found.\n"</span>);</span>
+<span class="line">}</span></pre>
+            </div>
+          </div>
+
+          <div class="code-output-panel">
+            <div class="panel-section">
+              <div class="panel-header">Input</div>
+              <textarea class="code-input-area" id="inputArea" placeholder="Enter input values here (one per line)...">1
+Phone Unlocked
+Phone
+5</textarea>
+            </div>
+            <div class="panel-section" style="flex:2;">
+              <div class="panel-header">Output</div>
+              <div class="code-output-area" id="outputArea">Click <strong>▶ Run</strong> to see simulated output...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section logic-section" id="logic-explanations">
+      <div class="container">
+        <h2 class="reveal">Logic Explained — Step by Step</h2>
+        <div class="logic-grid">
+
+          <div class="logic-card reveal" id="logic-malloc">
+            <div class="logic-card-header" onclick="this.parentElement.classList.toggle('expanded')">
+              <h4><span>🧠</span> malloc() — Memory Allocation</h4>
+              <span class="logic-chevron">▼</span>
+            </div>
+            <div class="logic-card-body"><div class="logic-card-body-inner">
+              <pre><code>struct Event *newNode = (struct Event*)malloc(sizeof(struct Event));</code></pre>
+              <ol>
+                <li><strong>sizeof(struct Event)</strong> calculates the total bytes needed for one Event node (id + name + category + date + time + pointer).</li>
+                <li><strong>malloc()</strong> requests that many bytes from the heap (dynamic memory).</li>
+                <li>The OS finds a free block of memory and returns a <strong>void*</strong> pointer to it.</li>
+                <li>We cast it to <strong>(struct Event*)</strong> so the compiler knows the type.</li>
+                <li>If no memory is available, malloc returns <strong>NULL</strong> — always check for this!</li>
+              </ol>
+              <div class="pointer-diagram">
+                <span class="ptr-box">malloc(88 bytes)</span>
+                <span class="ptr-arrow">→</span>
+                <span class="ptr-box">Heap: 0x7FF...</span>
+                <span class="ptr-arrow">→</span>
+                <span class="ptr-box">newNode ✓</span>
+              </div>
+            </div></div>
+          </div>
+
+          <div class="logic-card reveal" id="logic-node">
+            <div class="logic-card-header" onclick="this.parentElement.classList.toggle('expanded')">
+              <h4><span>📦</span> Node Creation</h4>
+              <span class="logic-chevron">▼</span>
+            </div>
+            <div class="logic-card-body"><div class="logic-card-body-inner">
+              <pre><code>newNode->id = next_id++;
+strcpy(newNode->name, "Phone Unlocked");
+strcpy(newNode->category, "Phone");
+newNode->next = NULL;</code></pre>
+              <ol>
+                <li>The <strong>-></strong> operator accesses members through a pointer.</li>
+                <li>Each field is filled: ID is auto-incremented, name and category from user input.</li>
+                <li>Date and time are auto-generated using <strong>time()</strong> and <strong>strftime()</strong>.</li>
+                <li><strong>next</strong> is set to NULL because this node is not yet connected to the list.</li>
+              </ol>
+              <div class="pointer-diagram">
+                <span class="ptr-box">id: 1</span>
+                <span class="ptr-box">name: "Phone Unlocked"</span>
+                <span class="ptr-box">next: NULL</span>
+              </div>
+            </div></div>
+          </div>
+
+          <div class="logic-card reveal" id="logic-insert">
+            <div class="logic-card-header" onclick="this.parentElement.classList.toggle('expanded')">
+              <h4><span>🔗</span> Linked List Insertion</h4>
+              <span class="logic-chevron">▼</span>
+            </div>
+            <div class="logic-card-body"><div class="logic-card-body-inner">
+              <pre><code>if (head == NULL) {
+    head = newNode;
+} else {
+    struct Event *temp = head;
+    while (temp->next != NULL)
+        temp = temp->next;
+    temp->next = newNode;
+}</code></pre>
+              <ol>
+                <li>If the list is empty (head == NULL), the new node becomes the head.</li>
+                <li>Otherwise, traverse from head following <strong>next</strong> pointers until the last node.</li>
+                <li>The last node has <strong>next == NULL</strong> — that's how we know it's the tail.</li>
+                <li>Set <strong>tail->next = newNode</strong> to append at the end.</li>
+              </ol>
+              <div class="pointer-diagram">
+                <span class="ptr-box">HEAD</span>
+                <span class="ptr-arrow">→</span>
+                <span class="ptr-box">Node 1</span>
+                <span class="ptr-arrow">→</span>
+                <span class="ptr-box">Node 2</span>
+                <span class="ptr-arrow">→</span>
+                <span class="ptr-box" style="border-color:#00d4aa;">NEW ✓</span>
+                <span class="ptr-arrow">→</span>
+                <span class="ptr-box">NULL</span>
+              </div>
+            </div></div>
+          </div>
+
+          <div class="logic-card reveal" id="logic-pointer">
+            <div class="logic-card-header" onclick="this.parentElement.classList.toggle('expanded')">
+              <h4><span>👉</span> Pointer Update</h4>
+              <span class="logic-chevron">▼</span>
+            </div>
+            <div class="logic-card-body"><div class="logic-card-body-inner">
+              <pre><code>// Before: tail->next == NULL
+tail->next = newNode;
+// After:  tail->next == newNode
+//         newNode->next == NULL</code></pre>
+              <p>Pointers are just memory addresses. When we write <strong>temp->next = newNode</strong>, we're storing the address of newNode in the previous node's next field. This is how linked lists "link" — each node holds the address of the next one in the chain.</p>
+              <div class="pointer-diagram">
+                <span class="ptr-box">0x100</span>
+                <span class="ptr-arrow">→</span>
+                <span class="ptr-box">0x200</span>
+                <span class="ptr-arrow">→</span>
+                <span class="ptr-box">0x300 (new)</span>
+                <span class="ptr-arrow">→</span>
+                <span class="ptr-box">NULL</span>
+              </div>
+            </div></div>
+          </div>
+
+          <div class="logic-card reveal" id="logic-push">
+            <div class="logic-card-header" onclick="this.parentElement.classList.toggle('expanded')">
+              <h4><span>⬆️</span> Push Operation</h4>
+              <span class="logic-chevron">▼</span>
+            </div>
+            <div class="logic-card-body"><div class="logic-card-body-inner">
+              <pre><code>void pushToStack(struct Event *event) {
+    struct StackNode *sn = malloc(sizeof(struct StackNode));
+    sn->event_data = malloc(sizeof(struct Event));
+    memcpy(sn->event_data, event, sizeof(struct Event));
+    sn->next = stack_top;
+    stack_top = sn;
+}</code></pre>
+              <ol>
+                <li>Allocate a new StackNode.</li>
+                <li>Deep-copy the event data (so the stack has its own copy).</li>
+                <li>Point the new node's <strong>next</strong> to the current top.</li>
+                <li>Update <strong>stack_top</strong> to point to the new node — it's now on top.</li>
+              </ol>
+            </div></div>
+          </div>
+
+          <div class="logic-card reveal" id="logic-pop">
+            <div class="logic-card-header" onclick="this.parentElement.classList.toggle('expanded')">
+              <h4><span>⬇️</span> Pop Operation</h4>
+              <span class="logic-chevron">▼</span>
+            </div>
+            <div class="logic-card-body"><div class="logic-card-body-inner">
+              <pre><code>struct Event* popFromStack() {
+    if (stack_top == NULL) return NULL;
+    struct StackNode *temp = stack_top;
+    struct Event *data = temp->event_data;
+    stack_top = stack_top->next;
+    free(temp);
+    return data;
+}</code></pre>
+              <ol>
+                <li>Save the current top node in a temp pointer.</li>
+                <li>Extract the event data pointer (we'll return this).</li>
+                <li>Move <strong>stack_top</strong> to the next node below.</li>
+                <li>Free the StackNode wrapper (but NOT the event data — caller will use it).</li>
+                <li>Return the event data to the caller.</li>
+              </ol>
+            </div></div>
+          </div>
+
+          <div class="logic-card reveal" id="logic-delete">
+            <div class="logic-card-header" onclick="this.parentElement.classList.toggle('expanded')">
+              <h4><span>🗑️</span> Deletion & free()</h4>
+              <span class="logic-chevron">▼</span>
+            </div>
+            <div class="logic-card-body"><div class="logic-card-body-inner">
+              <pre><code>prev->next = curr->next;  // bypass the node
+free(curr);               // release memory</code></pre>
+              <ol>
+                <li>Find the node to delete and its <strong>previous</strong> node.</li>
+                <li>Set <strong>prev->next = curr->next</strong> — this bypasses the target node.</li>
+                <li>Call <strong>free(curr)</strong> to return the memory to the OS.</li>
+                <li>Special case: if deleting the head, just set <strong>head = head->next</strong> first.</li>
+              </ol>
+              <div class="pointer-diagram">
+                <span class="ptr-box">prev</span>
+                <span class="ptr-arrow">⤳</span>
+                <span class="ptr-box" style="border-color:#ff4d6a;text-decoration:line-through;">curr ✗</span>
+                <span class="ptr-arrow">⤳</span>
+                <span class="ptr-box">curr→next</span>
+              </div>
+            </div></div>
+          </div>
+
+          <div class="logic-card reveal" id="logic-traverse">
+            <div class="logic-card-header" onclick="this.parentElement.classList.toggle('expanded')">
+              <h4><span>🔄</span> Traversal</h4>
+              <span class="logic-chevron">▼</span>
+            </div>
+            <div class="logic-card-body"><div class="logic-card-body-inner">
+              <pre><code>struct Event *temp = head;
+while (temp != NULL) {
+    printf("%s\n", temp->name);
+    temp = temp->next;
+}</code></pre>
+              <ol>
+                <li>Start with a <strong>temp</strong> pointer at the head.</li>
+                <li>Process the current node (print, compare, count, etc.).</li>
+                <li>Move to the next node: <strong>temp = temp->next</strong>.</li>
+                <li>Stop when <strong>temp == NULL</strong> — we've reached the end.</li>
+                <li>This pattern is O(n) time and O(1) space — the foundation of every operation.</li>
+              </ol>
+              <div class="pointer-diagram">
+                <span class="ptr-box" style="border-color:#00d4aa;">temp</span>
+                <span class="ptr-arrow">→</span>
+                <span class="ptr-box">Node 1</span>
+                <span class="ptr-arrow">→</span>
+                <span class="ptr-box">Node 2</span>
+                <span class="ptr-arrow">→</span>
+                <span class="ptr-box">NULL (stop)</span>
+              </div>
+            </div></div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer"><div class="footer-content"><div class="footer-brand"><span class="logo-icon">◈</span><span>Digital Shadow</span></div><p class="footer-tagline">Your Life Has a Memory, Even When You Don't.</p><div class="footer-links"><a href="index.html">Home</a><a href="about.html">About</a><a href="visualization.html">Demo</a><a href="contact.html">Contact</a></div><p class="footer-copy">© 2026 Digital Shadow. Built with passion.</p></div></footer>
+
+  <script src="js/main.js"></script>
+  <script src="js/navbar.js"></script>
+  <script src="js/theme.js"></script>
+  <script src="js/particles.js"></script>
+  <script src="js/search.js"></script>
+  <script>
+    var originalCode;
+    (function() {
+      originalCode = document.getElementById('codeContent').innerHTML;
+    })();
+
+    function runCode() {
+      var output = document.getElementById('outputArea');
+      output.innerHTML = '<span class="output-notice">Note: This is simulated output. To run the actual C program, compile main.c with gcc and run locally.</span>\n';
+      var lines = [
+        '╔══════════════════════════════════════════╗',
+        '║        D I G I T A L   S H A D O W       ║',
+        '║   Your Life Has a Memory, Even When You   ║',
+        '║                  Don\'t.                   ║',
+        '╚══════════════════════════════════════════╝',
+        '',
+        '┌──────────────────────────────────────────┐',
+        '│            MAIN MENU                     │',
+        '│  1. Add Event       6. Today\'s Timeline  │',
+        '│  2. Delete Event    7. Replay Day        │',
+        '│  3. Edit Event      8. Undo Last Event   │',
+        '│  4. Search Event    9. Statistics         │',
+        '│  5. Display Timeline 0. Exit             │',
+        '└──────────────────────────────────────────┘',
+        '',
+        'Enter your choice: 1',
+        '',
+        'Enter event name: Phone Unlocked',
+        'Enter category: Phone',
+        '',
+        '✓ Event added successfully!',
+        '  ID: 1 | Phone Unlocked | Phone | 05/07/2026 | 20:30:15',
+        '',
+        'Enter your choice: 5',
+        '',
+        '┌────┬──────────────────┬──────────┬────────────┬──────────┐',
+        '│ ID │ Event Name       │ Category │ Date       │ Time     │',
+        '├────┼──────────────────┼──────────┼────────────┼──────────┤',
+        '│  1 │ Phone Unlocked   │ Phone    │ 05/07/2026 │ 20:30:15 │',
+        '└────┴──────────────────┴──────────┴────────────┴──────────┘',
+        '',
+        'Total events: 1',
+        '',
+        'Enter your choice: 0',
+        '',
+        '  Freeing all events... Done.',
+        '  Freeing stack... Done.',
+        '',
+        '  Goodbye! Your shadow remembers. ◈',
+      ];
+      var i = 0;
+      function printLine() {
+        if (i < lines.length) {
+          output.innerHTML += lines[i] + '\n';
+          output.scrollTop = output.scrollHeight;
+          i++;
+          setTimeout(printLine, 40);
+        }
+      }
+      printLine();
+    }
+
+    function clearOutput() {
+      document.getElementById('outputArea').innerHTML = '';
+    }
+
+    function resetCode() {
+      document.getElementById('codeContent').innerHTML = originalCode;
+    }
+  </script>
+</body>
+</html>

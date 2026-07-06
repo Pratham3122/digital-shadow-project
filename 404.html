@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404 — Digital Shadow</title>
+  <meta name="description" content="Page not found. This page got lost in the timeline.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>◈</text></svg>">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/navbar.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/cards.css">
+  <link rel="stylesheet" href="css/timeline.css">
+  <link rel="stylesheet" href="css/compiler.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <link rel="stylesheet" href="css/darktheme.css">
+  <style>
+    .error-page {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      text-align: center;
+      padding: 2rem;
+    }
+    .error-page::before {
+      content: '';
+      position: absolute;
+      top: 30%;
+      left: 50%;
+      width: 700px;
+      height: 700px;
+      transform: translateX(-50%);
+      background: radial-gradient(circle, rgba(124,92,255,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .error-content {
+      position: relative;
+      z-index: 1;
+      max-width: 600px;
+    }
+
+    /* Glitch 404 */
+    .error-code {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(8rem, 20vw, 14rem);
+      font-weight: 700;
+      line-height: 1;
+      background: linear-gradient(135deg, #7c5cff 0%, #00d4aa 50%, #7c5cff 100%);
+      background-size: 200% 200%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: gradient-shift 3s ease-in-out infinite;
+      position: relative;
+      margin-bottom: 1rem;
+      user-select: none;
+    }
+    @keyframes gradient-shift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    /* Glitch Effect */
+    .error-code::before,
+    .error-code::after {
+      content: '404';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #7c5cff 0%, #00d4aa 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .error-code::before {
+      animation: glitch-1 3s ease-in-out infinite;
+      clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
+    }
+    .error-code::after {
+      animation: glitch-2 3s ease-in-out infinite;
+      clip-path: polygon(0 55%, 100% 55%, 100% 100%, 0 100%);
+    }
+    @keyframes glitch-1 {
+      0%, 90%, 100% { transform: translate(0); }
+      92% { transform: translate(-5px, -2px); }
+      94% { transform: translate(5px, 2px); }
+      96% { transform: translate(-3px, 1px); }
+      98% { transform: translate(3px, -1px); }
+    }
+    @keyframes glitch-2 {
+      0%, 90%, 100% { transform: translate(0); }
+      91% { transform: translate(5px, 2px); }
+      93% { transform: translate(-5px, -2px); }
+      95% { transform: translate(3px, -1px); }
+      97% { transform: translate(-3px, 1px); }
+    }
+
+    .error-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(1.3rem, 3vw, 1.8rem);
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 1rem;
+    }
+    .error-message {
+      font-family: 'Inter', sans-serif;
+      font-size: 1.05rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      margin-bottom: 2.5rem;
+      max-width: 450px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .btn-home {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.9rem 2.5rem;
+      border-radius: 50px;
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      font-weight: 500;
+      color: #fff;
+      background: linear-gradient(135deg, #7c5cff 0%, #00d4aa 100%);
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 20px rgba(124,92,255,0.3);
+    }
+    .btn-home:hover {
+      transform: scale(1.04) translateY(-2px);
+      box-shadow: 0 8px 35px rgba(124,92,255,0.45);
+    }
+
+    /* Decorative broken timeline */
+    .broken-timeline {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-bottom: 2.5rem;
+      opacity: 0.5;
+    }
+    .bt-node {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--primary);
+      flex-shrink: 0;
+    }
+    .bt-line {
+      width: 40px;
+      height: 2px;
+      background: var(--surface-border);
+      flex-shrink: 0;
+    }
+    .bt-line.broken {
+      background: transparent;
+      border-bottom: 2px dashed var(--error);
+      opacity: 0.5;
+    }
+    .bt-node.missing {
+      background: transparent;
+      border: 2px dashed var(--error);
+      opacity: 0.5;
+    }
+
+    /* Floating Particles (extra) */
+    .fp {
+      position: absolute;
+      border-radius: 50%;
+      background: var(--primary);
+      opacity: 0.15;
+      animation: float-particle 6s ease-in-out infinite;
+    }
+    .fp:nth-child(1) { width: 6px; height: 6px; top: 15%; left: 20%; animation-delay: 0s; }
+    .fp:nth-child(2) { width: 4px; height: 4px; top: 25%; right: 25%; animation-delay: 1s; }
+    .fp:nth-child(3) { width: 8px; height: 8px; bottom: 30%; left: 15%; animation-delay: 2s; }
+    .fp:nth-child(4) { width: 5px; height: 5px; bottom: 20%; right: 20%; animation-delay: 3s; }
+    .fp:nth-child(5) { width: 3px; height: 3px; top: 40%; left: 30%; animation-delay: 4s; background: var(--accent); }
+    .fp:nth-child(6) { width: 7px; height: 7px; top: 60%; right: 15%; animation-delay: 5s; background: var(--accent); }
+    .fp:nth-child(7) { width: 4px; height: 4px; bottom: 40%; left: 40%; animation-delay: 0.5s; }
+    .fp:nth-child(8) { width: 6px; height: 6px; top: 70%; left: 10%; animation-delay: 2.5s; }
+    @keyframes float-particle {
+      0%, 100% { transform: translate(0, 0); }
+      25% { transform: translate(15px, -20px); }
+      50% { transform: translate(-10px, 15px); }
+      75% { transform: translate(20px, 10px); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="nav-logo">
+        <span class="logo-icon">◈</span>
+        <span class="logo-text">Digital Shadow</span>
+      </a>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="nav-menu" id="navMenu">
+        <div class="nav-links">
+          <a href="index.html" class="nav-link">Home</a>
+          <a href="about.html" class="nav-link">About</a>
+          <a href="problem.html" class="nav-link">Problem</a>
+          <a href="features.html" class="nav-link">Features</a>
+          <a href="architecture.html" class="nav-link">Architecture</a>
+          <div class="nav-dropdown">
+            <button class="nav-link dropdown-trigger">Data Structures <span class="dropdown-arrow">▾</span></button>
+            <div class="dropdown-menu">
+              <a href="linkedlist.html" class="dropdown-link">Linked List</a>
+              <a href="stack.html" class="dropdown-link">Stack</a>
+            </div>
+          </div>
+          <a href="flowchart.html" class="nav-link">Flowchart</a>
+          <a href="algorithm.html" class="nav-link">Algorithm</a>
+          <a href="visualization.html" class="nav-link">Visualization</a>
+          <a href="compiler.html" class="nav-link">Compiler</a>
+          <a href="statistics.html" class="nav-link">Statistics</a>
+          <a href="future.html" class="nav-link">Future</a>
+          <a href="viva.html" class="nav-link">Viva</a>
+          <a href="report.html" class="nav-link">Report</a>
+          <a href="ppt.html" class="nav-link">PPT</a>
+          <a href="contact.html" class="nav-link">Contact</a>
+        </div>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+          <span class="theme-icon">🌙</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <div id="particles-container" class="particles-container"></div>
+
+  <!-- Floating particles -->
+  <div class="fp"></div>
+  <div class="fp"></div>
+  <div class="fp"></div>
+  <div class="fp"></div>
+  <div class="fp"></div>
+  <div class="fp"></div>
+  <div class="fp"></div>
+  <div class="fp"></div>
+
+  <main>
+    <section class="error-page" id="errorPage">
+      <div class="error-content">
+        <div class="error-code" id="errorCode">404</div>
+        <h1 class="error-title">This page got lost in the timeline</h1>
+        <p class="error-message">The event you're looking for doesn't exist in our linked list. It may have been deleted, undone, or never recorded in the first place.</p>
+
+        <div class="broken-timeline" aria-hidden="true">
+          <div class="bt-node"></div>
+          <div class="bt-line"></div>
+          <div class="bt-node"></div>
+          <div class="bt-line"></div>
+          <div class="bt-node"></div>
+          <div class="bt-line broken"></div>
+          <div class="bt-node missing"></div>
+          <div class="bt-line broken"></div>
+          <div class="bt-node"></div>
+          <div class="bt-line"></div>
+          <div class="bt-node"></div>
+        </div>
+
+        <a href="index.html" class="btn-home" id="btnReturnHome">
+          ← Return Home
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-brand">
+        <span class="logo-icon">◈</span>
+        <span>Digital Shadow</span>
+      </div>
+      <p class="footer-tagline">Your Life Has a Memory, Even When You Don't.</p>
+      <div class="footer-links">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="visualization.html">Demo</a>
+        <a href="contact.html">Contact</a>
+      </div>
+      <p class="footer-copy">© 2026 Digital Shadow. Built with passion.</p>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script src="js/navbar.js"></script>
+  <script src="js/theme.js"></script>
+  <script src="js/particles.js"></script>
+  <script src="js/search.js"></script>
+</body>
+</html>

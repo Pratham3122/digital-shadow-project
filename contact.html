@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact — Digital Shadow</title>
+  <meta name="description" content="Get in touch with the Digital Shadow team. Questions, feedback, and collaboration inquiries welcome.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>◈</text></svg>">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/navbar.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/cards.css">
+  <link rel="stylesheet" href="css/timeline.css">
+  <link rel="stylesheet" href="css/compiler.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <link rel="stylesheet" href="css/darktheme.css">
+  <style>
+    /* ===== CONTACT LAYOUT ===== */
+    .contact-layout {
+      display: grid;
+      grid-template-columns: 1.3fr 0.7fr;
+      gap: 3rem;
+      align-items: start;
+    }
+
+    /* ===== FORM ===== */
+    .contact-form-card {
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-lg);
+      padding: 3rem;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      position: relative;
+      overflow: hidden;
+    }
+    .contact-form-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--gradient-primary);
+    }
+    .form-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+    }
+    .form-subtitle {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      margin-bottom: 2rem;
+      line-height: 1.6;
+    }
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    .form-label {
+      display: block;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+    }
+    .form-input,
+    .form-select,
+    .form-textarea {
+      width: 100%;
+      padding: 0.85rem 1.2rem;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-md);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9rem;
+      color: var(--text-primary);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      outline: none;
+      box-sizing: border-box;
+    }
+    .form-input:focus,
+    .form-select:focus,
+    .form-textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(124,92,255,0.15);
+      background: rgba(124,92,255,0.03);
+    }
+    .form-input::placeholder,
+    .form-textarea::placeholder {
+      color: var(--text-tertiary);
+    }
+    .form-select {
+      cursor: pointer;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238888aa' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 1rem center;
+      padding-right: 2.5rem;
+    }
+    .form-select option {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+    }
+    .form-textarea {
+      min-height: 150px;
+      resize: vertical;
+      line-height: 1.6;
+    }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+
+    /* Submit Button */
+    .btn-submit {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      width: 100%;
+      padding: 1rem 2rem;
+      border-radius: 50px;
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #fff;
+      background: linear-gradient(135deg, #7c5cff 0%, #00d4aa 100%);
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 20px rgba(124,92,255,0.3);
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-submit::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background: rgba(255,255,255,0.1);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width 0.6s ease, height 0.6s ease;
+    }
+    .btn-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 35px rgba(124,92,255,0.45), 0 0 50px rgba(124,92,255,0.15);
+    }
+    .btn-submit:hover::before {
+      width: 300px;
+      height: 300px;
+    }
+    .btn-submit:active {
+      transform: translateY(0);
+    }
+
+    /* Success Message */
+    .form-success {
+      display: none;
+      text-align: center;
+      padding: 3rem 2rem;
+    }
+    .form-success.show {
+      display: block;
+    }
+    .form-success .success-icon {
+      font-size: 3.5rem;
+      margin-bottom: 1.5rem;
+      display: block;
+    }
+    .form-success h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.75rem;
+    }
+    .form-success p {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+
+    /* ===== SIDE INFO ===== */
+    .contact-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+    .info-card {
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .info-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--surface-border-hover);
+    }
+    .info-card h4 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .info-card p {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      margin-bottom: 0.5rem;
+    }
+    .info-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.85rem;
+      color: var(--primary);
+      text-decoration: none;
+      margin-top: 0.75rem;
+      transition: color 0.2s ease;
+      font-weight: 500;
+    }
+    .info-link:hover {
+      color: var(--primary-glow);
+    }
+    .info-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .info-list li {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      padding: 0.5rem 0;
+      border-bottom: 1px solid var(--surface-border);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .info-list li:last-child {
+      border-bottom: none;
+    }
+    .info-list .list-label {
+      color: var(--text-primary);
+      font-weight: 500;
+      min-width: 80px;
+    }
+    .college-note {
+      background: rgba(124,92,255,0.05);
+      border: 1px solid rgba(124,92,255,0.15);
+      border-radius: var(--radius-md);
+      padding: 1.25rem;
+      margin-top: 0.5rem;
+    }
+    .college-note p {
+      font-size: 0.85rem;
+      margin: 0;
+    }
+    .college-note .note-highlight {
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    @media (max-width: 900px) {
+      .contact-layout { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="nav-logo">
+        <span class="logo-icon">◈</span>
+        <span class="logo-text">Digital Shadow</span>
+      </a>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="nav-menu" id="navMenu">
+        <div class="nav-links">
+          <a href="index.html" class="nav-link">Home</a>
+          <a href="about.html" class="nav-link">About</a>
+          <a href="problem.html" class="nav-link">Problem</a>
+          <a href="features.html" class="nav-link">Features</a>
+          <a href="architecture.html" class="nav-link">Architecture</a>
+          <div class="nav-dropdown">
+            <button class="nav-link dropdown-trigger">Data Structures <span class="dropdown-arrow">▾</span></button>
+            <div class="dropdown-menu">
+              <a href="linkedlist.html" class="dropdown-link">Linked List</a>
+              <a href="stack.html" class="dropdown-link">Stack</a>
+            </div>
+          </div>
+          <a href="flowchart.html" class="nav-link">Flowchart</a>
+          <a href="algorithm.html" class="nav-link">Algorithm</a>
+          <a href="visualization.html" class="nav-link">Visualization</a>
+          <a href="compiler.html" class="nav-link">Compiler</a>
+          <a href="statistics.html" class="nav-link">Statistics</a>
+          <a href="future.html" class="nav-link">Future</a>
+          <a href="viva.html" class="nav-link">Viva</a>
+          <a href="report.html" class="nav-link">Report</a>
+          <a href="ppt.html" class="nav-link">PPT</a>
+          <a href="contact.html" class="nav-link">Contact</a>
+        </div>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+          <span class="theme-icon">🌙</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <div id="particles-container" class="particles-container"></div>
+
+  <main>
+    <!-- PAGE HERO -->
+    <section class="page-hero">
+      <div class="container">
+        <span class="section-badge">CONTACT</span>
+        <h1 class="page-title">Get In Touch</h1>
+        <p class="page-subtitle">Have questions about Digital Shadow? We'd love to hear from you.</p>
+      </div>
+    </section>
+
+    <!-- CONTACT SECTION -->
+    <section class="section" id="contact-form-section">
+      <div class="container">
+        <div class="contact-layout">
+          <!-- Form -->
+          <div class="contact-form-card reveal" id="contactFormCard">
+            <form id="contactForm">
+              <h3 class="form-title">Send a Message</h3>
+              <p class="form-subtitle">Fill out the form below and we'll get back to you as soon as possible.</p>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="contactName" class="form-label">Full Name</label>
+                  <input type="text" id="contactName" class="form-input" placeholder="Enter your name" required>
+                </div>
+                <div class="form-group">
+                  <label for="contactEmail" class="form-label">Email Address</label>
+                  <input type="email" id="contactEmail" class="form-input" placeholder="you@example.com" required>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="contactSubject" class="form-label">Subject</label>
+                <select id="contactSubject" class="form-select" required>
+                  <option value="" disabled selected>Select a subject</option>
+                  <option value="general">General Inquiry</option>
+                  <option value="feedback">Project Feedback</option>
+                  <option value="collaboration">Collaboration</option>
+                  <option value="bug">Bug Report</option>
+                  <option value="feature">Feature Request</option>
+                  <option value="academic">Academic Question</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="contactMessage" class="form-label">Message</label>
+                <textarea id="contactMessage" class="form-textarea" placeholder="Write your message here..." required></textarea>
+              </div>
+
+              <button type="submit" class="btn-submit" id="submitBtn">
+                Send Message ↗
+              </button>
+            </form>
+
+            <div class="form-success" id="formSuccess">
+              <span class="success-icon">✅</span>
+              <h3>Message Sent!</h3>
+              <p>Thank you for reaching out. Since this is a college project demo, the message isn't actually sent to a server — but in a production version, it would be delivered to the team inbox.</p>
+            </div>
+          </div>
+
+          <!-- Info Panel -->
+          <div class="contact-info reveal reveal-right">
+            <div class="info-card" id="infoProject">
+              <h4>📂 Project Links</h4>
+              <p>Explore the source code and documentation for Digital Shadow.</p>
+              <a href="#" class="info-link" id="githubLink">View on GitHub →</a>
+            </div>
+
+            <div class="info-card" id="infoTeam">
+              <h4>👥 Team</h4>
+              <ul class="info-list">
+                <li>
+                  <span class="list-label">Project</span>
+                  Digital Shadow
+                </li>
+                <li>
+                  <span class="list-label">Type</span>
+                  Mini Project
+                </li>
+                <li>
+                  <span class="list-label">Subject</span>
+                  Data Structures
+                </li>
+                <li>
+                  <span class="list-label">Language</span>
+                  C Programming
+                </li>
+                <li>
+                  <span class="list-label">Semester</span>
+                  2nd Year
+                </li>
+              </ul>
+            </div>
+
+            <div class="info-card" id="infoAbout">
+              <h4>🎓 About This Project</h4>
+              <div class="college-note">
+                <p>This is a <span class="note-highlight">college mini project</span> built to demonstrate the practical application of data structures — specifically Linked Lists and Stacks — in solving a real-world problem. The project combines technical implementation in C with a modern web presentation.</p>
+              </div>
+            </div>
+
+            <div class="info-card" id="infoTech">
+              <h4>🛠️ Built With</h4>
+              <ul class="info-list">
+                <li>
+                  <span class="list-label">Backend</span>
+                  C Language
+                </li>
+                <li>
+                  <span class="list-label">Frontend</span>
+                  HTML, CSS, JS
+                </li>
+                <li>
+                  <span class="list-label">DS Used</span>
+                  Linked List, Stack
+                </li>
+                <li>
+                  <span class="list-label">Design</span>
+                  Custom Design System
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-brand">
+        <span class="logo-icon">◈</span>
+        <span>Digital Shadow</span>
+      </div>
+      <p class="footer-tagline">Your Life Has a Memory, Even When You Don't.</p>
+      <div class="footer-links">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="visualization.html">Demo</a>
+        <a href="contact.html">Contact</a>
+      </div>
+      <p class="footer-copy">© 2026 Digital Shadow. Built with passion.</p>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script src="js/navbar.js"></script>
+  <script src="js/theme.js"></script>
+  <script src="js/particles.js"></script>
+  <script src="js/search.js"></script>
+
+  <!-- Form Handler -->
+  <script>
+    (function() {
+      var form = document.getElementById('contactForm');
+      var successMsg = document.getElementById('formSuccess');
+
+      if (form) {
+        form.addEventListener('submit', function(e) {
+          e.preventDefault();
+          var btn = document.getElementById('submitBtn');
+          btn.textContent = 'Sending...';
+          btn.disabled = true;
+
+          setTimeout(function() {
+            form.style.display = 'none';
+            successMsg.classList.add('show');
+          }, 1200);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

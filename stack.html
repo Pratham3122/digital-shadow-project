@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stack — Digital Shadow</title>
+  <meta name="description" content="Deep dive into the Stack data structure used in Digital Shadow for undo and replay operations.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>◈</text></svg>">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/navbar.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/cards.css">
+  <link rel="stylesheet" href="css/timeline.css">
+  <link rel="stylesheet" href="css/compiler.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <link rel="stylesheet" href="css/darktheme.css">
+  <style>
+    /* ── Stack Page Styles ── */
+    .section-intro {
+      text-align: center;
+      max-width: 700px;
+      margin: 0 auto 2rem;
+    }
+    .section-intro p {
+      color: var(--text-secondary);
+      font-size: 1.05rem;
+      line-height: 1.7;
+    }
+
+    /* ── Animated Stack Illustration ── */
+    .stack-illustration {
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      gap: 3rem;
+      padding: 2rem 0;
+      flex-wrap: wrap;
+    }
+
+    .stack-visual {
+      display: flex;
+      flex-direction: column-reverse;
+      align-items: center;
+      gap: 4px;
+      position: relative;
+      min-height: 280px;
+      justify-content: flex-start;
+    }
+
+    .stack-base {
+      width: 220px;
+      height: 8px;
+      background: var(--gradient-primary);
+      border-radius: 0 0 8px 8px;
+    }
+
+    .stack-block-static {
+      width: 200px;
+      padding: 0.75rem 1rem;
+      background: var(--surface);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--surface-border);
+      border-radius: 8px;
+      text-align: center;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      animation: stackSlideIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+      opacity: 0;
+    }
+
+    .stack-block-static:nth-child(2) { animation-delay: 0.3s; }
+    .stack-block-static:nth-child(3) { animation-delay: 0.6s; }
+    .stack-block-static:nth-child(4) { animation-delay: 0.9s; }
+    .stack-block-static:nth-child(5) { animation-delay: 1.2s; }
+
+    @keyframes stackSlideIn {
+      from { opacity: 0; transform: translateY(-30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .stack-label {
+      position: absolute;
+      right: -60px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.7rem;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 600;
+    }
+
+    .stack-label.top-label {
+      top: 0;
+    }
+
+    .stack-label.bottom-label {
+      bottom: 12px;
+    }
+
+    .stack-info-panel {
+      max-width: 350px;
+    }
+
+    .stack-info-panel h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 1rem;
+    }
+
+    .stack-info-panel p {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      line-height: 1.7;
+      margin-bottom: 1rem;
+    }
+
+    .lifo-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: rgba(124,92,255,0.1);
+      border: 1px solid rgba(124,92,255,0.2);
+      border-radius: 50px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    /* ── Explain Grid ── */
+    .explain-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin-top: 3rem;
+    }
+
+    .explain-card {
+      background: var(--surface);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--surface-border);
+      border-radius: 16px;
+      padding: 2rem;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .explain-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--surface-border-hover);
+      box-shadow: var(--shadow-glow);
+    }
+
+    .explain-card h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .explain-card p {
+      color: var(--text-secondary);
+      font-size: 0.925rem;
+      line-height: 1.7;
+    }
+
+    .explain-card ul {
+      list-style: none;
+      padding: 0;
+      margin: 0.75rem 0 0;
+    }
+
+    .explain-card ul li {
+      padding: 0.3rem 0;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    .explain-card ul li::before {
+      content: '▸ ';
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    /* ── Interactive Stack Visualization ── */
+    .viz-container {
+      background: var(--surface);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--surface-border);
+      border-radius: 16px;
+      padding: 2rem;
+      margin-top: 2rem;
+    }
+
+    .viz-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--surface-border);
+    }
+
+    .viz-btn {
+      padding: 0.6rem 1.25rem;
+      border: 1px solid var(--surface-border);
+      border-radius: 50px;
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .viz-btn:hover {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+      box-shadow: 0 0 20px rgba(124,92,255,0.3);
+      transform: scale(1.02);
+    }
+
+    .viz-btn:active { transform: scale(0.98); }
+
+    .viz-btn.accent:hover {
+      background: var(--accent);
+      border-color: var(--accent);
+      box-shadow: 0 0 20px rgba(0,212,170,0.3);
+    }
+
+    .viz-btn.warning:hover {
+      background: var(--warning);
+      border-color: var(--warning);
+      color: #111;
+      box-shadow: 0 0 20px rgba(255,184,0,0.3);
+    }
+
+    .viz-btn.danger:hover {
+      background: var(--error);
+      border-color: var(--error);
+      box-shadow: 0 0 20px rgba(255,77,106,0.3);
+    }
+
+    .viz-stack-wrapper {
+      display: flex;
+      gap: 2rem;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+
+    .viz-stack-area {
+      display: flex;
+      flex-direction: column-reverse;
+      align-items: center;
+      gap: 6px;
+      min-height: 300px;
+      min-width: 260px;
+      justify-content: flex-start;
+      position: relative;
+      flex: 1;
+    }
+
+    .viz-stack-base {
+      width: 240px;
+      height: 6px;
+      background: var(--gradient-primary);
+      border-radius: 0 0 8px 8px;
+      flex-shrink: 0;
+    }
+
+    .viz-stack-block {
+      width: 220px;
+      padding: 0.7rem 1rem;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--surface-border);
+      border-radius: 8px;
+      text-align: center;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transform: translateY(-40px);
+      opacity: 0;
+      position: relative;
+    }
+
+    .viz-stack-block.visible {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .viz-stack-block.popping {
+      transform: translateY(-60px);
+      opacity: 0;
+    }
+
+    .viz-stack-block.is-top {
+      border-color: var(--primary);
+      box-shadow: 0 0 15px rgba(124,92,255,0.2);
+    }
+
+    .viz-stack-block.undone {
+      border-color: var(--error);
+      background: rgba(255,77,106,0.1);
+    }
+
+    .viz-stack-top-marker {
+      position: absolute;
+      right: -50px;
+      font-size: 0.65rem;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 600;
+    }
+
+    .viz-info-panel {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .viz-stat {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid var(--surface-border);
+    }
+
+    .viz-stat:last-child { border-bottom: none; }
+
+    .viz-stat-label {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    .viz-stat-value {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .viz-status {
+      margin-top: 1rem;
+      padding: 0.75rem 1.25rem;
+      background: var(--bg-tertiary);
+      border-radius: 8px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      min-height: 1.5rem;
+    }
+
+    .viz-notification {
+      position: fixed;
+      top: 100px;
+      right: 30px;
+      padding: 1rem 1.5rem;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--surface-border);
+      border-radius: 12px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.9rem;
+      color: var(--text-primary);
+      z-index: 1000;
+      transform: translateX(120%);
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .viz-notification.show {
+      transform: translateX(0);
+    }
+
+    .viz-notification.undo {
+      border-color: var(--error);
+    }
+
+    .viz-notification.push-notif {
+      border-color: var(--accent);
+    }
+
+    /* ── Operation Steps ── */
+    .op-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .op-step {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      background: var(--surface);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--surface-border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      transition: all 0.3s ease;
+    }
+
+    .op-step:hover {
+      border-color: var(--surface-border-hover);
+    }
+
+    .op-step-num {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--gradient-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 0.8rem;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .op-step-content h4 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 600;
+      color: var(--text-primary);
+      font-size: 0.95rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .op-step-content p {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      line-height: 1.6;
+    }
+
+    .op-step-content code {
+      background: var(--bg-tertiary);
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      color: var(--accent);
+    }
+
+    /* ── Code Block ── */
+    .code-block {
+      background: var(--bg-primary);
+      border: 1px solid var(--surface-border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-top: 1.5rem;
+      overflow-x: auto;
+    }
+
+    .code-block-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--surface-border);
+    }
+
+    .code-block-lang {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .code-block pre {
+      margin: 0;
+      font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+      font-size: 0.85rem;
+      line-height: 1.8;
+      color: var(--text-primary);
+      white-space: pre;
+    }
+
+    .code-block .kw { color: var(--primary); font-weight: 600; }
+    .code-block .type { color: var(--accent); }
+    .code-block .str { color: var(--warning); }
+    .code-block .cmt { color: var(--text-tertiary); font-style: italic; }
+    .code-block .fn { color: #ff79c6; }
+    .code-block .num { color: var(--error); }
+    .code-block .ptr { color: var(--accent-glow); }
+
+    /* ── Reverse Traversal Diagram ── */
+    .reverse-diagram {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 2rem 0;
+    }
+
+    .reverse-step {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      width: 100%;
+      max-width: 500px;
+    }
+
+    .reverse-order {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+    }
+
+    .reverse-order.push-order {
+      background: rgba(0,212,170,0.15);
+      color: var(--accent);
+      border: 1px solid rgba(0,212,170,0.2);
+    }
+
+    .reverse-order.pop-order {
+      background: rgba(124,92,255,0.15);
+      color: var(--primary);
+      border: 1px solid rgba(124,92,255,0.2);
+    }
+
+    .reverse-event {
+      flex: 1;
+      padding: 0.6rem 1rem;
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: 8px;
+      font-size: 0.9rem;
+      color: var(--text-primary);
+    }
+
+    .reverse-label {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      width: 50px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .reverse-separator {
+      text-align: center;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.8rem;
+      color: var(--text-tertiary);
+      padding: 0.5rem 0;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      width: 100%;
+      max-width: 500px;
+    }
+
+    .reverse-separator::before,
+    .reverse-separator::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--surface-border);
+    }
+
+    @media (max-width: 768px) {
+      .stack-illustration { flex-direction: column; align-items: center; }
+      .viz-stack-wrapper { flex-direction: column; }
+      .explain-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="nav-logo">
+        <span class="logo-icon">◈</span>
+        <span class="logo-text">Digital Shadow</span>
+      </a>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="nav-menu" id="navMenu">
+        <div class="nav-links">
+          <a href="index.html" class="nav-link">Home</a>
+          <a href="about.html" class="nav-link">About</a>
+          <a href="problem.html" class="nav-link">Problem</a>
+          <a href="features.html" class="nav-link">Features</a>
+          <a href="architecture.html" class="nav-link">Architecture</a>
+          <div class="nav-dropdown">
+            <button class="nav-link dropdown-trigger">Data Structures <span class="dropdown-arrow">▾</span></button>
+            <div class="dropdown-menu">
+              <a href="linkedlist.html" class="dropdown-link">Linked List</a>
+              <a href="stack.html" class="dropdown-link">Stack</a>
+            </div>
+          </div>
+          <a href="flowchart.html" class="nav-link">Flowchart</a>
+          <a href="algorithm.html" class="nav-link">Algorithm</a>
+          <a href="visualization.html" class="nav-link">Visualization</a>
+          <a href="compiler.html" class="nav-link">Compiler</a>
+          <a href="statistics.html" class="nav-link">Statistics</a>
+          <a href="future.html" class="nav-link">Future</a>
+          <a href="viva.html" class="nav-link">Viva</a>
+          <a href="report.html" class="nav-link">Report</a>
+          <a href="ppt.html" class="nav-link">PPT</a>
+          <a href="contact.html" class="nav-link">Contact</a>
+        </div>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+          <span class="theme-icon">🌙</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <div id="particles-container" class="particles-container"></div>
+
+  <!-- Notification Toast -->
+  <div class="viz-notification" id="stackNotification"></div>
+
+  <main>
+    <!-- ── PAGE HERO ── -->
+    <section class="page-hero">
+      <div class="container">
+        <span class="section-badge">Stack</span>
+        <h1 class="page-title">Understanding Stacks</h1>
+        <p class="page-subtitle">The LIFO powerhouse behind undo operations and reverse-chronological replay in Digital Shadow.</p>
+      </div>
+    </section>
+
+    <!-- ── SECTION 1: What is a Stack? ── -->
+    <section class="section" id="what-is-stack">
+      <div class="container">
+        <div class="section-intro reveal">
+          <span class="section-badge">Fundamentals</span>
+          <h2 class="gradient-text">What is a Stack?</h2>
+          <p>A stack is a linear data structure that follows the <strong>Last In, First Out (LIFO)</strong> principle — the most recently added element is the first one removed.</p>
+        </div>
+
+        <div class="stack-illustration reveal">
+          <div class="stack-visual">
+            <div class="stack-base"></div>
+            <div class="stack-block-static">📱 Phone Unlocked</div>
+            <div class="stack-block-static">🚶 Left Home</div>
+            <div class="stack-block-static">🏫 Entered College</div>
+            <div class="stack-block-static">📶 Connected WiFi</div>
+            <span class="stack-label top-label">← TOP</span>
+            <span class="stack-label bottom-label">← BOTTOM</span>
+          </div>
+
+          <div class="stack-info-panel">
+            <div class="lifo-badge">📚 LIFO — Last In, First Out</div>
+            <h3 style="margin-top: 1.5rem;">Think of a Stack of Plates</h3>
+            <p>Just like a stack of plates in a cafeteria — you can only take the <strong>top plate</strong> (pop) and add a new plate on <strong>top</strong> (push). You cannot access plates in the middle without removing the ones above.</p>
+            <p>In Digital Shadow, when you "replay" your day, events are pushed onto a stack in chronological order. When popped, they come out in <strong>reverse</strong> — showing your day backwards, from the most recent event to the earliest.</p>
+          </div>
+        </div>
+
+        <div class="explain-grid">
+          <div class="explain-card reveal stagger-1">
+            <h3>⬆️ Push</h3>
+            <p>Add an element to the top of the stack. The <code>top</code> pointer increments by one, and the new element is placed at the new top position.</p>
+            <ul>
+              <li>Time complexity: O(1)</li>
+              <li>top++ → stack[top] = element</li>
+              <li>Check for stack overflow first</li>
+            </ul>
+          </div>
+          <div class="explain-card reveal stagger-2">
+            <h3>⬇️ Pop</h3>
+            <p>Remove and return the top element. The <code>top</code> pointer decrements by one. The element at the old top position is returned.</p>
+            <ul>
+              <li>Time complexity: O(1)</li>
+              <li>element = stack[top] → top--</li>
+              <li>Check for stack underflow first</li>
+            </ul>
+          </div>
+          <div class="explain-card reveal stagger-3">
+            <h3>👁️ Peek</h3>
+            <p>View the top element without removing it. The <code>top</code> pointer remains unchanged — a read-only operation.</p>
+            <ul>
+              <li>Time complexity: O(1)</li>
+              <li>return stack[top] (no pointer change)</li>
+              <li>Useful for checking before pop</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── SECTION 2: Why Stack for Digital Shadow? ── -->
+    <section class="section" id="why-stack">
+      <div class="container">
+        <div class="section-intro reveal">
+          <span class="section-badge">Design Choice</span>
+          <h2 class="gradient-text">Why Stack for Digital Shadow?</h2>
+          <p>The stack serves two critical features: <strong>Undo</strong> (reverse the last action) and <strong>Replay</strong> (play back a day in reverse order).</p>
+        </div>
+
+        <div class="explain-grid">
+          <div class="explain-card reveal stagger-1">
+            <h3>↩️ Undo Last Action</h3>
+            <p>Every time the user adds an event, it's pushed onto the undo stack. When "Undo" is selected, the top event is popped and removed from the linked list — effectively reversing the last action.</p>
+            <ul>
+              <li>Push: when event is added to linked list</li>
+              <li>Pop: when user selects "Undo"</li>
+              <li>After pop, find and delete from linked list</li>
+              <li>Single-level undo (most recent action only)</li>
+            </ul>
+          </div>
+          <div class="explain-card reveal stagger-2">
+            <h3>🔄 Replay Day</h3>
+            <p>To replay a day's events in reverse, all events matching the date are pushed onto the stack. Then, popping them one by one yields the reverse chronological order — most recent first.</p>
+            <ul>
+              <li>Filter linked list by target date</li>
+              <li>Push each matching event onto stack</li>
+              <li>Pop and display until stack is empty</li>
+              <li>Result: events from newest to oldest</li>
+            </ul>
+          </div>
+          <div class="explain-card reveal stagger-3">
+            <h3>⚡ O(1) Operations</h3>
+            <p>Both push and pop are constant-time operations, making the undo and replay features extremely fast regardless of how many events are stored.</p>
+            <ul>
+              <li>No traversal needed for push/pop</li>
+              <li>Array-based: direct index access</li>
+              <li>Predictable performance at any scale</li>
+              <li>Simple overflow/underflow checking</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── INTERACTIVE VISUALIZATION ── -->
+    <section class="section" id="interactive-stack">
+      <div class="container">
+        <div class="section-intro reveal">
+          <span class="section-badge">Interactive</span>
+          <h2 class="gradient-text">Try It Yourself</h2>
+          <p>Push events, pop them off, replay a full day, or undo the last action. Watch the stack respond in real time.</p>
+        </div>
+
+        <div class="viz-container reveal" id="stackVizContainer">
+          <div class="viz-controls">
+            <button class="viz-btn" id="stackPushBtn" onclick="stackViz.push()">⬆️ Push</button>
+            <button class="viz-btn danger" id="stackPopBtn" onclick="stackViz.pop()">⬇️ Pop</button>
+            <button class="viz-btn accent" id="stackReplayBtn" onclick="stackViz.replayAll()">🔄 Replay All</button>
+            <button class="viz-btn warning" id="stackUndoBtn" onclick="stackViz.undoLast()">↩️ Undo Last</button>
+          </div>
+
+          <div class="viz-stack-wrapper">
+            <div class="viz-stack-area" id="stackVizArea">
+              <div class="viz-stack-base"></div>
+              <!-- Stack blocks rendered by JS -->
+            </div>
+            <div class="viz-info-panel" id="stackInfoPanel">
+              <div class="viz-stat">
+                <span class="viz-stat-label">Stack Size</span>
+                <span class="viz-stat-value" id="stackSize">0</span>
+              </div>
+              <div class="viz-stat">
+                <span class="viz-stat-label">Top Element</span>
+                <span class="viz-stat-value" id="stackTopElem">Empty</span>
+              </div>
+              <div class="viz-stat">
+                <span class="viz-stat-label">Capacity</span>
+                <span class="viz-stat-value" id="stackCapacity">10</span>
+              </div>
+              <div class="viz-stat">
+                <span class="viz-stat-label">Status</span>
+                <span class="viz-stat-value" id="stackState">Empty</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="viz-status" id="stackVizStatus">Ready. Use the buttons above to interact with the stack.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── SECTION 3: Stack Operations ── -->
+    <section class="section" id="stack-operations">
+      <div class="container">
+        <div class="section-intro reveal">
+          <span class="section-badge">Operations</span>
+          <h2 class="gradient-text">Stack Operations Step-by-Step</h2>
+          <p>A detailed walkthrough of Push and Pop — the two fundamental operations that power undo and replay.</p>
+        </div>
+
+        <div class="explain-grid">
+          <div class="explain-card reveal stagger-1">
+            <h3>⬆️ Push Operation</h3>
+            <div class="op-steps">
+              <div class="op-step">
+                <div class="op-step-num">1</div>
+                <div class="op-step-content">
+                  <h4>Check Overflow</h4>
+                  <p>Verify <code>top &lt; MAX_SIZE - 1</code>. If false, the stack is full — print an error and return.</p>
+                </div>
+              </div>
+              <div class="op-step">
+                <div class="op-step-num">2</div>
+                <div class="op-step-content">
+                  <h4>Increment Top</h4>
+                  <p>Move the top pointer up: <code>top = top + 1</code>. This creates space for the new element.</p>
+                </div>
+              </div>
+              <div class="op-step">
+                <div class="op-step-num">3</div>
+                <div class="op-step-content">
+                  <h4>Place Element</h4>
+                  <p>Copy the event data into the stack array: <code>stack[top] = event</code>. The element is now on the stack.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="code-block">
+              <div class="code-block-header">
+                <span class="code-block-lang">C — Push</span>
+              </div>
+              <pre><span class="type">void</span> <span class="fn">push</span>(<span class="type">Event</span> *<span class="ptr">event</span>) {
+    <span class="kw">if</span> (top == MAX_SIZE - <span class="num">1</span>) {
+        <span class="fn">printf</span>(<span class="str">"Stack Overflow!\n"</span>);
+        <span class="kw">return</span>;
+    }
+    top++;
+    stack[top] = *<span class="ptr">event</span>;
+    <span class="fn">printf</span>(<span class="str">"Pushed: %s\n"</span>, <span class="ptr">event</span>->description);
+}</pre>
+            </div>
+          </div>
+
+          <div class="explain-card reveal stagger-2">
+            <h3>⬇️ Pop Operation</h3>
+            <div class="op-steps">
+              <div class="op-step">
+                <div class="op-step-num">1</div>
+                <div class="op-step-content">
+                  <h4>Check Underflow</h4>
+                  <p>Verify <code>top &gt;= 0</code>. If false, the stack is empty — print an error and return NULL.</p>
+                </div>
+              </div>
+              <div class="op-step">
+                <div class="op-step-num">2</div>
+                <div class="op-step-content">
+                  <h4>Read Element</h4>
+                  <p>Copy the event data from the top: <code>event = stack[top]</code>. This captures the element before removal.</p>
+                </div>
+              </div>
+              <div class="op-step">
+                <div class="op-step-num">3</div>
+                <div class="op-step-content">
+                  <h4>Decrement Top</h4>
+                  <p>Move the top pointer down: <code>top = top - 1</code>. The element is effectively removed from the stack.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="code-block">
+              <div class="code-block-header">
+                <span class="code-block-lang">C — Pop</span>
+              </div>
+              <pre><span class="type">Event</span> <span class="fn">pop</span>() {
+    <span class="kw">if</span> (top == -<span class="num">1</span>) {
+        <span class="fn">printf</span>(<span class="str">"Stack Underflow!\n"</span>);
+        <span class="type">Event</span> empty = {<span class="num">0</span>};
+        <span class="kw">return</span> empty;
+    }
+    <span class="type">Event</span> <span class="ptr">popped</span> = stack[top];
+    top--;
+    <span class="fn">printf</span>(<span class="str">"Popped: %s\n"</span>, <span class="ptr">popped</span>.description);
+    <span class="kw">return</span> <span class="ptr">popped</span>;
+}</pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── SECTION 4: Reverse Traversal ── -->
+    <section class="section" id="reverse-traversal">
+      <div class="container">
+        <div class="section-intro reveal">
+          <span class="section-badge">Reversal</span>
+          <h2 class="gradient-text">Reverse Traversal with LIFO</h2>
+          <p>The stack's LIFO nature naturally reverses the order of elements. This is how we replay a day's events from newest to oldest.</p>
+        </div>
+
+        <div class="reverse-diagram reveal">
+          <div class="reverse-step">
+            <div class="reverse-order push-order">1</div>
+            <div class="reverse-event">📱 07:00 — Phone Unlocked</div>
+            <div class="reverse-label">Push 1st</div>
+          </div>
+          <div class="reverse-step">
+            <div class="reverse-order push-order">2</div>
+            <div class="reverse-event">🚶 08:30 — Left Home</div>
+            <div class="reverse-label">Push 2nd</div>
+          </div>
+          <div class="reverse-step">
+            <div class="reverse-order push-order">3</div>
+            <div class="reverse-event">🏫 09:00 — Entered College</div>
+            <div class="reverse-label">Push 3rd</div>
+          </div>
+          <div class="reverse-step">
+            <div class="reverse-order push-order">4</div>
+            <div class="reverse-event">📶 09:05 — Connected WiFi</div>
+            <div class="reverse-label">Push 4th</div>
+          </div>
+
+          <div class="reverse-separator">↕ LIFO Reversal ↕</div>
+
+          <div class="reverse-step">
+            <div class="reverse-order pop-order">1</div>
+            <div class="reverse-event">📶 09:05 — Connected WiFi</div>
+            <div class="reverse-label">Pop 1st</div>
+          </div>
+          <div class="reverse-step">
+            <div class="reverse-order pop-order">2</div>
+            <div class="reverse-event">🏫 09:00 — Entered College</div>
+            <div class="reverse-label">Pop 2nd</div>
+          </div>
+          <div class="reverse-step">
+            <div class="reverse-order pop-order">3</div>
+            <div class="reverse-event">🚶 08:30 — Left Home</div>
+            <div class="reverse-label">Pop 3rd</div>
+          </div>
+          <div class="reverse-step">
+            <div class="reverse-order pop-order">4</div>
+            <div class="reverse-event">📱 07:00 — Phone Unlocked</div>
+            <div class="reverse-label">Pop 4th</div>
+          </div>
+        </div>
+
+        <div class="explain-card reveal" style="max-width: 700px; margin: 2rem auto 0;">
+          <h3>🔑 Key Insight</h3>
+          <p>Events pushed in order <strong>1, 2, 3, 4</strong> come out as <strong>4, 3, 2, 1</strong>. This natural reversal is exactly what we need for replaying a day's events — showing the most recent event first, then working backwards through the day to the earliest event. No sorting algorithm needed — the stack's LIFO structure handles it automatically.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-brand">
+        <span class="logo-icon">◈</span>
+        <span>Digital Shadow</span>
+      </div>
+      <p class="footer-tagline">Your Life Has a Memory, Even When You Don't.</p>
+      <div class="footer-links">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="visualization.html">Demo</a>
+        <a href="contact.html">Contact</a>
+      </div>
+      <p class="footer-copy">© 2026 Digital Shadow. Built with passion.</p>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script src="js/navbar.js"></script>
+  <script src="js/theme.js"></script>
+  <script src="js/particles.js"></script>
+  <script src="js/search.js"></script>
+  <script src="js/stack.js"></script>
+</body>
+</html>

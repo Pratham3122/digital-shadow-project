@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Digital Shadow — Your Life Has a Memory</title>
+  <meta name="description" content="Digital Shadow is a digital life timeline reconstruction system built with Linked List and Stack in C. Reconstruct, replay, and analyze your digital footprint.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>◈</text></svg>">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/navbar.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/cards.css">
+  <link rel="stylesheet" href="css/timeline.css">
+  <link rel="stylesheet" href="css/compiler.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <link rel="stylesheet" href="css/darktheme.css">
+  <style>
+    /* ===== HERO ===== */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      padding: 6rem 1.5rem 2rem;
+      background: var(--gradient-hero);
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 20%;
+      left: 50%;
+      width: 800px;
+      height: 800px;
+      transform: translateX(-50%);
+      background: radial-gradient(circle, rgba(124,92,255,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1.25rem;
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-pill);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--accent);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 2rem;
+      backdrop-filter: blur(12px);
+      animation: fadeInDown 0.8s ease-out;
+    }
+    .hero-badge .dot {
+      width: 6px;
+      height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.4); }
+    }
+    .hero-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(3rem, 8vw, 7rem);
+      font-weight: 700;
+      text-align: center;
+      line-height: 1.05;
+      margin-bottom: 1.5rem;
+      background: linear-gradient(135deg, #7c5cff 0%, #00d4aa 50%, #7c5cff 100%);
+      background-size: 200% 200%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: gradient-shift 4s ease-in-out infinite, fadeInUp 1s ease-out;
+      filter: drop-shadow(0 0 40px rgba(124,92,255,0.3));
+    }
+    @keyframes gradient-shift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+    .hero-subtitle {
+      font-family: 'Inter', sans-serif;
+      font-size: clamp(1rem, 2.5vw, 1.35rem);
+      color: var(--text-secondary);
+      text-align: center;
+      max-width: 600px;
+      line-height: 1.7;
+      margin-bottom: 3rem;
+      overflow: hidden;
+    }
+    .hero-subtitle .typewriter {
+      display: inline;
+      border-right: 2px solid var(--primary);
+      animation: blink-caret 0.8s step-end infinite;
+    }
+    @keyframes blink-caret {
+      0%, 100% { border-color: var(--primary); }
+      50% { border-color: transparent; }
+    }
+    .hero-buttons {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 3rem;
+      animation: fadeInUp 1.2s ease-out;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.85rem 2rem;
+      border-radius: var(--radius-pill);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 500;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-primary {
+      background: var(--gradient-primary);
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(124,92,255,0.3);
+    }
+    .btn-primary:hover {
+      transform: scale(1.02) translateY(-2px);
+      box-shadow: 0 8px 30px rgba(124,92,255,0.45);
+    }
+    .btn-secondary {
+      background: transparent;
+      color: var(--text-primary);
+      border: 1px solid var(--surface-border);
+    }
+    .btn-secondary:hover {
+      border-color: var(--primary);
+      background: rgba(124,92,255,0.08);
+      transform: scale(1.02) translateY(-2px);
+    }
+
+    /* ===== TIMELINE STRIP ===== */
+    .timeline-strip {
+      width: 100%;
+      overflow: hidden;
+      padding: 1.5rem 0;
+      position: relative;
+      margin-bottom: 2rem;
+    }
+    .timeline-strip::before,
+    .timeline-strip::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      width: 100px;
+      height: 100%;
+      z-index: 2;
+      pointer-events: none;
+    }
+    .timeline-strip::before {
+      left: 0;
+      background: linear-gradient(to right, var(--bg-primary), transparent);
+    }
+    .timeline-strip::after {
+      right: 0;
+      background: linear-gradient(to left, var(--bg-primary), transparent);
+    }
+    .timeline-track {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      animation: scroll-left 25s linear infinite;
+      width: max-content;
+    }
+    @keyframes scroll-left {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+    .tl-event {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      flex-shrink: 0;
+    }
+    .tl-event-node {
+      padding: 0.6rem 1.2rem;
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-pill);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      white-space: nowrap;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+    }
+    .tl-event-node:hover {
+      border-color: var(--primary);
+      background: rgba(124,92,255,0.1);
+      box-shadow: 0 0 15px rgba(124,92,255,0.2);
+    }
+    .tl-arrow {
+      color: var(--text-tertiary);
+      font-size: 0.85rem;
+      padding: 0 0.75rem;
+      flex-shrink: 0;
+    }
+
+    /* ===== SCROLL INDICATOR ===== */
+    .scroll-indicator {
+      position: absolute;
+      bottom: 2.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      animation: bounce 2s ease-in-out infinite;
+      cursor: pointer;
+    }
+    .scroll-indicator span {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.7rem;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+    .scroll-chevron {
+      width: 24px;
+      height: 24px;
+      border-right: 2px solid var(--text-tertiary);
+      border-bottom: 2px solid var(--text-tertiary);
+      transform: rotate(45deg);
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(10px); }
+    }
+
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ===== PREVIEW CARDS ===== */
+    .preview-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+    }
+    .preview-card {
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-lg);
+      padding: 2.5rem 2rem;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+    .preview-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--gradient-primary);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .preview-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--surface-border-hover);
+      box-shadow: var(--shadow-md);
+    }
+    .preview-card:hover::before {
+      opacity: 1;
+    }
+    .preview-card-icon {
+      width: 56px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-md);
+      background: rgba(124,92,255,0.1);
+      margin-bottom: 1.5rem;
+      font-size: 1.5rem;
+    }
+    .preview-card h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.75rem;
+    }
+    .preview-card p {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+
+    /* ===== FEATURE MINI GRID ===== */
+    .feature-mini-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+    .feature-mini-card {
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-md);
+      padding: 2rem 1.5rem;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      text-align: center;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .feature-mini-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--surface-border-hover);
+      box-shadow: 0 0 25px rgba(124,92,255,0.15);
+    }
+    .feature-mini-icon {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      display: block;
+    }
+    .feature-mini-card h4 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 600;
+      font-size: 1.05rem;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+    }
+    .feature-mini-card p {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* ===== HOW IT WORKS ===== */
+    .steps-flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      flex-wrap: wrap;
+    }
+    .step-card {
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-lg);
+      padding: 2.5rem 2rem;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      text-align: center;
+      flex: 0 1 280px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+    }
+    .step-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--primary);
+      box-shadow: var(--shadow-glow);
+    }
+    .step-number {
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-circle);
+      background: var(--gradient-primary);
+      color: #fff;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin: 0 auto 1.5rem;
+    }
+    .step-card h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.75rem;
+    }
+    .step-card p {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+    .step-arrow {
+      font-size: 2rem;
+      color: var(--primary);
+      padding: 0 1rem;
+      animation: pulse-arrow 2s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+    @keyframes pulse-arrow {
+      0%, 100% { opacity: 0.5; transform: translateX(0); }
+      50% { opacity: 1; transform: translateX(5px); }
+    }
+
+    /* ===== TECH STACK ===== */
+    .tech-grid {
+      display: flex;
+      gap: 2rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .tech-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 2rem 2.5rem;
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-lg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      min-width: 160px;
+    }
+    .tech-item:hover {
+      transform: translateY(-4px);
+      border-color: var(--primary);
+      box-shadow: var(--shadow-glow);
+    }
+    .tech-icon {
+      font-size: 2.5rem;
+    }
+    .tech-item h4 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .tech-item p {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+
+    /* ===== FINAL CTA ===== */
+    .cta-section {
+      text-align: center;
+      position: relative;
+    }
+    .cta-section::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 600px;
+      height: 600px;
+      transform: translate(-50%, -50%);
+      background: radial-gradient(circle, rgba(124,92,255,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .cta-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 1rem;
+    }
+    .cta-text {
+      font-family: 'Inter', sans-serif;
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+      max-width: 550px;
+      margin: 0 auto 2.5rem;
+      line-height: 1.7;
+    }
+    .cta-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    /* ===== SECTION TITLES ===== */
+    .section-header {
+      text-align: center;
+      margin-bottom: 4rem;
+    }
+    .section-header .section-badge {
+      display: inline-block;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--primary);
+      margin-bottom: 1rem;
+      padding: 0.4rem 1rem;
+      background: rgba(124,92,255,0.1);
+      border-radius: var(--radius-pill);
+    }
+    .section-header h2 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(1.8rem, 3vw, 2.5rem);
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 1rem;
+    }
+    .section-header p {
+      font-family: 'Inter', sans-serif;
+      font-size: 1.05rem;
+      color: var(--text-secondary);
+      max-width: 600px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 768px) {
+      .preview-grid { grid-template-columns: 1fr; }
+      .feature-mini-grid { grid-template-columns: repeat(2, 1fr); }
+      .step-arrow { transform: rotate(90deg); padding: 0.5rem 0; }
+      .steps-flow { flex-direction: column; gap: 0; }
+    }
+    @media (max-width: 480px) {
+      .feature-mini-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="nav-logo">
+        <span class="logo-icon">◈</span>
+        <span class="logo-text">Digital Shadow</span>
+      </a>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="nav-menu" id="navMenu">
+        <div class="nav-links">
+          <a href="index.html" class="nav-link">Home</a>
+          <a href="about.html" class="nav-link">About</a>
+          <a href="problem.html" class="nav-link">Problem</a>
+          <a href="features.html" class="nav-link">Features</a>
+          <a href="architecture.html" class="nav-link">Architecture</a>
+          <div class="nav-dropdown">
+            <button class="nav-link dropdown-trigger">Data Structures <span class="dropdown-arrow">▾</span></button>
+            <div class="dropdown-menu">
+              <a href="linkedlist.html" class="dropdown-link">Linked List</a>
+              <a href="stack.html" class="dropdown-link">Stack</a>
+            </div>
+          </div>
+          <a href="flowchart.html" class="nav-link">Flowchart</a>
+          <a href="algorithm.html" class="nav-link">Algorithm</a>
+          <a href="visualization.html" class="nav-link">Visualization</a>
+          <a href="compiler.html" class="nav-link">Compiler</a>
+          <a href="statistics.html" class="nav-link">Statistics</a>
+          <a href="future.html" class="nav-link">Future</a>
+          <a href="viva.html" class="nav-link">Viva</a>
+          <a href="report.html" class="nav-link">Report</a>
+          <a href="ppt.html" class="nav-link">PPT</a>
+          <a href="contact.html" class="nav-link">Contact</a>
+        </div>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+          <span class="theme-icon">🌙</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <div id="particles-container" class="particles-container"></div>
+
+  <main>
+    <!-- ===== HERO SECTION ===== -->
+    <section class="hero" id="hero">
+      <div class="hero-badge">
+        <span class="dot"></span>
+        Digital Life Reconstruction Engine
+      </div>
+      <h1 class="hero-title">DIGITAL SHADOW</h1>
+      <p class="hero-subtitle">
+        <span class="typewriter" id="heroTypewriter"></span>
+      </p>
+      <div class="hero-buttons">
+        <a href="about.html" class="btn btn-primary" id="ctaExplore">Explore Project ↗</a>
+        <a href="visualization.html" class="btn btn-secondary" id="ctaDemo">Run Live Demo →</a>
+      </div>
+
+      <!-- Animated Timeline Strip -->
+      <div class="timeline-strip" aria-label="Sample digital events timeline">
+        <div class="timeline-track" id="timelineTrack">
+          <div class="tl-event"><span class="tl-event-node">📱 Phone Unlocked</span><span class="tl-arrow">→</span></div>
+          <div class="tl-event"><span class="tl-event-node">🏠 Left Home</span><span class="tl-arrow">→</span></div>
+          <div class="tl-event"><span class="tl-event-node">🎓 Entered College</span><span class="tl-arrow">→</span></div>
+          <div class="tl-event"><span class="tl-event-node">📶 Connected Wi-Fi</span><span class="tl-arrow">→</span></div>
+          <div class="tl-event"><span class="tl-event-node">💳 Made Payment</span><span class="tl-arrow">→</span></div>
+          <div class="tl-event"><span class="tl-event-node">📧 Checked Email</span><span class="tl-arrow">→</span></div>
+          <div class="tl-event"><span class="tl-event-node">🎵 Played Music</span><span class="tl-arrow">→</span></div>
+          <div class="tl-event"><span class="tl-event-node">📸 Took Photo</span><span class="tl-arrow">→</span></div>
+          <div class="tl-event"><span class="tl-event-node">🗺️ GPS Tracked</span><span class="tl-arrow">→</span></div>
+          <div class="tl-event"><span class="tl-event-node">🔔 Got Notification</span><span class="tl-arrow">→</span></div>
+          <div class="tl-event"><span class="tl-event-node">🛒 Online Order</span><span class="tl-arrow">→</span></div>
+          <div class="tl-event"><span class="tl-event-node">🏋️ Gym Check-in</span><span class="tl-arrow">→</span></div>
+          <!-- Duplicate for seamless loop -->
+          <div class="tl-event"><span class="tl-event-node">📱 Phone Unlocked</span><span class="tl-arrow">→</span></div>
+          <div class="tl-event"><span class="tl-event-node">🏠 Left Home</span><span class="tl-arrow">→</span></div>
+          <div class="tl-event"><span class="tl-event-node">🎓 Entered College</span><span class="tl-arrow">→</span></div>
+          <div class="tl-event"><span class="tl-event-node">📶 Connected Wi-Fi</span><span class="tl-arrow">→</span></div>
+          <div class="tl-event"><span class="tl-event-node">💳 Made Payment</span><span class="tl-arrow">→</span></div>
+          <div class="tl-event"><span class="tl-event-node">📧 Checked Email</span><span class="tl-arrow">→</span></div>
+          <div class="tl-event"><span class="tl-event-node">🎵 Played Music</span><span class="tl-arrow">→</span></div>
+          <div class="tl-event"><span class="tl-event-node">📸 Took Photo</span><span class="tl-arrow">→</span></div>
+          <div class="tl-event"><span class="tl-event-node">🗺️ GPS Tracked</span><span class="tl-arrow">→</span></div>
+          <div class="tl-event"><span class="tl-event-node">🔔 Got Notification</span><span class="tl-arrow">→</span></div>
+          <div class="tl-event"><span class="tl-event-node">🛒 Online Order</span><span class="tl-arrow">→</span></div>
+          <div class="tl-event"><span class="tl-event-node">🏋️ Gym Check-in</span><span class="tl-arrow">→</span></div>
+        </div>
+      </div>
+
+      <div class="scroll-indicator" id="scrollDown">
+        <span>Scroll</span>
+        <div class="scroll-chevron"></div>
+      </div>
+    </section>
+
+    <!-- ===== WHAT IS DIGITAL SHADOW ===== -->
+    <section class="section" id="what-is">
+      <div class="container">
+        <div class="section-header reveal">
+          <span class="section-badge">Overview</span>
+          <h2>What is Digital Shadow?</h2>
+          <p>A systematic engine that captures, stores, and reconstructs the timeline of your digital life — every event, every action, every moment.</p>
+        </div>
+        <div class="preview-grid">
+          <div class="preview-card reveal stagger-1" id="cardProblem">
+            <div class="preview-card-icon">⚡</div>
+            <h3>The Problem</h3>
+            <p>Every day, you generate thousands of digital events — phone unlocks, messages, payments, GPS movements. But human memory forgets the sequence, the timing, and the connections between these moments. Critical patterns are lost forever.</p>
+          </div>
+          <div class="preview-card reveal stagger-2" id="cardSolution">
+            <div class="preview-card-icon">🧠</div>
+            <h3>The Solution</h3>
+            <p>Digital Shadow uses a Linked List to store events in chronological order and a Stack to enable undo and replay capabilities. It reconstructs a complete, navigable timeline of your digital footprint with full analytical power.</p>
+          </div>
+          <div class="preview-card reveal stagger-3" id="cardDemo">
+            <div class="preview-card-icon">🎯</div>
+            <h3>Live Demo</h3>
+            <p>Experience the system in action. Add events, navigate timelines, undo actions, replay entire days, and view statistical breakdowns — all through an elegant console-inspired interface built right into your browser.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== KEY FEATURES ===== -->
+    <section class="section" id="key-features">
+      <div class="container">
+        <div class="section-header reveal">
+          <span class="section-badge">Features</span>
+          <h2>Key Features</h2>
+          <p>Powerful capabilities for capturing and understanding your digital life.</p>
+        </div>
+        <div class="feature-mini-grid">
+          <div class="feature-mini-card reveal stagger-1" id="featTimeline">
+            <span class="feature-mini-icon">📋</span>
+            <h4>Timeline Reconstruction</h4>
+            <p>Build a chronological sequence of all digital events using a doubly linked list structure.</p>
+          </div>
+          <div class="feature-mini-card reveal stagger-2" id="featUndo">
+            <span class="feature-mini-icon">↩️</span>
+            <h4>Undo & Replay</h4>
+            <p>Stack-based undo lets you reverse events, while replay reconstructs your entire day step by step.</p>
+          </div>
+          <div class="feature-mini-card reveal stagger-3" id="featSearch">
+            <span class="feature-mini-icon">🔍</span>
+            <h4>Smart Search</h4>
+            <p>Find any event by keyword, category, or timestamp with efficient traversal algorithms.</p>
+          </div>
+          <div class="feature-mini-card reveal stagger-4" id="featStats">
+            <span class="feature-mini-icon">📊</span>
+            <h4>Analytics Dashboard</h4>
+            <p>View event statistics, category breakdowns, and usage patterns over time.</p>
+          </div>
+          <div class="feature-mini-card reveal stagger-5" id="featCategories">
+            <span class="feature-mini-icon">🏷️</span>
+            <h4>Event Categories</h4>
+            <p>Classify events into types — communication, travel, finance, health, entertainment, and more.</p>
+          </div>
+          <div class="feature-mini-card reveal stagger-6" id="featUI">
+            <span class="feature-mini-icon">💻</span>
+            <h4>Console Interface</h4>
+            <p>Professional terminal-style UI with formatted output, color coding, and intuitive navigation.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== HOW IT WORKS ===== -->
+    <section class="section" id="how-it-works">
+      <div class="container">
+        <div class="section-header reveal">
+          <span class="section-badge">Process</span>
+          <h2>How It Works</h2>
+          <p>Three simple steps to reconstruct your digital timeline.</p>
+        </div>
+        <div class="steps-flow">
+          <div class="step-card reveal stagger-1" id="step1">
+            <div class="step-number">1</div>
+            <h3>Record</h3>
+            <p>Every digital action — from phone unlocks to payments — is captured as a structured event with timestamp, category, and metadata.</p>
+          </div>
+          <span class="step-arrow reveal stagger-2">→</span>
+          <div class="step-card reveal stagger-3" id="step2">
+            <div class="step-number">2</div>
+            <h3>Store</h3>
+            <p>Events are inserted into a doubly linked list, maintaining chronological order. A stack keeps track of recent actions for undo capability.</p>
+          </div>
+          <span class="step-arrow reveal stagger-4">→</span>
+          <div class="step-card reveal stagger-5" id="step3">
+            <div class="step-number">3</div>
+            <h3>Reconstruct</h3>
+            <p>Traverse the linked list to rebuild the complete timeline. Analyze patterns, replay sequences, and gain insights into your digital behavior.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== BUILT WITH ===== -->
+    <section class="section" id="tech-stack">
+      <div class="container">
+        <div class="section-header reveal">
+          <span class="section-badge">Technology</span>
+          <h2>Built With</h2>
+          <p>A focused tech stack designed for efficiency and educational value.</p>
+        </div>
+        <div class="tech-grid">
+          <div class="tech-item reveal stagger-1" id="techC">
+            <span class="tech-icon">⚙️</span>
+            <h4>C Language</h4>
+            <p>Core Implementation</p>
+          </div>
+          <div class="tech-item reveal stagger-2" id="techLinkedList">
+            <span class="tech-icon">🔗</span>
+            <h4>Linked List</h4>
+            <p>Event Storage</p>
+          </div>
+          <div class="tech-item reveal stagger-3" id="techStack">
+            <span class="tech-icon">📚</span>
+            <h4>Stack</h4>
+            <p>Undo & Replay</p>
+          </div>
+          <div class="tech-item reveal stagger-4" id="techConsole">
+            <span class="tech-icon">🖥️</span>
+            <h4>Console UI</h4>
+            <p>User Interface</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== FINAL CTA ===== -->
+    <section class="section cta-section" id="final-cta">
+      <div class="container">
+        <div class="reveal">
+          <h2 class="cta-title">Ready to Explore?</h2>
+          <p class="cta-text">Dive deep into how Digital Shadow reconstructs your digital life. Explore the architecture, understand the algorithms, or jump straight into the live demo.</p>
+          <div class="cta-buttons">
+            <a href="about.html" class="btn btn-primary" id="ctaLearn">Learn More ↗</a>
+            <a href="visualization.html" class="btn btn-secondary" id="ctaTryDemo">Try the Demo →</a>
+            <a href="features.html" class="btn btn-secondary" id="ctaFeatures">View Features →</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-brand">
+        <span class="logo-icon">◈</span>
+        <span>Digital Shadow</span>
+      </div>
+      <p class="footer-tagline">Your Life Has a Memory, Even When You Don't.</p>
+      <div class="footer-links">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="visualization.html">Demo</a>
+        <a href="contact.html">Contact</a>
+      </div>
+      <p class="footer-copy">© 2026 Digital Shadow. Built with passion.</p>
+    </div>
+  </footer>
+
+  <!-- JS Scripts -->
+  <script src="js/main.js"></script>
+  <script src="js/navbar.js"></script>
+  <script src="js/theme.js"></script>
+  <script src="js/particles.js"></script>
+  <script src="js/search.js"></script>
+
+  <!-- Hero Typewriter Effect -->
+  <script>
+    (function() {
+      const text = "Your Life Has a Memory, Even When You Don't.";
+      const el = document.getElementById('heroTypewriter');
+      let i = 0;
+      function type() {
+        if (i <= text.length) {
+          el.textContent = text.substring(0, i);
+          i++;
+          setTimeout(type, 50);
+        }
+      }
+      setTimeout(type, 800);
+
+      // Scroll indicator
+      const scrollBtn = document.getElementById('scrollDown');
+      if (scrollBtn) {
+        scrollBtn.addEventListener('click', function() {
+          document.getElementById('what-is').scrollIntoView({ behavior: 'smooth' });
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

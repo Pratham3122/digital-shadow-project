@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Presentation — Digital Shadow</title>
+  <meta name="description" content="12-slide project presentation for Digital Shadow covering problem, architecture, data structures, algorithms, implementation, and future scope.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>◈</text></svg>">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/navbar.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/cards.css">
+  <link rel="stylesheet" href="css/timeline.css">
+  <link rel="stylesheet" href="css/compiler.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <link rel="stylesheet" href="css/darktheme.css">
+  <style>
+    .ppt-controls {
+      display: flex; gap: 1rem; justify-content: center; margin-bottom: 2.5rem; flex-wrap: wrap;
+    }
+    .ppt-btn {
+      padding: 0.7rem 1.75rem; border-radius: 50px; font-family: 'Inter', sans-serif;
+      font-size: 0.9rem; font-weight: 500; border: 1px solid var(--surface-border);
+      background: transparent; color: var(--text-primary); cursor: pointer; transition: all 0.3s ease;
+    }
+    .ppt-btn:hover { border-color: var(--primary); background: rgba(124,92,255,0.08); }
+    .ppt-btn.primary { background: var(--primary); border-color: var(--primary); color: #fff; }
+    .ppt-btn.primary:hover { background: var(--primary-glow, #9d7dff); box-shadow: 0 0 20px rgba(124,92,255,0.4); }
+    .slides-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem;
+    }
+    .slide-card {
+      background: var(--surface); border: 1px solid var(--surface-border);
+      border-radius: var(--radius-lg, 16px); overflow: hidden; backdrop-filter: blur(20px);
+      cursor: pointer; transition: all 0.3s ease; position: relative;
+    }
+    .slide-card:hover { transform: translateY(-4px); border-color: var(--primary); box-shadow: var(--shadow-glow, 0 0 30px rgba(124,92,255,0.3)); }
+    .slide-number {
+      position: absolute; top: 0.75rem; right: 0.75rem; width: 32px; height: 32px;
+      background: rgba(124,92,255,0.15); border-radius: 50%; display: flex;
+      align-items: center; justify-content: center; font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.8rem; font-weight: 700; color: var(--primary);
+    }
+    .slide-content { padding: 2rem 1.75rem; }
+    .slide-content h3 {
+      font-family: 'Space Grotesk', sans-serif; font-size: 1.15rem; font-weight: 600;
+      color: var(--text-primary); margin-bottom: 0.75rem;
+    }
+    .slide-content p, .slide-content li {
+      font-family: 'Inter', sans-serif; font-size: 0.85rem; color: var(--text-secondary);
+      line-height: 1.7;
+    }
+    .slide-content ul { padding-left: 1.25rem; margin-top: 0.5rem; }
+    .slide-content ul li { margin-bottom: 0.3rem; }
+    .slide-tag {
+      display: inline-block; padding: 0.2rem 0.6rem; border-radius: 4px;
+      font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
+      margin-bottom: 0.5rem;
+    }
+    .tag-title { background: rgba(124,92,255,0.12); color: #9d7dff; }
+    .tag-problem { background: rgba(255,77,106,0.12); color: #ff4d6a; }
+    .tag-design { background: rgba(0,212,170,0.12); color: #00d4aa; }
+    .tag-code { background: rgba(255,184,0,0.12); color: #ffb800; }
+    .tag-results { background: rgba(0,180,216,0.12); color: #00b4d8; }
+
+    .mini-arch { display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; margin-top: 0.5rem; }
+    .mini-box { padding: 0.3rem 0.6rem; border: 1px solid var(--primary); border-radius: 6px; font-size: 0.7rem; color: var(--text-primary); font-family: 'Inter', sans-serif; }
+    .mini-arrow { color: var(--primary); font-size: 0.8rem; }
+
+    /* Modal */
+    .ppt-modal {
+      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      z-index: 9999; align-items: center; justify-content: center;
+    }
+    .ppt-modal.open { display: flex; }
+    .ppt-modal-overlay {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
+    }
+    .ppt-modal-content {
+      position: relative; width: 90%; max-width: 800px; max-height: 85vh;
+      background: var(--bg-secondary, #0d0d1a); border: 1px solid var(--surface-border);
+      border-radius: var(--radius-xl, 24px); padding: 3rem; overflow-y: auto;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.5);
+    }
+    .ppt-modal-content h3 {
+      font-family: 'Space Grotesk', sans-serif; font-size: 1.8rem; font-weight: 700;
+      color: var(--text-primary); margin-bottom: 1rem;
+    }
+    .ppt-modal-content p, .ppt-modal-content li {
+      font-family: 'Inter', sans-serif; font-size: 1rem; color: var(--text-secondary);
+      line-height: 1.8;
+    }
+    .ppt-modal-content ul { padding-left: 1.5rem; }
+    .ppt-modal-close {
+      position: absolute; top: 1rem; right: 1rem; width: 36px; height: 36px;
+      border-radius: 50%; border: 1px solid var(--surface-border); background: transparent;
+      color: var(--text-secondary); font-size: 1.2rem; cursor: pointer; display: flex;
+      align-items: center; justify-content: center; transition: all 0.2s ease;
+    }
+    .ppt-modal-close:hover { border-color: var(--primary); color: var(--text-primary); }
+    .ppt-modal-nav {
+      position: absolute; top: 50%; transform: translateY(-50%); width: 44px; height: 44px;
+      border-radius: 50%; border: 1px solid var(--surface-border); background: var(--surface);
+      color: var(--text-primary); font-size: 1.2rem; cursor: pointer; display: flex;
+      align-items: center; justify-content: center; transition: all 0.2s ease; backdrop-filter: blur(12px);
+    }
+    .ppt-modal-nav:hover { border-color: var(--primary); background: rgba(124,92,255,0.1); }
+    .ppt-modal-nav.prev { left: -60px; }
+    .ppt-modal-nav.next { right: -60px; }
+    .ppt-slide-counter {
+      text-align: center; margin-top: 1.5rem; font-family: 'Inter', sans-serif;
+      font-size: 0.85rem; color: var(--text-tertiary);
+    }
+
+    @media (max-width: 768px) {
+      .slides-grid { grid-template-columns: 1fr; }
+      .ppt-modal-nav.prev { left: 0.5rem; }
+      .ppt-modal-nav.next { right: 0.5rem; }
+      .ppt-modal-content { padding: 2rem 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar" id="navbar"><div class="nav-container"><a href="index.html" class="nav-logo"><span class="logo-icon">◈</span><span class="logo-text">Digital Shadow</span></a><button class="nav-toggle" id="navToggle" aria-label="Toggle navigation"><span></span><span></span><span></span></button><div class="nav-menu" id="navMenu"><div class="nav-links"><a href="index.html" class="nav-link">Home</a><a href="about.html" class="nav-link">About</a><a href="problem.html" class="nav-link">Problem</a><a href="features.html" class="nav-link">Features</a><a href="architecture.html" class="nav-link">Architecture</a><div class="nav-dropdown"><button class="nav-link dropdown-trigger">Data Structures <span class="dropdown-arrow">▾</span></button><div class="dropdown-menu"><a href="linkedlist.html" class="dropdown-link">Linked List</a><a href="stack.html" class="dropdown-link">Stack</a></div></div><a href="flowchart.html" class="nav-link">Flowchart</a><a href="algorithm.html" class="nav-link">Algorithm</a><a href="visualization.html" class="nav-link">Visualization</a><a href="compiler.html" class="nav-link">Compiler</a><a href="statistics.html" class="nav-link">Statistics</a><a href="future.html" class="nav-link">Future</a><a href="viva.html" class="nav-link">Viva</a><a href="report.html" class="nav-link">Report</a><a href="ppt.html" class="nav-link">PPT</a><a href="contact.html" class="nav-link">Contact</a></div><button class="theme-toggle" id="themeToggle" aria-label="Toggle theme"><span class="theme-icon">🌙</span></button></div></div></nav>
+
+  <div id="particles-container" class="particles-container"></div>
+
+  <main>
+    <section class="page-hero">
+      <div class="container">
+        <span class="section-badge">Presentation</span>
+        <h1 class="page-title">Project Slides</h1>
+        <p class="page-subtitle">A complete 12-slide presentation covering every aspect of Digital Shadow.</p>
+      </div>
+    </section>
+
+    <section class="section" id="ppt-section">
+      <div class="container">
+        <div class="ppt-controls reveal">
+          <button class="ppt-btn primary" onclick="startPresentation()">▶ Present Full Screen</button>
+          <button class="ppt-btn" onclick="openSlide(0)">View First Slide</button>
+        </div>
+
+        <div class="slides-grid" id="slidesGrid">
+
+          <div class="slide-card reveal stagger-1" onclick="openSlide(0)">
+            <div class="slide-number">1</div>
+            <div class="slide-content">
+              <span class="slide-tag tag-title">Title</span>
+              <h3>Digital Shadow</h3>
+              <p>"Your Life Has a Memory, Even When You Don't."</p>
+              <p style="margin-top:0.5rem;font-size:0.8rem;color:var(--text-tertiary);">A Digital Life Timeline Reconstruction System</p>
+            </div>
+          </div>
+
+          <div class="slide-card reveal stagger-2" onclick="openSlide(1)">
+            <div class="slide-number">2</div>
+            <div class="slide-content">
+              <span class="slide-tag tag-problem">Problem</span>
+              <h3>Problem Statement</h3>
+              <p>Humans generate thousands of digital events daily but forget the sequence and connections. Existing tools don't provide structured reconstruction or undo capabilities.</p>
+            </div>
+          </div>
+
+          <div class="slide-card reveal stagger-3" onclick="openSlide(2)">
+            <div class="slide-number">3</div>
+            <div class="slide-content">
+              <span class="slide-tag tag-design">Objectives</span>
+              <h3>Project Objectives</h3>
+              <ul>
+                <li>Build a timeline reconstruction system</li>
+                <li>Implement using Linked List & Stack</li>
+                <li>Enable undo and replay features</li>
+                <li>Provide statistical analysis</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="slide-card reveal stagger-4" onclick="openSlide(3)">
+            <div class="slide-number">4</div>
+            <div class="slide-content">
+              <span class="slide-tag tag-design">Architecture</span>
+              <h3>System Architecture</h3>
+              <div class="mini-arch">
+                <span class="mini-box">User</span><span class="mini-arrow">→</span>
+                <span class="mini-box">UI</span><span class="mini-arrow">→</span>
+                <span class="mini-box">Linked List</span><span class="mini-arrow">→</span>
+                <span class="mini-box">Stack</span><span class="mini-arrow">→</span>
+                <span class="mini-box">Output</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="slide-card reveal stagger-5" onclick="openSlide(4)">
+            <div class="slide-number">5</div>
+            <div class="slide-content">
+              <span class="slide-tag tag-code">Data Structure</span>
+              <h3>Linked List</h3>
+              <p>Dynamic storage for events. Each node holds event data and a pointer to the next node. Supports O(n) insertion, deletion, and search.</p>
+            </div>
+          </div>
+
+          <div class="slide-card reveal stagger-6" onclick="openSlide(5)">
+            <div class="slide-number">6</div>
+            <div class="slide-content">
+              <span class="slide-tag tag-code">Data Structure</span>
+              <h3>Stack</h3>
+              <p>LIFO structure for undo and replay operations. Push records actions, Pop reverses them. Implemented via a linked list for dynamic sizing.</p>
+            </div>
+          </div>
+
+          <div class="slide-card reveal stagger-1" onclick="openSlide(6)">
+            <div class="slide-number">7</div>
+            <div class="slide-content">
+              <span class="slide-tag tag-design">Flow</span>
+              <h3>Program Flowchart</h3>
+              <p>Start → Menu → Choice → Execute Operation → Loop. 10 operations including add, delete, edit, search, display, replay, undo, and statistics.</p>
+            </div>
+          </div>
+
+          <div class="slide-card reveal stagger-2" onclick="openSlide(7)">
+            <div class="slide-number">8</div>
+            <div class="slide-content">
+              <span class="slide-tag tag-code">Algorithms</span>
+              <h3>Key Algorithms</h3>
+              <ul>
+                <li>Add Event — O(n) tail insertion</li>
+                <li>Delete — O(n) search + unlink</li>
+                <li>Replay — O(n) push all + pop all</li>
+                <li>Undo — O(1) pop + O(n) delete</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="slide-card reveal stagger-3" onclick="openSlide(8)">
+            <div class="slide-number">9</div>
+            <div class="slide-content">
+              <span class="slide-tag tag-code">Implementation</span>
+              <h3>Implementation</h3>
+              <p>Written in C with struct-based nodes, malloc/free memory management, modular functions, and cross-platform console UI. 530+ lines, zero warnings.</p>
+            </div>
+          </div>
+
+          <div class="slide-card reveal stagger-4" onclick="openSlide(9)">
+            <div class="slide-number">10</div>
+            <div class="slide-content">
+              <span class="slide-tag tag-results">Results</span>
+              <h3>Demo & Results</h3>
+              <p>Successfully tested with 15+ events across 8 categories. All operations functional: add, delete, edit, search, display, replay, undo, statistics.</p>
+            </div>
+          </div>
+
+          <div class="slide-card reveal stagger-5" onclick="openSlide(10)">
+            <div class="slide-number">11</div>
+            <div class="slide-content">
+              <span class="slide-tag tag-design">Future</span>
+              <h3>Future Scope</h3>
+              <ul>
+                <li>GUI with GTK/Qt</li>
+                <li>File-based persistent storage</li>
+                <li>Cloud sync & mobile app</li>
+                <li>AI-based pattern detection</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="slide-card reveal stagger-6" onclick="openSlide(11)">
+            <div class="slide-number">12</div>
+            <div class="slide-content">
+              <span class="slide-tag tag-title">Closing</span>
+              <h3>Thank You ◈</h3>
+              <p>"Your Life Has a Memory, Even When You Don't."</p>
+              <p style="margin-top:0.5rem;font-size:0.8rem;color:var(--text-tertiary);">Questions? We'd love to discuss the project.</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- SLIDE MODAL -->
+  <div class="ppt-modal" id="pptModal">
+    <div class="ppt-modal-overlay" onclick="closeModal()"></div>
+    <div class="ppt-modal-content" id="pptModalContent">
+      <button class="ppt-modal-close" onclick="closeModal()">✕</button>
+      <button class="ppt-modal-nav prev" onclick="prevSlide()">←</button>
+      <button class="ppt-modal-nav next" onclick="nextSlide()">→</button>
+      <div id="modalSlideContent"></div>
+      <div class="ppt-slide-counter" id="slideCounter"></div>
+    </div>
+  </div>
+
+  <footer class="footer"><div class="footer-content"><div class="footer-brand"><span class="logo-icon">◈</span><span>Digital Shadow</span></div><p class="footer-tagline">Your Life Has a Memory, Even When You Don't.</p><div class="footer-links"><a href="index.html">Home</a><a href="about.html">About</a><a href="visualization.html">Demo</a><a href="contact.html">Contact</a></div><p class="footer-copy">© 2026 Digital Shadow. Built with passion.</p></div></footer>
+
+  <script src="js/main.js"></script>
+  <script src="js/navbar.js"></script>
+  <script src="js/theme.js"></script>
+  <script src="js/particles.js"></script>
+  <script src="js/search.js"></script>
+  <script>
+    var currentSlide = 0;
+    var slidesData = [
+      { title: 'Digital Shadow', content: '<span class="slide-tag tag-title" style="display:inline-block;padding:0.3rem 0.8rem;border-radius:6px;font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;background:rgba(124,92,255,0.12);color:#9d7dff;margin-bottom:1rem;">Slide 1 — Title</span><h3 style="font-size:2.5rem;margin-bottom:0.5rem;">Digital Shadow</h3><p style="font-size:1.3rem;color:var(--text-secondary);margin-bottom:1rem;">"Your Life Has a Memory, Even When You Don\'t."</p><p>A Digital Life Timeline Reconstruction System built with Linked List and Stack in C.</p><p style="margin-top:1.5rem;color:var(--text-tertiary);">College Mini Project · Data Structures · 2026</p>' },
+      { title: 'Problem Statement', content: '<span class="slide-tag tag-problem" style="display:inline-block;padding:0.3rem 0.8rem;border-radius:6px;font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;background:rgba(255,77,106,0.12);color:#ff4d6a;margin-bottom:1rem;">Slide 2 — Problem</span><h3>Problem Statement</h3><p>Every person generates an average of <strong>10,000+ digital events</strong> per day — phone interactions, location changes, payments, app usage, network connections. Yet <strong>90% of these events are forgotten within 24 hours</strong>.</p><p>Current tools (diaries, calendars) are manual and don\'t capture the full picture. There is no system to automatically reconstruct the complete sequence of digital activities with undo/replay capabilities.</p><p><strong>Digital Shadow solves this</strong> by providing a structured, efficient timeline reconstruction engine using fundamental data structures.</p>' },
+      { title: 'Objectives', content: '<span class="slide-tag tag-design" style="display:inline-block;padding:0.3rem 0.8rem;border-radius:6px;font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;background:rgba(0,212,170,0.12);color:#00d4aa;margin-bottom:1rem;">Slide 3 — Objectives</span><h3>Project Objectives</h3><ul><li>Design and implement a digital timeline reconstruction system using C.</li><li>Use <strong>Linked List</strong> as the primary data structure for dynamic event storage.</li><li>Use <strong>Stack</strong> to enable undo and replay functionality (LIFO property).</li><li>Support 10 operations: Add, Delete, Edit, Search, Display, Today\'s Timeline, Replay, Undo, Statistics, Exit.</li><li>Demonstrate practical application of pointers, dynamic memory allocation (malloc/free), and modular programming.</li><li>Provide statistical analysis of stored events including category frequency and timeline metrics.</li></ul>' },
+      { title: 'Architecture', content: '<span class="slide-tag tag-design" style="display:inline-block;padding:0.3rem 0.8rem;border-radius:6px;font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;background:rgba(0,212,170,0.12);color:#00d4aa;margin-bottom:1rem;">Slide 4 — Architecture</span><h3>System Architecture</h3><p>The system follows a layered architecture:</p><div style="display:flex;flex-direction:column;align-items:center;gap:0.5rem;margin:1.5rem 0;"><span style="padding:0.5rem 2rem;border:2px solid #7c5cff;border-radius:8px;color:var(--text-primary);">User Input (Console)</span><span style="color:var(--primary);font-size:1.5rem;">↓</span><span style="padding:0.5rem 2rem;border:2px solid #00d4aa;border-radius:8px;color:var(--text-primary);">Linked List (Event Storage)</span><span style="color:var(--primary);font-size:1.5rem;">↓</span><span style="padding:0.5rem 2rem;border:2px solid #ffb800;border-radius:8px;color:var(--text-primary);">Stack (Undo / Replay)</span><span style="color:var(--primary);font-size:1.5rem;">↓</span><span style="padding:0.5rem 2rem;border:2px solid #00b4d8;border-radius:8px;color:var(--text-primary);">Analytics & Output</span></div>' },
+      { title: 'Linked List', content: '<span class="slide-tag tag-code" style="display:inline-block;padding:0.3rem 0.8rem;border-radius:6px;font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;background:rgba(255,184,0,0.12);color:#ffb800;margin-bottom:1rem;">Slide 5 — Linked List</span><h3>Linked List</h3><p>Each event is stored as a <strong>node</strong> in a singly linked list:</p><pre style="background:#0c0c18;padding:1rem;border-radius:8px;font-family:monospace;font-size:0.85rem;line-height:1.7;color:#c9d1d9;margin:1rem 0;">struct Event {\n    int id;\n    char name[50];\n    char category[20];\n    char date[11];\n    char time_stamp[9];\n    struct Event *next;\n};</pre><p><strong>Why Linked List?</strong> Dynamic sizing (no fixed array limit), O(1) insertion at tail once located, efficient deletion without shifting elements, natural sequential representation of timeline events.</p>' },
+      { title: 'Stack', content: '<span class="slide-tag tag-code" style="display:inline-block;padding:0.3rem 0.8rem;border-radius:6px;font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;background:rgba(255,184,0,0.12);color:#ffb800;margin-bottom:1rem;">Slide 6 — Stack</span><h3>Stack</h3><p>The stack provides <strong>undo</strong> and <strong>replay</strong> capabilities using the LIFO (Last In, First Out) principle:</p><ul><li><strong>Push</strong>: Every added event is also pushed onto the undo stack (deep copy).</li><li><strong>Pop</strong>: Undo pops the most recent event and deletes it from the linked list.</li><li><strong>Replay</strong>: All events are pushed to a temp stack, then popped to display in reverse order.</li></ul><p>Implemented as a linked list of StackNodes, each holding a copy of event data.</p>' },
+      { title: 'Flowchart', content: '<span class="slide-tag tag-design" style="display:inline-block;padding:0.3rem 0.8rem;border-radius:6px;font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;background:rgba(0,212,170,0.12);color:#00d4aa;margin-bottom:1rem;">Slide 7 — Flowchart</span><h3>Program Flow</h3><p>The program follows a do-while menu loop:</p><ol><li><strong>Start</strong> → Print welcome header</li><li><strong>Display Menu</strong> → Show 10 options</li><li><strong>Read Choice</strong> → Switch on user input</li><li><strong>Execute Operation</strong> → Call the appropriate function</li><li><strong>Loop Back</strong> → Return to menu (unless Exit)</li><li><strong>Exit</strong> → Free all memory → End</li></ol>' },
+      { title: 'Algorithms', content: '<span class="slide-tag tag-code" style="display:inline-block;padding:0.3rem 0.8rem;border-radius:6px;font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;background:rgba(255,184,0,0.12);color:#ffb800;margin-bottom:1rem;">Slide 8 — Algorithms</span><h3>Key Algorithms & Complexity</h3><table style="width:100%;border-collapse:collapse;margin:1rem 0;font-family:Inter,sans-serif;font-size:0.85rem;"><tr style="border-bottom:1px solid var(--surface-border);"><th style="text-align:left;padding:0.5rem;color:var(--text-primary);">Operation</th><th style="padding:0.5rem;color:var(--primary);">Time</th><th style="padding:0.5rem;color:var(--accent, #00d4aa);">Space</th></tr><tr style="border-bottom:1px solid var(--surface-border);"><td style="padding:0.5rem;color:var(--text-secondary);">Add Event</td><td style="padding:0.5rem;text-align:center;color:var(--text-secondary);">O(n)</td><td style="padding:0.5rem;text-align:center;color:var(--text-secondary);">O(1)</td></tr><tr style="border-bottom:1px solid var(--surface-border);"><td style="padding:0.5rem;color:var(--text-secondary);">Delete Event</td><td style="padding:0.5rem;text-align:center;color:var(--text-secondary);">O(n)</td><td style="padding:0.5rem;text-align:center;color:var(--text-secondary);">O(1)</td></tr><tr style="border-bottom:1px solid var(--surface-border);"><td style="padding:0.5rem;color:var(--text-secondary);">Search</td><td style="padding:0.5rem;text-align:center;color:var(--text-secondary);">O(n)</td><td style="padding:0.5rem;text-align:center;color:var(--text-secondary);">O(1)</td></tr><tr style="border-bottom:1px solid var(--surface-border);"><td style="padding:0.5rem;color:var(--text-secondary);">Replay Day</td><td style="padding:0.5rem;text-align:center;color:var(--text-secondary);">O(n)</td><td style="padding:0.5rem;text-align:center;color:var(--text-secondary);">O(n)</td></tr><tr><td style="padding:0.5rem;color:var(--text-secondary);">Undo</td><td style="padding:0.5rem;text-align:center;color:var(--text-secondary);">O(n)</td><td style="padding:0.5rem;text-align:center;color:var(--text-secondary);">O(1)</td></tr></table>' },
+      { title: 'Implementation', content: '<span class="slide-tag tag-code" style="display:inline-block;padding:0.3rem 0.8rem;border-radius:6px;font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;background:rgba(255,184,0,0.12);color:#ffb800;margin-bottom:1rem;">Slide 9 — Implementation</span><h3>Implementation Details</h3><ul><li><strong>Language:</strong> C (compiled with GCC, zero warnings)</li><li><strong>Lines of Code:</strong> 530+ (no comments, self-documenting)</li><li><strong>Files:</strong> main.c, header.h</li><li><strong>Data Structures:</strong> Singly Linked List + Stack (linked list based)</li><li><strong>Memory:</strong> Dynamic allocation with malloc/free, no memory leaks</li><li><strong>Features:</strong> 10 operations, 8 event categories, auto-timestamping, case-insensitive search, formatted console output</li><li><strong>Platform:</strong> Cross-platform (Windows/Linux/macOS)</li></ul>' },
+      { title: 'Results', content: '<span class="slide-tag tag-results" style="display:inline-block;padding:0.3rem 0.8rem;border-radius:6px;font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;background:rgba(0,180,216,0.12);color:#00b4d8;margin-bottom:1rem;">Slide 10 — Results</span><h3>Demo & Results</h3><p>The system was tested with a dataset of <strong>15+ events</strong> across 8 categories:</p><ul><li>✅ All 10 operations tested and working correctly</li><li>✅ Undo correctly reverses the last added event</li><li>✅ Replay displays events in reverse (LIFO) order</li><li>✅ Statistics accurately count categories and identify the most frequent</li><li>✅ Search finds partial matches (case-insensitive)</li><li>✅ Memory properly freed on exit (no leaks)</li><li>✅ Compiles with zero warnings using -Wall -Wextra</li></ul>' },
+      { title: 'Future Scope', content: '<span class="slide-tag tag-design" style="display:inline-block;padding:0.3rem 0.8rem;border-radius:6px;font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;background:rgba(0,212,170,0.12);color:#00d4aa;margin-bottom:1rem;">Slide 11 — Future Scope</span><h3>Future Scope</h3><ul><li><strong>Phase 1:</strong> GUI implementation (GTK/Qt), file-based persistent storage, PDF/CSV export</li><li><strong>Phase 2:</strong> Multi-user support, cloud synchronisation, mobile companion app</li><li><strong>Phase 3:</strong> AI-based pattern detection, IoT integration for auto-logging, voice-activated input, cross-platform desktop app, REST API for third-party integrations</li></ul><p>The modular C implementation provides a solid foundation that can be extended with any of these enhancements.</p>' },
+      { title: 'Thank You', content: '<div style="text-align:center;padding:2rem 0;"><p style="font-size:3rem;margin-bottom:1rem;">◈</p><h3 style="font-size:2.5rem;margin-bottom:1rem;background:linear-gradient(135deg,#7c5cff,#00d4aa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Thank You</h3><p style="font-size:1.2rem;color:var(--text-secondary);margin-bottom:2rem;">"Your Life Has a Memory, Even When You Don\'t."</p><p style="color:var(--text-tertiary);">Digital Shadow · College Mini Project · 2026</p><p style="color:var(--text-tertiary);margin-top:1rem;">We welcome your questions and feedback.</p></div>' }
+    ];
+
+    function openSlide(index) {
+      currentSlide = index;
+      renderModal();
+      document.getElementById('pptModal').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+      document.getElementById('pptModal').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    function prevSlide() {
+      currentSlide = (currentSlide - 1 + slidesData.length) % slidesData.length;
+      renderModal();
+    }
+
+    function nextSlide() {
+      currentSlide = (currentSlide + 1) % slidesData.length;
+      renderModal();
+    }
+
+    function renderModal() {
+      document.getElementById('modalSlideContent').innerHTML = slidesData[currentSlide].content;
+      document.getElementById('slideCounter').textContent = 'Slide ' + (currentSlide + 1) + ' of ' + slidesData.length;
+    }
+
+    function startPresentation() {
+      openSlide(0);
+      var modal = document.getElementById('pptModal');
+      if (modal.requestFullscreen) modal.requestFullscreen();
+      else if (modal.webkitRequestFullscreen) modal.webkitRequestFullscreen();
+    }
+
+    document.addEventListener('keydown', function(e) {
+      if (!document.getElementById('pptModal').classList.contains('open')) return;
+      if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); }
+      else if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); }
+      else if (e.key === 'Escape') { closeModal(); }
+    });
+  </script>
+</body>
+</html>

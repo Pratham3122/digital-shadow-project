@@ -1,0 +1,1319 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Viva Questions — Digital Shadow</title>
+  <meta name="description" content="55+ viva questions and answers covering linked lists, stacks, pointers, memory management, structures, complexity analysis, and Digital Shadow project-specific topics.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>◈</text></svg>">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/navbar.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/cards.css">
+  <link rel="stylesheet" href="css/timeline.css">
+  <link rel="stylesheet" href="css/compiler.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <link rel="stylesheet" href="css/darktheme.css">
+  <style>
+    /* ===== VIVA PAGE SPECIFIC STYLES ===== */
+
+    /* Stats Bar */
+    .viva-stats {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 2rem;
+    }
+
+    .viva-stat-card {
+      background: var(--surface);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-md);
+      padding: 1rem 1.5rem;
+      flex: 1;
+      min-width: 140px;
+      text-align: center;
+    }
+
+    .viva-stat-value {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .viva-stat-label {
+      font-size: 0.8rem;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-top: 0.25rem;
+    }
+
+    /* Filter Buttons */
+    .filter-bar {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 2.5rem;
+      padding: 1rem;
+      background: var(--surface);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-lg);
+    }
+
+    .filter-btn {
+      padding: 0.5rem 1.2rem;
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-pill);
+      background: transparent;
+      color: var(--text-secondary);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      white-space: nowrap;
+    }
+
+    .filter-btn:hover {
+      color: var(--text-primary);
+      border-color: var(--surface-border-hover);
+      background: var(--surface-hover);
+    }
+
+    .filter-btn.active {
+      background: rgba(124, 92, 255, 0.15);
+      color: var(--primary-glow);
+      border-color: rgba(124, 92, 255, 0.3);
+    }
+
+    .filter-count {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 20px;
+      height: 20px;
+      border-radius: 10px;
+      background: rgba(124, 92, 255, 0.2);
+      font-size: 0.7rem;
+      margin-left: 0.35rem;
+      padding: 0 5px;
+    }
+
+    .filter-btn.active .filter-count {
+      background: rgba(124, 92, 255, 0.3);
+    }
+
+    /* Search Bar */
+    .viva-search-wrapper {
+      margin-bottom: 2rem;
+    }
+
+    .viva-search {
+      width: 100%;
+      padding: 0.85rem 1.25rem 0.85rem 3rem;
+      background: var(--surface);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-md);
+      color: var(--text-primary);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.95rem;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    .viva-search:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(124, 92, 255, 0.1);
+    }
+
+    .viva-search::placeholder {
+      color: var(--text-tertiary);
+    }
+
+    .viva-search-wrapper {
+      position: relative;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-tertiary);
+      font-size: 1.1rem;
+      pointer-events: none;
+    }
+
+    /* Q&A Cards */
+    .qa-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .qa-card {
+      background: var(--surface);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .qa-card:hover {
+      border-color: var(--surface-border-hover);
+    }
+
+    .qa-card.hidden {
+      display: none;
+    }
+
+    .qa-question {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1.1rem 1.5rem;
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.2s ease;
+    }
+
+    .qa-question:hover {
+      background: var(--surface-hover);
+    }
+
+    .qa-number {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: var(--primary);
+      min-width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(124, 92, 255, 0.1);
+      border-radius: var(--radius-sm);
+      flex-shrink: 0;
+    }
+
+    .qa-text {
+      flex: 1;
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      line-height: 1.4;
+    }
+
+    .qa-category-badge {
+      font-size: 0.65rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      padding: 0.25rem 0.7rem;
+      border-radius: var(--radius-pill);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .qa-category-badge[data-cat="linked-list"] {
+      background: rgba(124, 92, 255, 0.12);
+      color: var(--primary-glow);
+    }
+    .qa-category-badge[data-cat="stack"] {
+      background: rgba(0, 212, 170, 0.12);
+      color: var(--accent-glow);
+    }
+    .qa-category-badge[data-cat="pointers"] {
+      background: rgba(255, 184, 0, 0.12);
+      color: var(--warning);
+    }
+    .qa-category-badge[data-cat="memory"] {
+      background: rgba(255, 77, 106, 0.12);
+      color: var(--error);
+    }
+    .qa-category-badge[data-cat="structures"] {
+      background: rgba(100, 180, 255, 0.12);
+      color: #64b4ff;
+    }
+    .qa-category-badge[data-cat="complexity"] {
+      background: rgba(200, 120, 255, 0.12);
+      color: #c878ff;
+    }
+    .qa-category-badge[data-cat="project"] {
+      background: rgba(124, 92, 255, 0.08);
+      color: var(--primary);
+      border: 1px solid rgba(124, 92, 255, 0.15);
+    }
+    .qa-category-badge[data-cat="applications"] {
+      background: rgba(0, 212, 170, 0.08);
+      color: var(--accent);
+      border: 1px solid rgba(0, 212, 170, 0.15);
+    }
+
+    .qa-toggle {
+      font-size: 1.2rem;
+      color: var(--text-tertiary);
+      transition: transform 0.3s ease;
+      flex-shrink: 0;
+    }
+
+    .qa-card.open .qa-toggle {
+      transform: rotate(180deg);
+    }
+
+    .qa-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), padding 0.3s ease;
+    }
+
+    .qa-card.open .qa-answer {
+      max-height: 800px;
+    }
+
+    .qa-answer-inner {
+      padding: 0 1.5rem 1.5rem 4.5rem;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      line-height: 1.8;
+    }
+
+    .qa-answer-inner code {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--surface-border);
+      border-radius: 4px;
+      padding: 0.15rem 0.45rem;
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+      font-size: 0.82rem;
+      color: var(--accent);
+    }
+
+    .qa-answer-inner strong {
+      color: var(--text-primary);
+    }
+
+    .no-results {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--text-tertiary);
+      display: none;
+    }
+
+    .no-results.show {
+      display: block;
+    }
+
+    .no-results-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .qa-question {
+        padding: 0.9rem 1rem;
+        gap: 0.75rem;
+      }
+
+      .qa-answer-inner {
+        padding: 0 1rem 1.25rem 1rem;
+      }
+
+      .qa-category-badge {
+        display: none;
+      }
+
+      .viva-stats {
+        gap: 0.75rem;
+      }
+
+      .viva-stat-card {
+        min-width: 100px;
+        padding: 0.75rem 1rem;
+      }
+
+      .filter-btn {
+        font-size: 0.75rem;
+        padding: 0.4rem 0.9rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="nav-logo">
+        <span class="logo-icon">◈</span>
+        <span class="logo-text">Digital Shadow</span>
+      </a>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="nav-menu" id="navMenu">
+        <div class="nav-links">
+          <a href="index.html" class="nav-link">Home</a>
+          <a href="about.html" class="nav-link">About</a>
+          <a href="problem.html" class="nav-link">Problem</a>
+          <a href="features.html" class="nav-link">Features</a>
+          <a href="architecture.html" class="nav-link">Architecture</a>
+          <div class="nav-dropdown">
+            <button class="nav-link dropdown-trigger">Data Structures <span class="dropdown-arrow">▾</span></button>
+            <div class="dropdown-menu">
+              <a href="linkedlist.html" class="dropdown-link">Linked List</a>
+              <a href="stack.html" class="dropdown-link">Stack</a>
+            </div>
+          </div>
+          <a href="flowchart.html" class="nav-link">Flowchart</a>
+          <a href="algorithm.html" class="nav-link">Algorithm</a>
+          <a href="visualization.html" class="nav-link">Visualization</a>
+          <a href="compiler.html" class="nav-link">Compiler</a>
+          <a href="statistics.html" class="nav-link">Statistics</a>
+          <a href="future.html" class="nav-link">Future</a>
+          <a href="viva.html" class="nav-link active">Viva</a>
+          <a href="report.html" class="nav-link">Report</a>
+          <a href="ppt.html" class="nav-link">PPT</a>
+          <a href="contact.html" class="nav-link">Contact</a>
+        </div>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+          <span class="theme-icon">🌙</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <div id="particles-container" class="particles-container"></div>
+
+  <main>
+    <section class="page-hero">
+      <div class="container">
+        <span class="section-badge">VIVA PREP</span>
+        <h1 class="page-title">Viva Questions & Answers</h1>
+        <p class="page-subtitle">55 comprehensive questions and answers covering every aspect of the Digital Shadow project — from core data structures to implementation details.</p>
+      </div>
+    </section>
+
+    <section class="section" id="viva-content">
+      <div class="container">
+        <!-- Stats -->
+        <div class="viva-stats reveal">
+          <div class="viva-stat-card">
+            <div class="viva-stat-value" id="totalCount">55</div>
+            <div class="viva-stat-label">Total Questions</div>
+          </div>
+          <div class="viva-stat-card">
+            <div class="viva-stat-value">8</div>
+            <div class="viva-stat-label">Categories</div>
+          </div>
+          <div class="viva-stat-card">
+            <div class="viva-stat-value" id="visibleCount">55</div>
+            <div class="viva-stat-label">Showing</div>
+          </div>
+        </div>
+
+        <!-- Search -->
+        <div class="viva-search-wrapper reveal">
+          <span class="search-icon">🔍</span>
+          <input type="text" class="viva-search" id="vivaSearch" placeholder="Search questions...">
+        </div>
+
+        <!-- Filter Buttons -->
+        <div class="filter-bar reveal">
+          <button class="filter-btn active" data-filter="all" id="filterAll">All <span class="filter-count">55</span></button>
+          <button class="filter-btn" data-filter="linked-list" id="filterLinkedList">Linked List <span class="filter-count">12</span></button>
+          <button class="filter-btn" data-filter="stack" id="filterStack">Stack <span class="filter-count">8</span></button>
+          <button class="filter-btn" data-filter="pointers" id="filterPointers">Pointers <span class="filter-count">6</span></button>
+          <button class="filter-btn" data-filter="memory" id="filterMemory">Memory <span class="filter-count">6</span></button>
+          <button class="filter-btn" data-filter="structures" id="filterStructures">Structures <span class="filter-count">5</span></button>
+          <button class="filter-btn" data-filter="complexity" id="filterComplexity">Complexity <span class="filter-count">5</span></button>
+          <button class="filter-btn" data-filter="project" id="filterProject">Project-Specific <span class="filter-count">13</span></button>
+        </div>
+
+        <!-- Q&A Cards -->
+        <div class="qa-grid" id="qaGrid">
+
+          <!-- ==================== LINKED LIST (12) ==================== -->
+
+          <div class="qa-card reveal" data-category="linked-list" id="qa-1">
+            <div class="qa-question" onclick="toggleQA(this)">
+              <span class="qa-number">01</span>
+              <span class="qa-text">What is a linked list?</span>
+              <span class="qa-category-badge" data-cat="linked-list">Linked List</span>
+              <span class="qa-toggle">▾</span>
+            </div>
+            <div class="qa-answer">
+              <div class="qa-answer-inner">
+                A linked list is a <strong>linear data structure</strong> in which elements (called nodes) are stored in non-contiguous memory locations. Each node contains two parts: the <strong>data field</strong> (which holds the actual value or information) and a <strong>pointer field</strong> (which stores the address of the next node in the sequence). Unlike arrays, linked lists do not require a fixed block of contiguous memory. The first node is called the <strong>head</strong>, and the last node's pointer is set to <code>NULL</code>, indicating the end of the list. This structure allows for efficient dynamic memory usage and flexible insertion/deletion operations.
+              </div>
+            </div>
+          </div>
+
+          <div class="qa-card reveal" data-category="linked-list" id="qa-2">
+            <div class="qa-question" onclick="toggleQA(this)">
+              <span class="qa-number">02</span>
+              <span class="qa-text">What are the types of linked lists?</span>
+              <span class="qa-category-badge" data-cat="linked-list">Linked List</span>
+              <span class="qa-toggle">▾</span>
+            </div>
+            <div class="qa-answer">
+              <div class="qa-answer-inner">
+                There are four main types of linked lists: <strong>1) Singly Linked List</strong> — each node has a data field and one pointer to the next node. Traversal is only possible in one direction (forward). <strong>2) Doubly Linked List</strong> — each node has two pointers: one to the next node and one to the previous node, allowing bidirectional traversal. <strong>3) Circular Linked List</strong> — the last node points back to the first node instead of <code>NULL</code>, creating a circular chain. This can be singly or doubly linked. <strong>4) Circular Doubly Linked List</strong> — combines both concepts: each node has two pointers, and the list forms a circle. In Digital Shadow, we use a <strong>singly linked list</strong> because unidirectional traversal is sufficient for chronological event display.
+              </div>
+            </div>
+          </div>
+
+          <div class="qa-card reveal" data-category="linked-list" id="qa-3">
+            <div class="qa-question" onclick="toggleQA(this)">
+              <span class="qa-number">03</span>
+              <span class="qa-text">How is a linked list different from an array?</span>
+              <span class="qa-category-badge" data-cat="linked-list">Linked List</span>
+              <span class="qa-toggle">▾</span>
+            </div>
+            <div class="qa-answer">
+              <div class="qa-answer-inner">
+                Key differences: <strong>Memory allocation</strong> — arrays use contiguous memory blocks allocated at compile time (static) or via <code>malloc</code> (dynamic but still contiguous), while linked lists use scattered memory locations connected by pointers. <strong>Size flexibility</strong> — arrays have fixed sizes (or require expensive reallocation), while linked lists grow/shrink dynamically. <strong>Insertion/Deletion</strong> — arrays require shifting elements (O(n) time), while linked lists only require pointer updates (O(1) at known positions). <strong>Random access</strong> — arrays support O(1) index-based access, while linked lists require O(n) traversal. <strong>Memory overhead</strong> — linked lists use extra memory for storing pointers in each node. <strong>Cache performance</strong> — arrays have better cache locality due to contiguous storage.
+              </div>
+            </div>
+          </div>
+
+          <div class="qa-card reveal" data-category="linked-list" id="qa-4">
+            <div class="qa-question" onclick="toggleQA(this)">
+              <span class="qa-number">04</span>
+              <span class="qa-text">What is a node in a linked list?</span>
+              <span class="qa-category-badge" data-cat="linked-list">Linked List</span>
+              <span class="qa-toggle">▾</span>
+            </div>
+            <div class="qa-answer">
+              <div class="qa-answer-inner">
+                A <strong>node</strong> is the fundamental building block of a linked list. It is a self-contained unit that holds two components: <strong>data</strong> and a <strong>link (pointer)</strong>. The data portion stores the actual information (it can be a simple integer, character, or a complex structure with multiple fields). The link portion is a pointer that stores the memory address of the next node in the sequence. In C, a node is typically implemented as a <code>struct</code>: <code>struct Node { int data; struct Node *next; };</code>. In Digital Shadow, each node stores multiple fields: <code>id</code>, <code>title</code>, <code>category</code>, <code>description</code>, <code>timestamp</code>, and the <code>next</code> pointer to the next event.
+              </div>
+            </div>
+          </div>
+
+          <div class="qa-card reveal" data-category="linked-list" id="qa-5">
+            <div class="qa-question" onclick="toggleQA(this)">
+              <span class="qa-number">05</span>
+              <span class="qa-text">How do you insert a node at the end of a linked list?</span>
+              <span class="qa-category-badge" data-cat="linked-list">Linked List</span>
+              <span class="qa-toggle">▾</span>
+            </div>
+            <div class="qa-answer">
+              <div class="qa-answer-inner">
+                To insert a node at the end: <strong>1)</strong> Create a new node using <code>malloc()</code> and set its data fields. Set its <code>next</code> pointer to <code>NULL</code> since it will be the last node. <strong>2)</strong> Check if the list is empty (head == NULL). If empty, make the new node the head. <strong>3)</strong> If the list is not empty, traverse the list starting from the head until you reach the last node (the node whose <code>next</code> pointer is <code>NULL</code>). <strong>4)</strong> Set the last node's <code>next</code> pointer to the new node. The time complexity is <strong>O(n)</strong> because you must traverse the entire list to find the end. This can be optimized to O(1) by maintaining a tail pointer.
+              </div>
+            </div>
+          </div>
+
+          <div class="qa-card reveal" data-category="linked-list" id="qa-6">
+            <div class="qa-question" onclick="toggleQA(this)">
+              <span class="qa-number">06</span>
+              <span class="qa-text">How do you delete a node from a linked list?</span>
+              <span class="qa-category-badge" data-cat="linked-list">Linked List</span>
+              <span class="qa-toggle">▾</span>
+            </div>
+            <div class="qa-answer">
+              <div class="qa-answer-inner">
+                To delete a node: <strong>1)</strong> If deleting the head node, store a reference to the head, update the head pointer to <code>head->next</code>, then <code>free()</code> the original head. <strong>2)</strong> For any other node, traverse the list with two pointers — a <code>current</code> pointer and a <code>previous</code> pointer. When the target node is found, set <code>previous->next = current->next</code>, bypassing the target node. Then call <code>free(current)</code> to release the memory. <strong>3)</strong> Always handle edge cases: empty list (do nothing), single-node list (set head to NULL), and node not found (report error). <strong>Important:</strong> Always free the memory of the deleted node to prevent memory leaks. In Digital Shadow, deleted event data is first pushed onto the undo stack before freeing.
+              </div>
+            </div>
+          </div>
+
+          <div class="qa-card reveal" data-category="linked-list" id="qa-7">
+            <div class="qa-question" onclick="toggleQA(this)">
+              <span class="qa-number">07</span>
+              <span class="qa-text">What is the time complexity of searching in a linked list?</span>
+              <span class="qa-category-badge" data-cat="linked-list">Linked List</span>
+              <span class="qa-toggle">▾</span>
+            </div>
+            <div class="qa-answer">
+              <div class="qa-answer-inner">
+                The time complexity of searching in a singly linked list is <strong>O(n)</strong> in both the average and worst case, where n is the number of nodes. This is because linked lists do not support random access — you must start from the head and traverse each node sequentially, comparing the search key with each node's data, until you find a match or reach the end of the list. <strong>Best case</strong> is O(1) — if the target is the first node. <strong>Worst case</strong> is O(n) — if the target is the last node or not present. Unlike arrays, you cannot use binary search on a linked list because there is no way to directly access the middle element. To improve search performance, you could maintain a sorted list or use additional data structures like hash tables for indexing.
+              </div>
+            </div>
+          </div>
+
+          <div class="qa-card reveal" data-category="linked-list" id="qa-8">
+            <div class="qa-question" onclick="toggleQA(this)">
+              <span class="qa-number">08</span>
+              <span class="qa-text">What is a self-referential structure?</span>
+              <span class="qa-category-badge" data-cat="linked-list">Linked List</span>
+              <span class="qa-toggle">▾</span>
+            </div>
+            <div class="qa-answer">
+              <div class="qa-answer-inner">
+                A <strong>self-referential structure</strong> is a structure in C that contains a pointer to another instance of the same structure type. This is the fundamental mechanism that makes linked data structures possible. For example: <code>struct Node { int data; struct Node *next; };</code> — here, the <code>next</code> field is a pointer to another <code>struct Node</code>. Note that the pointer is to the <em>same type</em> of structure, not an embedded copy. You cannot have a structure that contains an actual instance of itself (that would be infinitely recursive), but you <em>can</em> have a pointer to one because pointers have a fixed size regardless of what they point to. Self-referential structures are the foundation of linked lists, trees, graphs, and other dynamic data structures.
+              </div>
+            </div>
+          </div>
+
+          <div class="qa-card reveal" data-category="linked-list" id="qa-9">
+            <div class="qa-question" onclick="toggleQA(this)">
+              <span class="qa-number">09</span>
+              <span class="qa-text">How does traversal work in a linked list?</span>
+              <span class="qa-category-badge" data-cat="linked-list">Linked List</span>
+              <span class="qa-toggle">▾</span>
+            </div>
+            <div class="qa-answer">
+              <div class="qa-answer-inner">
+                Traversal means visiting every node in the linked list sequentially. The process works as follows: <strong>1)</strong> Start with a temporary pointer set to the head of the list: <code>Node *temp = head;</code>. <strong>2)</strong> Enter a loop that continues while <code>temp != NULL</code>. <strong>3)</strong> At each iteration, process the current node's data (print it, compare it, accumulate statistics, etc.). <strong>4)</strong> Move the pointer to the next node: <code>temp = temp->next;</code>. <strong>5)</strong> When <code>temp</code> becomes <code>NULL</code>, you've reached the end of the list and the traversal is complete. The time complexity is always <strong>O(n)</strong> since every node must be visited. In Digital Shadow, traversal is used for displaying the timeline, searching events, calculating statistics, and replaying events.
+              </div>
+            </div>
+          </div>
+
+          <div class="qa-card reveal" data-category="linked-list" id="qa-10">
+            <div class="qa-question" onclick="toggleQA(this)">
+              <span class="qa-number">10</span>
+              <span class="qa-text">What are the advantages of linked lists over arrays?</span>
+              <span class="qa-category-badge" data-cat="linked-list">Linked List</span>
+              <span class="qa-toggle">▾</span>
+            </div>
+            <div class="qa-answer">
+              <div class="qa-answer-inner">
+                <strong>1) Dynamic size:</strong> Linked lists can grow or shrink at runtime without needing to declare a fixed size upfront. <strong>2) Efficient insertion/deletion:</strong> Adding or removing nodes at the beginning or middle requires only pointer updates (O(1) at known position), not shifting elements like arrays. <strong>3) No memory waste:</strong> Memory is allocated only when needed for new nodes, whereas arrays may have unused allocated space. <strong>4) No reallocation overhead:</strong> Arrays may need expensive copy-and-reallocate operations when they outgrow their capacity; linked lists never do. <strong>5) Flexibility:</strong> Different nodes can be scattered across memory, which can be advantageous in systems with fragmented free memory. In Digital Shadow, these advantages are critical because the number of events is unknown at compile time and events are frequently added and deleted.
+              </div>
+            </div>
+          </div>
+
+          <div class="qa-card reveal" data-category="linked-list" id="qa-11">
+            <div class="qa-question" onclick="toggleQA(this)">
+              <span class="qa-number">11</span>
+              <span class="qa-text">What are the disadvantages of linked lists?</span>
+              <span class="qa-category-badge" data-cat="linked-list">Linked List</span>
+              <span class="qa-toggle">▾</span>
+            </div>
+            <div class="qa-answer">
+              <div class="qa-answer-inner">
+                <strong>1) No random access:</strong> You cannot access the i-th element directly; you must traverse from the head (O(n)). <strong>2) Extra memory:</strong> Each node requires additional memory for storing the pointer(s), which can be significant for small data items. <strong>3) Poor cache locality:</strong> Nodes are scattered in memory, leading to more cache misses compared to arrays stored contiguously. <strong>4) Reverse traversal is hard:</strong> In singly linked lists, you cannot traverse backward without additional data structures. <strong>5) Complexity:</strong> Pointer manipulation is more error-prone and harder to debug than simple array indexing. Errors can lead to segmentation faults, memory leaks, or corrupted lists. <strong>6) No binary search:</strong> Even if the list is sorted, binary search requires random access and isn't directly applicable.
+              </div>
+            </div>
+          </div>
+
+          <div class="qa-card reveal" data-category="linked-list" id="qa-12">
+            <div class="qa-question" onclick="toggleQA(this)">
+              <span class="qa-number">12</span>
+              <span class="qa-text">What is a doubly linked list?</span>
+              <span class="qa-category-badge" data-cat="linked-list">Linked List</span>
+              <span class="qa-toggle">▾</span>
+            </div>
+            <div class="qa-answer">
+              <div class="qa-answer-inner">
+                A <strong>doubly linked list</strong> is a type of linked list where each node has two pointers: one pointing to the <strong>next</strong> node and one pointing to the <strong>previous</strong> node. This allows <strong>bidirectional traversal</strong> — you can move both forward and backward through the list. The structure in C looks like: <code>struct Node { int data; struct Node *prev; struct Node *next; };</code>. Advantages include easier deletion (no need for a separate previous pointer during traversal), ability to traverse in reverse, and simpler implementation of certain algorithms. Disadvantages include increased memory usage (two pointers per node instead of one) and slightly more complex insertion/deletion logic. Digital Shadow uses a singly linked list because backward traversal is not required for our use case.
+              </div>
+            </div>
+          </div>
+
+          <!-- ==================== STACK (8) ==================== -->
+
+          <div class="qa-card reveal" data-category="stack" id="qa-13">
+            <div class="qa-question" onclick="toggleQA(this)">
+              <span class="qa-number">13</span>
+              <span class="qa-text">What is a stack?</span>
+              <span class="qa-category-badge" data-cat="stack">Stack</span>
+              <span class="qa-toggle">▾</span>
+            </div>
+            <div class="qa-answer">
+              <div class="qa-answer-inner">
+                A <strong>stack</strong> is a linear data structure that follows the <strong>Last-In, First-Out (LIFO)</strong> principle. Think of it like a stack of plates — you can only add (push) or remove (pop) plates from the top. The last element added is the first one to be removed. A stack has a single point of access called the <strong>top</strong>. Elements are added above the current top and removed from the top. Stacks can be implemented using arrays (with a fixed capacity and a top index) or linked lists (with dynamic capacity and the top as the head pointer). In Digital Shadow, we use a stack to implement the undo feature — the most recent operation is always undone first, which perfectly matches LIFO behavior.
+              </div>
+            </div>
+          </div>
+
+          <div class="qa-card reveal" data-category="stack" id="qa-14">
+            <div class="qa-question" onclick="toggleQA(this)">
+              <span class="qa-number">14</span>
+              <span class="qa-text">What does LIFO mean?</span>
+              <span class="qa-category-badge" data-cat="stack">Stack</span>
+              <span class="qa-toggle">▾</span>
+            </div>
+            <div class="qa-answer">
+              <div class="qa-answer-inner">
+                <strong>LIFO</strong> stands for <strong>Last-In, First-Out</strong>. It is the operational principle of a stack. It means that the element which is inserted <em>last</em> into the stack will be the <em>first</em> one to be removed. Real-world analogies include: a stack of books (you pick up the top one first), a Pringles can (the last chip put in is the first one you eat), undo operations in text editors (the most recent change is undone first), and browser back buttons (you go back to the most recently visited page). In contrast, a queue follows <strong>FIFO</strong> (First-In, First-Out) where the first element added is the first removed. LIFO is fundamental to function call management, expression evaluation, and backtracking algorithms.
+              </div>
+            </div>
+          </div>
+
+          <div class="qa-card reveal" data-category="stack" id="qa-15">
+            <div class="qa-question" onclick="toggleQA(this)">
+              <span class="qa-number">15</span>
+              <span class="qa-text">What are the main operations on a stack?</span>
+              <span class="qa-category-badge" data-cat="stack">Stack</span>
+              <span class="qa-toggle">▾</span>
+            </div>
+            <div class="qa-answer">
+              <div class="qa-answer-inner">
+                The main stack operations are: <strong>1) Push</strong> — adds an element to the top of the stack. In array implementation, increment the top index and place the element. In linked list implementation, create a new node and make it the new head. Time complexity: O(1). <strong>2) Pop</strong> — removes and returns the element from the top. In array implementation, read the element at top index and decrement. In linked list implementation, store the head's data, move head to the next node, and free the old head. Time complexity: O(1). <strong>3) Peek/Top</strong> — returns the top element without removing it. Time complexity: O(1). <strong>4) isEmpty</strong> — checks if the stack is empty (top == -1 for arrays, or head == NULL for linked lists). <strong>5) isFull</strong> — checks if the stack is full (only applicable to array-based stacks).
+              </div>
+            </div>
+          </div>
+
+          <div class="qa-card reveal" data-category="stack" id="qa-16">
+            <div class="qa-question" onclick="toggleQA(this)">
+              <span class="qa-number">16</span>
+              <span class="qa-text">How is a stack implemented using a linked list?</span>
+              <span class="qa-category-badge" data-cat="stack">Stack</span>
+              <span class="qa-toggle">▾</span>
+            </div>
+            <div class="qa-answer">
+              <div class="qa-answer-inner">
+                In a linked list implementation of a stack, the <strong>top of the stack is represented by the head pointer</strong> of the linked list. <strong>Push</strong> operation: Create a new node with <code>malloc()</code>, set its data, point its <code>next</code> to the current head, then update head to the new node. This is identical to "insert at the beginning" of a linked list. <strong>Pop</strong> operation: Store the head node's data, update head to <code>head->next</code>, free the old head node, and return the stored data. This is identical to "delete from the beginning." Both operations are <strong>O(1)</strong>. Advantages over array implementation: no fixed size limit, no stack overflow from preset capacity, and dynamic memory usage. This is exactly how Digital Shadow implements its undo stack — as a linked list with push/pop at the head.
+              </div>
+            </div>
+          </div>
+
+          <div class="qa-card reveal" data-category="stack" id="qa-17">
+            <div class="qa-question" onclick="toggleQA(this)">
+              <span class="qa-number">17</span>
+              <span class="qa-text">What is stack overflow?</span>
+              <span class="qa-category-badge" data-cat="stack">Stack</span>
+              <span class="qa-toggle">▾</span>
+            </div>
+            <div class="qa-answer">
+              <div class="qa-answer-inner">
+                <strong>Stack overflow</strong> occurs when you try to push an element onto a stack that is already full. In array-based stacks, this happens when the top index equals the maximum array size minus one — there is no more space to store additional elements. In program execution, a stack overflow occurs when the <strong>call stack</strong> (used to store function call frames, local variables, and return addresses) exceeds its allocated memory. This commonly happens with <strong>infinite recursion</strong> — when a recursive function lacks a proper base case and keeps calling itself, each call adding a new frame to the call stack until the memory limit is reached. In linked-list implementations, stack overflow only occurs when the system runs out of heap memory (i.e., <code>malloc()</code> returns <code>NULL</code>).
+              </div>
+            </div>
+          </div>
+
+          <div class="qa-card reveal" data-category="stack" id="qa-18">
+            <div class="qa-question" onclick="toggleQA(this)">
+              <span class="qa-number">18</span>
+              <span class="qa-text">What is stack underflow?</span>
+              <span class="qa-category-badge" data-cat="stack">Stack</span>
+              <span class="qa-toggle">▾</span>
+            </div>
+            <div class="qa-answer">
+              <div class="qa-answer-inner">
+                <strong>Stack underflow</strong> occurs when you try to pop an element from an empty stack. Since there are no elements to remove, the operation is invalid. In array-based stacks, this means attempting to pop when <code>top == -1</code>. In linked-list stacks, this means attempting to pop when <code>head == NULL</code>. Proper implementations should always check for this condition before performing a pop operation and handle it gracefully — either by returning an error code, printing a message, or throwing an exception. In Digital Shadow, the undo function checks if the undo stack is empty before attempting to pop; if it is empty, it displays "Nothing to undo" to the user.
+              </div>
+            </div>
+          </div>
+
+          <div class="qa-card reveal" data-category="stack" id="qa-19">
+            <div class="qa-question" onclick="toggleQA(this)">
+              <span class="qa-number">19</span>
+              <span class="qa-text">What are applications of stacks?</span>
+              <span class="qa-category-badge" data-cat="stack">Stack</span>
+              <span class="qa-toggle">▾</span>
+            </div>
+            <div class="qa-answer">
+              <div class="qa-answer-inner">
+                Stacks have numerous practical applications: <strong>1) Function call management</strong> — the system call stack tracks active function calls, local variables, and return addresses. <strong>2) Expression evaluation</strong> — converting infix to postfix notation and evaluating postfix expressions. <strong>3) Undo/Redo functionality</strong> — text editors, graphic design tools, and Digital Shadow use stacks to track operations for reversal. <strong>4) Bracket matching</strong> — compilers use stacks to verify that parentheses, brackets, and braces are properly balanced. <strong>5) Backtracking</strong> — algorithms like maze solving, N-Queens, and depth-first search use stacks to remember paths and decisions. <strong>6) Browser history</strong> — the back button follows LIFO order. <strong>7) Syntax parsing</strong> — parsers use stacks to analyze grammar rules. <strong>8) Memory management</strong> — stack-based memory allocation for local variables.
+              </div>
+            </div>
+          </div>
+
+          <div class="qa-card reveal" data-category="stack" id="qa-20">
+            <div class="qa-question" onclick="toggleQA(this)">
+              <span class="qa-number">20</span>
+              <span class="qa-text">How does the function call stack work?</span>
+              <span class="qa-category-badge" data-cat="stack">Stack</span>
+              <span class="qa-toggle">▾</span>
+            </div>
+            <div class="qa-answer">
+              <div class="qa-answer-inner">
+                The <strong>function call stack</strong> (or execution stack) is a system-managed stack that tracks the execution flow of a program. When a function is called: <strong>1)</strong> A new <strong>stack frame</strong> (or activation record) is pushed onto the call stack. This frame contains the function's parameters, local variables, the return address (where to continue after the function finishes), and saved register values. <strong>2)</strong> Execution jumps to the called function. <strong>3)</strong> When the function returns, its stack frame is popped, local variables are destroyed, and execution resumes at the saved return address. For recursive functions, each call creates a new frame with its own copy of local variables. This is why deep or infinite recursion causes stack overflow — each frame consumes memory until the stack space is exhausted. The call stack is allocated a fixed size by the operating system (typically 1–8 MB).
+              </div>
+            </div>
+          </div>
+
+          <!-- ==================== POINTERS (6) ==================== -->
+
+          <div class="qa-card reveal" data-category="pointers" id="qa-21">
+            <div class="qa-question" onclick="toggleQA(this)">
+              <span class="qa-number">21</span>
+              <span class="qa-text">What is a pointer in C?</span>
+              <span class="qa-category-badge" data-cat="pointers">Pointers</span>
+              <span class="qa-toggle">▾</span>
+            </div>
+            <div class="qa-answer">
+              <div class="qa-answer-inner">
+                A <strong>pointer</strong> is a variable that stores the <strong>memory address</strong> of another variable. Instead of holding a direct data value like an integer or character, a pointer holds the location in memory where that data resides. Declared with the <code>*</code> symbol: <code>int *ptr;</code> declares a pointer to an integer. The <strong>address-of operator</strong> <code>&</code> gets a variable's address: <code>ptr = &x;</code>. The <strong>dereference operator</strong> <code>*</code> accesses the value at the pointed-to address: <code>*ptr</code> gives the value of <code>x</code>. Pointers are essential in C for dynamic memory allocation, linked data structures, passing by reference, array manipulation, and function pointers. In Digital Shadow, pointers connect nodes in the linked list and stack.
+              </div>
+            </div>
+          </div>
+
+          <div class="qa-card reveal" data-category="pointers" id="qa-22">
+            <div class="qa-question" onclick="toggleQA(this)">
+              <span class="qa-number">22</span>
+              <span class="qa-text">What is a NULL pointer?</span>
+              <span class="qa-category-badge" data-cat="pointers">Pointers</span>
+              <span class="qa-toggle">▾</span>
+            </div>
+            <div class="qa-answer">
+              <div class="qa-answer-inner">
+                A <strong>NULL pointer</strong> is a pointer that does not point to any valid memory location. It is assigned the special value <code>NULL</code> (defined as <code>((void*)0)</code> in C). NULL pointers serve several purposes: <strong>1)</strong> Indicating the end of a linked list — the last node's <code>next</code> pointer is NULL. <strong>2)</strong> Initializing pointers before they are assigned a valid address — a good practice to avoid dangling pointers. <strong>3)</strong> Error checking — functions like <code>malloc()</code> return NULL when memory allocation fails. <strong>4)</strong> Signaling absence — indicating that a pointer has no valid target. Dereferencing a NULL pointer (attempting to access <code>*ptr</code> when <code>ptr == NULL</code>) causes a <strong>segmentation fault</strong> — a runtime crash. Always check for NULL before dereferencing.
+              </div>
+            </div>
+          </div>
+
+          <div class="qa-card reveal" data-category="pointers" id="qa-23">
+            <div class="qa-question" onclick="toggleQA(this)">
+              <span class="qa-number">23</span>
+              <span class="qa-text">What is a dangling pointer?</span>
+              <span class="qa-category-badge" data-cat="pointers">Pointers</span>
+              <span class="qa-toggle">▾</span>
+            </div>
+            <div class="qa-answer">
+              <div class="qa-answer-inner">
+                A <strong>dangling pointer</strong> is a pointer that still holds the address of a memory location that has already been freed or deallocated. This happens in three common scenarios: <strong>1)</strong> After calling <code>free(ptr)</code> — the memory is released but <code>ptr</code> still holds the old address. Solution: set <code>ptr = NULL</code> after freeing. <strong>2)</strong> Returning the address of a local variable from a function — the local variable is destroyed when the function returns, leaving the pointer dangling. <strong>3)</strong> When an object goes out of scope. Using a dangling pointer leads to <strong>undefined behavior</strong> — the program might crash, produce garbage values, or appear to work correctly but with corrupted data. In Digital Shadow, we carefully set pointers to NULL after freeing nodes and validate pointers before access.
+              </div>
+            </div>
+          </div>
+
+          <div class="qa-card reveal" data-category="pointers" id="qa-24">
+            <div class="qa-question" onclick="toggleQA(this)">
+              <span class="qa-number">24</span>
+              <span class="qa-text">What is pointer arithmetic?</span>
+              <span class="qa-category-badge" data-cat="pointers">Pointers</span>
+              <span class="qa-toggle">▾</span>
+            </div>
+            <div class="qa-answer">
+              <div class="qa-answer-inner">
+                <strong>Pointer arithmetic</strong> is the set of operations you can perform on pointers. In C, you can: <strong>1) Increment/Decrement</strong> — <code>ptr++</code> moves the pointer forward by the size of the pointed-to type (e.g., <code>int *ptr; ptr++;</code> advances by 4 bytes on most systems). <strong>2) Add/Subtract integers</strong> — <code>ptr + n</code> moves the pointer forward by <code>n * sizeof(type)</code> bytes. <strong>3) Subtract two pointers</strong> — <code>ptr2 - ptr1</code> gives the number of elements between them (not bytes). <strong>4) Compare pointers</strong> — <code>ptr1 < ptr2</code> checks which address comes first. Pointer arithmetic is primarily used with arrays, where <code>*(arr + i)</code> is equivalent to <code>arr[i]</code>. However, pointer arithmetic on linked list node pointers is generally meaningless because nodes are not stored contiguously in memory.
+              </div>
+            </div>
+          </div>
+
+          <div class="qa-card reveal" data-category="pointers" id="qa-25">
+            <div class="qa-question" onclick="toggleQA(this)">
+              <span class="qa-number">25</span>
+              <span class="qa-text">How do you pass a pointer to a function?</span>
+              <span class="qa-category-badge" data-cat="pointers">Pointers</span>
+              <span class="qa-toggle">▾</span>
+            </div>
+            <div class="qa-answer">
+              <div class="qa-answer-inner">
+                Passing a pointer to a function is called <strong>pass by reference</strong> (or more precisely, passing the address by value). The function parameter is declared as a pointer type: <code>void modify(int *ptr) { *ptr = 42; }</code>. When calling: <code>int x = 10; modify(&x);</code> — the address of <code>x</code> is passed. Inside the function, <code>*ptr = 42</code> modifies the original variable <code>x</code>. This is essential when you need a function to modify its arguments. For linked list operations, we often pass a <strong>double pointer</strong> (<code>Node **head</code>) when the function needs to modify the head pointer itself (e.g., inserting at the beginning or deleting the head node). Without the double pointer, changes to <code>head</code> inside the function would only affect the local copy.
+              </div>
+            </div>
+          </div>
+
+          <div class="qa-card reveal" data-category="pointers" id="qa-26">
+            <div class="qa-question" onclick="toggleQA(this)">
+              <span class="qa-number">26</span>
+              <span class="qa-text">What is a double pointer (pointer to pointer)?</span>
+              <span class="qa-category-badge" data-cat="pointers">Pointers</span>
+              <span class="qa-toggle">▾</span>
+            </div>
+            <div class="qa-answer">
+              <div class="qa-answer-inner">
+                A <strong>double pointer</strong> (or pointer to pointer) is a pointer that stores the address of another pointer. Declared with two asterisks: <code>int **pp;</code>. If <code>int *p = &x;</code> and <code>int **pp = &p;</code>, then: <code>*pp</code> gives the value of <code>p</code> (the address of <code>x</code>), and <code>**pp</code> gives the value of <code>x</code>. Double pointers are essential in linked list functions that need to modify the head pointer: <code>void insertAtHead(Node **head, int data)</code>. Inside, <code>*head = newNode;</code> actually changes the head pointer in the caller's scope. Without a double pointer, you'd need to return the new head, which is less elegant and more error-prone. Double pointers are also used for dynamic 2D arrays and arrays of strings in C.
+              </div>
+            </div>
+          </div>
+
+          <!-- ==================== MEMORY (6) ==================== -->
+
+          <div class="qa-card reveal" data-category="memory" id="qa-27">
+            <div class="qa-question" onclick="toggleQA(this)">
+              <span class="qa-number">27</span>
+              <span class="qa-text">What is malloc()?</span>
+              <span class="qa-category-badge" data-cat="memory">Memory</span>
+              <span class="qa-toggle">▾</span>
+            </div>
+            <div class="qa-answer">
+              <div class="qa-answer-inner">
+                <code>malloc()</code> stands for <strong>memory allocation</strong>. It is a C standard library function (from <code>&lt;stdlib.h&gt;</code>) that dynamically allocates a specified number of bytes from the <strong>heap</strong> memory at runtime. Syntax: <code>void *malloc(size_t size);</code>. It returns a <code>void*</code> pointer to the allocated memory block, or <code>NULL</code> if allocation fails. The memory is <strong>not initialized</strong> — it contains garbage values. Usage example: <code>int *arr = (int *)malloc(10 * sizeof(int));</code> allocates space for 10 integers. In Digital Shadow, <code>malloc()</code> is used to create new event nodes: <code>Event *newEvent = (Event *)malloc(sizeof(Event));</code>. Always check if the return value is NULL to handle out-of-memory conditions, and always call <code>free()</code> when the memory is no longer needed.
+              </div>
+            </div>
+          </div>
+
+          <div class="qa-card reveal" data-category="memory" id="qa-28">
+            <div class="qa-question" onclick="toggleQA(this)">
+              <span class="qa-number">28</span>
+              <span class="qa-text">What is free()?</span>
+              <span class="qa-category-badge" data-cat="memory">Memory</span>
+              <span class="qa-toggle">▾</span>
+            </div>
+            <div class="qa-answer">
+              <div class="qa-answer-inner">
+                <code>free()</code> is a C standard library function that <strong>deallocates</strong> (releases) memory that was previously allocated by <code>malloc()</code>, <code>calloc()</code>, or <code>realloc()</code>. Syntax: <code>void free(void *ptr);</code>. After calling <code>free(ptr)</code>, the memory block is returned to the heap and can be reused by future allocations. <strong>Important rules:</strong> 1) Only free memory that was dynamically allocated — freeing stack memory or constants causes undefined behavior. 2) Don't free the same memory twice (double free) — this causes heap corruption. 3) Don't use the pointer after freeing (dangling pointer) — set it to NULL. 4) Not calling free leads to <strong>memory leaks</strong>. In Digital Shadow, <code>free()</code> is called whenever an event node is deleted from the linked list or when the undo stack nodes are cleaned up.
+              </div>
+            </div>
+          </div>
+
+          <div class="qa-card reveal" data-category="memory" id="qa-29">
+            <div class="qa-question" onclick="toggleQA(this)">
+              <span class="qa-number">29</span>
+              <span class="qa-text">What is the difference between stack and heap memory?</span>
+              <span class="qa-category-badge" data-cat="memory">Memory</span>
+              <span class="qa-toggle">▾</span>
+            </div>
+            <div class="qa-answer">
+              <div class="qa-answer-inner">
+                <strong>Stack memory:</strong> Used for static/automatic allocation. Stores local variables, function parameters, and return addresses. Managed automatically by the compiler — memory is allocated when a function is called and freed when it returns. Very fast (just moves a stack pointer). Limited in size (typically 1-8 MB). Grows downward in memory. LIFO order. <strong>Heap memory:</strong> Used for dynamic allocation via <code>malloc()</code>/<code>free()</code>. Managed manually by the programmer. Much larger than the stack (limited by system RAM). Slower than stack allocation (involves searching for free blocks). Memory persists until explicitly freed. Can lead to fragmentation, memory leaks, and dangling pointers. In Digital Shadow, event nodes and undo stack nodes live on the <strong>heap</strong> (allocated with malloc), while local variables in functions live on the <strong>stack</strong>.
+              </div>
+            </div>
+          </div>
+
+          <div class="qa-card reveal" data-category="memory" id="qa-30">
+            <div class="qa-question" onclick="toggleQA(this)">
+              <span class="qa-number">30</span>
+              <span class="qa-text">What is a memory leak?</span>
+              <span class="qa-category-badge" data-cat="memory">Memory</span>
+              <span class="qa-toggle">▾</span>
+            </div>
+            <div class="qa-answer">
+              <div class="qa-answer-inner">
+                A <strong>memory leak</strong> occurs when a program allocates memory dynamically (using <code>malloc()</code>) but fails to release it (using <code>free()</code>) when it is no longer needed. The allocated memory remains occupied but inaccessible — no pointer references it, so the program can neither use it nor free it. Over time, memory leaks accumulate and consume increasing amounts of RAM, eventually degrading system performance or causing the program to crash when no more memory is available. Common causes: losing the only pointer to allocated memory (overwriting it without freeing first), not freeing in all code paths (forgetting to free in error-handling branches), and circular references. In Digital Shadow, we prevent leaks by always freeing deleted event nodes and by implementing a cleanup function that frees all remaining nodes when the program exits.
+              </div>
+            </div>
+          </div>
+
+          <div class="qa-card reveal" data-category="memory" id="qa-31">
+            <div class="qa-question" onclick="toggleQA(this)">
+              <span class="qa-number">31</span>
+              <span class="qa-text">What is dynamic memory allocation?</span>
+              <span class="qa-category-badge" data-cat="memory">Memory</span>
+              <span class="qa-toggle">▾</span>
+            </div>
+            <div class="qa-answer">
+              <div class="qa-answer-inner">
+                <strong>Dynamic memory allocation</strong> is the process of allocating memory at <strong>runtime</strong> rather than at compile time. In C, four standard library functions handle dynamic memory: <strong>1) <code>malloc(size)</code></strong> — allocates <code>size</code> bytes of uninitialized memory. <strong>2) <code>calloc(n, size)</code></strong> — allocates memory for <code>n</code> elements of <code>size</code> bytes each, initialized to zero. <strong>3) <code>realloc(ptr, newSize)</code></strong> — resizes a previously allocated block to <code>newSize</code> bytes. <strong>4) <code>free(ptr)</code></strong> — releases dynamically allocated memory. Dynamic allocation is essential when the amount of memory needed is not known at compile time — such as linked lists where the number of nodes depends on user input. All dynamically allocated memory comes from the <strong>heap</strong> and must be manually managed by the programmer.
+              </div>
+            </div>
+          </div>
+
+          <div class="qa-card reveal" data-category="memory" id="qa-32">
+            <div class="qa-question" onclick="toggleQA(this)">
+              <span class="qa-number">32</span>
+              <span class="qa-text">What is the difference between calloc() and malloc()?</span>
+              <span class="qa-category-badge" data-cat="memory">Memory</span>
+              <span class="qa-toggle">▾</span>
+            </div>
+            <div class="qa-answer">
+              <div class="qa-answer-inner">
+                Both allocate dynamic memory from the heap, but they differ in three ways: <strong>1) Syntax and parameters:</strong> <code>malloc(size)</code> takes a single argument (total bytes), while <code>calloc(n, size)</code> takes two arguments (number of elements and size of each). <strong>2) Initialization:</strong> <code>malloc()</code> does <strong>not initialize</strong> the allocated memory — it contains whatever garbage values were previously stored. <code>calloc()</code> <strong>initializes all bytes to zero</strong>, which is safer but slightly slower. <strong>3) Performance:</strong> <code>calloc()</code> is marginally slower due to the zero-initialization step. Both return <code>void*</code> and return <code>NULL</code> on failure. For example, <code>malloc(10 * sizeof(int))</code> and <code>calloc(10, sizeof(int))</code> allocate the same amount of memory, but <code>calloc</code>'s result is all zeros. For linked list nodes, <code>malloc()</code> is typically used since all fields will be explicitly set anyway.
+              </div>
+            </div>
+          </div>
+
+          <!-- ==================== STRUCTURES (5) ==================== -->
+
+          <div class="qa-card reveal" data-category="structures" id="qa-33">
+            <div class="qa-question" onclick="toggleQA(this)">
+              <span class="qa-number">33</span>
+              <span class="qa-text">What is a structure in C?</span>
+              <span class="qa-category-badge" data-cat="structures">Structures</span>
+              <span class="qa-toggle">▾</span>
+            </div>
+            <div class="qa-answer">
+              <div class="qa-answer-inner">
+                A <strong>structure</strong> (or <code>struct</code>) in C is a user-defined data type that groups together variables of different types under a single name. Unlike arrays (which store multiple values of the same type), structures can hold heterogeneous data. Declared with the <code>struct</code> keyword: <code>struct Student { char name[50]; int age; float gpa; };</code>. Each variable inside is called a <strong>member</strong> or <strong>field</strong>. A structure defines a blueprint; you create instances (variables) of it: <code>struct Student s1;</code>. Memory is allocated contiguously for all members (with possible padding for alignment). In Digital Shadow, the Event structure groups together all the data for a single timeline event: <code>id</code>, <code>title</code>, <code>category</code>, <code>description</code>, <code>timestamp</code>, and the <code>next</code> pointer.
+              </div>
+            </div>
+          </div>
+
+          <div class="qa-card reveal" data-category="structures" id="qa-34">
+            <div class="qa-question" onclick="toggleQA(this)">
+              <span class="qa-number">34</span>
+              <span class="qa-text">How do you access members of a structure?</span>
+              <span class="qa-category-badge" data-cat="structures">Structures</span>
+              <span class="qa-toggle">▾</span>
+            </div>
+            <div class="qa-answer">
+              <div class="qa-answer-inner">
+                There are two ways to access structure members: <strong>1) Dot operator (<code>.</code>)</strong> — used when you have a structure variable (not a pointer): <code>struct Student s1; s1.name = "Alice"; s1.age = 20;</code>. <strong>2) Arrow operator (<code>-></code>)</strong> — used when you have a pointer to a structure: <code>struct Student *ptr = &s1; ptr->name; ptr->age;</code>. The arrow operator is shorthand for <code>(*ptr).name</code> — it dereferences the pointer and accesses the member in one step. In linked list code, you almost always use the arrow operator because you're working with pointers to nodes: <code>current->data</code>, <code>current->next</code>, <code>newNode->title</code>. The dot operator is used when you have the actual structure variable, which is less common in dynamic data structure code.
+              </div>
+            </div>
+          </div>
+
+          <div class="qa-card reveal" data-category="structures" id="qa-35">
+            <div class="qa-question" onclick="toggleQA(this)">
+              <span class="qa-number">35</span>
+              <span class="qa-text">What is the arrow operator (->)?</span>
+              <span class="qa-category-badge" data-cat="structures">Structures</span>
+              <span class="qa-toggle">▾</span>
+            </div>
+            <div class="qa-answer">
+              <div class="qa-answer-inner">
+                The <strong>arrow operator (<code>-></code>)</strong> is used to access members of a structure through a pointer. It combines two operations: dereferencing the pointer and accessing the member. <code>ptr->member</code> is exactly equivalent to <code>(*ptr).member</code>. The arrow operator exists for convenience and readability — writing <code>current->next</code> is cleaner than <code>(*current).next</code>. It is extensively used in linked list and tree operations where you're traversing via pointers. For example, in linked list traversal: <code>while(current != NULL) { printf("%s", current->title); current = current->next; }</code>. Note that you can only use <code>-></code> with pointers to structures, not with structure variables directly. With structure variables, you must use the dot operator.
+              </div>
+            </div>
+          </div>
+
+          <div class="qa-card reveal" data-category="structures" id="qa-36">
+            <div class="qa-question" onclick="toggleQA(this)">
+              <span class="qa-number">36</span>
+              <span class="qa-text">Can a structure contain a pointer to itself?</span>
+              <span class="qa-category-badge" data-cat="structures">Structures</span>
+              <span class="qa-toggle">▾</span>
+            </div>
+            <div class="qa-answer">
+              <div class="qa-answer-inner">
+                <strong>Yes</strong>, a structure can contain a pointer to another instance of the same structure type. This is called a <strong>self-referential structure</strong> and is the foundation of all linked data structures in C. For example: <code>struct Node { int data; struct Node *next; };</code>. Here, <code>next</code> is a pointer to another <code>struct Node</code>. However, a structure <strong>cannot</strong> contain an actual instance of itself (not a pointer) — <code>struct Node { int data; struct Node next; };</code> is <strong>invalid</strong> because the compiler would need infinite memory to resolve the recursive definition. A pointer works because all pointers have a fixed, known size (4 bytes on 32-bit, 8 bytes on 64-bit systems) regardless of the type they point to. This mechanism enables linked lists, binary trees, graphs, and other recursive data structures.
+              </div>
+            </div>
+          </div>
+
+          <div class="qa-card reveal" data-category="structures" id="qa-37">
+            <div class="qa-question" onclick="toggleQA(this)">
+              <span class="qa-number">37</span>
+              <span class="qa-text">What is typedef?</span>
+              <span class="qa-category-badge" data-cat="structures">Structures</span>
+              <span class="qa-toggle">▾</span>
+            </div>
+            <div class="qa-answer">
+              <div class="qa-answer-inner">
+                <code>typedef</code> is a C keyword that creates an <strong>alias</strong> (alternative name) for an existing data type. It makes code more readable and easier to modify. Syntax: <code>typedef existing_type new_name;</code>. Common uses: <strong>1)</strong> Simplifying structure declarations: without typedef, you must write <code>struct Node *ptr;</code> every time. With <code>typedef struct Node { ... } Node;</code>, you can simply write <code>Node *ptr;</code>. <strong>2)</strong> Creating platform-independent types: <code>typedef unsigned long uint64;</code>. <strong>3)</strong> Simplifying complex declarations: <code>typedef int (*FuncPtr)(int, int);</code> creates a readable function pointer type. In Digital Shadow, we use <code>typedef struct Event { ... } Event;</code> so we can write <code>Event *newEvent</code> instead of the more verbose <code>struct Event *newEvent</code> throughout the code.
+              </div>
+            </div>
+          </div>
+
+          <!-- ==================== COMPLEXITY (5) ==================== -->
+
+          <div class="qa-card reveal" data-category="complexity" id="qa-38">
+            <div class="qa-question" onclick="toggleQA(this)">
+              <span class="qa-number">38</span>
+              <span class="qa-text">What is time complexity?</span>
+              <span class="qa-category-badge" data-cat="complexity">Complexity</span>
+              <span class="qa-toggle">▾</span>
+            </div>
+            <div class="qa-answer">
+              <div class="qa-answer-inner">
+                <strong>Time complexity</strong> is a mathematical measure that describes how the <strong>running time</strong> of an algorithm grows as a function of the input size (n). It uses <strong>Big-O notation</strong> to express the upper bound of growth rate, focusing on the <strong>dominant term</strong> and ignoring constants and lower-order terms. For example, if an algorithm takes 3n² + 5n + 2 steps, its time complexity is O(n²). Common complexities (from fastest to slowest): <strong>O(1)</strong> — constant, <strong>O(log n)</strong> — logarithmic, <strong>O(n)</strong> — linear, <strong>O(n log n)</strong> — linearithmic, <strong>O(n²)</strong> — quadratic, <strong>O(2ⁿ)</strong> — exponential. Time complexity helps us compare algorithms independently of hardware, language, or implementation details, and predict how they will scale with larger inputs.
+              </div>
+            </div>
+          </div>
+
+          <div class="qa-card reveal" data-category="complexity" id="qa-39">
+            <div class="qa-question" onclick="toggleQA(this)">
+              <span class="qa-number">39</span>
+              <span class="qa-text">What is O(n)?</span>
+              <span class="qa-category-badge" data-cat="complexity">Complexity</span>
+              <span class="qa-toggle">▾</span>
+            </div>
+            <div class="qa-answer">
+              <div class="qa-answer-inner">
+                <strong>O(n)</strong> denotes <strong>linear time complexity</strong>. It means the running time of the algorithm grows directly proportional to the input size. If you double the input, the time roughly doubles. This occurs when the algorithm must examine each element exactly once (or a constant number of times). Examples: traversing a linked list to print all elements, searching for an element in an unsorted array, counting the number of nodes, and calculating statistics by visiting every event. In Digital Shadow, most operations are O(n) because they involve traversing the linked list: <strong>searching</strong> requires checking each node against the search term, <strong>sorted insertion</strong> requires finding the correct position, <strong>displaying</strong> the timeline visits every event, and <strong>statistics</strong> computation aggregates data from all nodes.
+              </div>
+            </div>
+          </div>
+
+          <div class="qa-card reveal" data-category="complexity" id="qa-40">
+            <div class="qa-question" onclick="toggleQA(this)">
+              <span class="qa-number">40</span>
+              <span class="qa-text">What is O(1)?</span>
+              <span class="qa-category-badge" data-cat="complexity">Complexity</span>
+              <span class="qa-toggle">▾</span>
+            </div>
+            <div class="qa-answer">
+              <div class="qa-answer-inner">
+                <strong>O(1)</strong> denotes <strong>constant time complexity</strong>. It means the operation takes the same amount of time regardless of the input size. Whether you have 10 elements or 10 million, the operation completes in a fixed number of steps. Examples: accessing an array element by index (<code>arr[5]</code>), pushing or popping from a stack (when implemented with a linked list head), checking if a list is empty, reading the head of a linked list, and hash table lookups (average case). In Digital Shadow, the <strong>undo operation</strong> (stack pop) is O(1) — it always involves the same steps: read the top node, update the top pointer, and process the data, regardless of how many items are in the undo history. Insertion at the head of a linked list is also O(1).
+              </div>
+            </div>
+          </div>
+
+          <div class="qa-card reveal" data-category="complexity" id="qa-41">
+            <div class="qa-question" onclick="toggleQA(this)">
+              <span class="qa-number">41</span>
+              <span class="qa-text">What is space complexity?</span>
+              <span class="qa-category-badge" data-cat="complexity">Complexity</span>
+              <span class="qa-toggle">▾</span>
+            </div>
+            <div class="qa-answer">
+              <div class="qa-answer-inner">
+                <strong>Space complexity</strong> measures the total amount of <strong>memory</strong> an algorithm uses as a function of input size, including both the input data and any auxiliary (extra) space needed. It is expressed using Big-O notation, similar to time complexity. It includes: <strong>1) Fixed part</strong> — space for constants, simple variables, program instructions (independent of input size). <strong>2) Variable part</strong> — space that depends on input size: dynamically allocated memory, recursive call stack frames, and temporary data structures. For example, a linked list of n events has O(n) space complexity. The undo stack adds additional O(k) space where k is the number of undo operations stored. A sorting algorithm that creates a copy of the array uses O(n) auxiliary space, while an in-place sort uses O(1) auxiliary space. Digital Shadow's overall space complexity is O(n + k) for n events and k undo entries.
+              </div>
+            </div>
+          </div>
+
+          <div class="qa-card reveal" data-category="complexity" id="qa-42">
+            <div class="qa-question" onclick="toggleQA(this)">
+              <span class="qa-number">42</span>
+              <span class="qa-text">What is best case vs worst case complexity?</span>
+              <span class="qa-category-badge" data-cat="complexity">Complexity</span>
+              <span class="qa-toggle">▾</span>
+            </div>
+            <div class="qa-answer">
+              <div class="qa-answer-inner">
+                Algorithms can have different running times depending on the input: <strong>Best case (Ω — Omega)</strong> — the minimum time an algorithm takes for any input of size n. This is the most favorable scenario. For linear search, the best case is O(1) when the target is the first element. <strong>Average case (Θ — Theta)</strong> — the expected time over all possible inputs of size n. For linear search, it's O(n/2) which simplifies to O(n). <strong>Worst case (O — Big-O)</strong> — the maximum time for any input of size n. This is the most commonly used because it provides an upper bound guarantee. For linear search, the worst case is O(n) when the target is the last element or not present. In Digital Shadow's search function: best case is O(1) (first event matches), worst case is O(n) (event is last or not found), and average case is O(n).
+              </div>
+            </div>
+          </div>
+
+          <!-- ==================== PROJECT-SPECIFIC (13) ==================== -->
+
+          <div class="qa-card reveal" data-category="project" id="qa-43">
+            <div class="qa-question" onclick="toggleQA(this)">
+              <span class="qa-number">43</span>
+              <span class="qa-text">What data structures does Digital Shadow use?</span>
+              <span class="qa-category-badge" data-cat="project">Project</span>
+              <span class="qa-toggle">▾</span>
+            </div>
+            <div class="qa-answer">
+              <div class="qa-answer-inner">
+                Digital Shadow uses two primary data structures: <strong>1) Singly Linked List</strong> — used as the main data store for timeline events. Each node represents one event containing fields for ID, title, category, description, timestamp, and a pointer to the next event. Events are stored in sorted chronological order. The linked list supports operations: insert (sorted), delete (by ID), search (by keyword), traverse (display all), and statistics computation. <strong>2) Stack (implemented as a linked list)</strong> — used for the undo/replay functionality. Each stack node stores operation metadata: the type of operation (add or delete) and a copy of the affected event data. The stack enables LIFO-based operation reversal for the undo feature and sequential replay of the timeline. Together, these structures provide a complete event management system with O(n) main operations and O(1) undo.
+              </div>
+            </div>
+          </div>
+
+          <div class="qa-card reveal" data-category="project" id="qa-44">
+            <div class="qa-question" onclick="toggleQA(this)">
+              <span class="qa-number">44</span>
+              <span class="qa-text">Why did you choose linked list for event storage?</span>
+              <span class="qa-category-badge" data-cat="project">Project</span>
+              <span class="qa-toggle">▾</span>
+            </div>
+            <div class="qa-answer">
+              <div class="qa-answer-inner">
+                We chose a linked list over an array for several reasons: <strong>1) Unknown size:</strong> The number of events a user will create is not known at compile time. A linked list grows dynamically with each new event, while an array would require either a fixed maximum size or expensive reallocation. <strong>2) Frequent insertions/deletions:</strong> Users frequently add and delete events. In a linked list, insertion at any position requires only O(1) pointer updates (after finding the position), while arrays require O(n) element shifting. <strong>3) Sorted insertion:</strong> Events need to be maintained in chronological order. Inserting into a sorted linked list is more efficient than inserting into a sorted array (no shifting). <strong>4) Memory efficiency:</strong> Each node uses exactly the memory needed — no wasted space from pre-allocated but unused array slots. <strong>5) Educational value:</strong> Linked lists demonstrate pointer manipulation, dynamic memory, and self-referential structures — key CS concepts.
+              </div>
+            </div>
+          </div>
+
+          <div class="qa-card reveal" data-category="project" id="qa-45">
+            <div class="qa-question" onclick="toggleQA(this)">
+              <span class="qa-number">45</span>
+              <span class="qa-text">Why did you choose stack for undo/replay?</span>
+              <span class="qa-category-badge" data-cat="project">Project</span>
+              <span class="qa-toggle">▾</span>
+            </div>
+            <div class="qa-answer">
+              <div class="qa-answer-inner">
+                The stack was chosen because its <strong>LIFO (Last-In, First-Out)</strong> property perfectly matches the semantics of an undo operation. When users want to undo, they expect to reverse the <em>most recent</em> action first — exactly what a stack's pop operation provides. A queue (FIFO) would undo the oldest action first, which is counterintuitive. Specific advantages: <strong>1) O(1) push and pop:</strong> Recording an operation (push) and undoing it (pop) are both constant-time operations, ensuring responsive user experience. <strong>2) Natural ordering:</strong> The most recent operation is always on top, requiring no searching or sorting. <strong>3) Simplicity:</strong> The stack abstraction cleanly separates the undo mechanism from the main linked list logic. <strong>4) Replay support:</strong> By traversing the stack, we can also replay the sequence of operations in reverse chronological order.
+              </div>
+            </div>
+          </div>
+
+          <div class="qa-card reveal" data-category="project" id="qa-46">
+            <div class="qa-question" onclick="toggleQA(this)">
+              <span class="qa-number">46</span>
+              <span class="qa-text">How does the undo feature work?</span>
+              <span class="qa-category-badge" data-cat="project">Project</span>
+              <span class="qa-toggle">▾</span>
+            </div>
+            <div class="qa-answer">
+              <div class="qa-answer-inner">
+                The undo feature uses the stack as an operation history: <strong>Recording phase:</strong> Every time the user performs an add or delete operation, the details are pushed onto the undo stack. For an add operation, the stack records "ADD" plus the new event's ID. For a delete operation, the stack records "DELETE" plus a complete copy of the deleted event's data (so it can be restored). <strong>Undo phase:</strong> When the user triggers undo: 1) Pop the top entry from the undo stack. 2) Check the operation type. 3) If it was an ADD — find and delete the event that was added (reverse the addition). 4) If it was a DELETE — re-insert the saved event data back into the linked list at its correct chronological position (reverse the deletion). 5) If the stack is empty, display "Nothing to undo." This approach ensures each undo operation is O(1) for the stack operation itself, plus O(n) for the linked list modification.
+              </div>
+            </div>
+          </div>
+
+          <div class="qa-card reveal" data-category="project" id="qa-47">
+            <div class="qa-question" onclick="toggleQA(this)">
+              <span class="qa-number">47</span>
+              <span class="qa-text">How does the replay feature work?</span>
+              <span class="qa-category-badge" data-cat="project">Project</span>
+              <span class="qa-toggle">▾</span>
+            </div>
+            <div class="qa-answer">
+              <div class="qa-answer-inner">
+                The replay feature provides a sequential playback of all events in the timeline. It works by <strong>traversing the entire linked list from head to tail</strong>, displaying each event one at a time with formatted output. The process: 1) Start from the head of the linked list (earliest event chronologically). 2) Display the current event's details in a formatted card — showing title, category, timestamp, and description. 3) Introduce a brief delay (using <code>sleep()</code> or a loop-based pause) to simulate real-time playback, giving the user time to read each event. 4) Move to the next node and repeat until reaching NULL (end of list). 5) Display a completion message with total events replayed. The replay traverses events in chronological order because the linked list is maintained in sorted order by timestamp. Time complexity is O(n) where n is the number of events.
+              </div>
+            </div>
+          </div>
+
+          <div class="qa-card reveal" data-category="project" id="qa-48">
+            <div class="qa-question" onclick="toggleQA(this)">
+              <span class="qa-number">48</span>
+              <span class="qa-text">How are events stored in memory?</span>
+              <span class="qa-category-badge" data-cat="project">Project</span>
+              <span class="qa-toggle">▾</span>
+            </div>
+            <div class="qa-answer">
+              <div class="qa-answer-inner">
+                Events are stored as <strong>dynamically allocated nodes on the heap</strong>. Each event is a <code>struct Event</code> allocated using <code>malloc(sizeof(Event))</code>. The struct contains fixed-size character arrays for title (100 bytes), category (50 bytes), description (256 bytes), and timestamp (20 bytes), plus an integer ID and a pointer to the next node. These nodes are <strong>not stored contiguously</strong> — each malloc call can return memory from any available heap location. The nodes are <strong>connected via pointers</strong>: each node's <code>next</code> field holds the address of the following node in chronological order. A global <code>head</code> pointer references the first (earliest) event. The undo stack nodes are similarly heap-allocated, forming a separate linked structure with its own <code>top</code> pointer. The total memory footprint is proportional to the number of events.
+              </div>
+            </div>
+          </div>
+
+          <div class="qa-card reveal" data-category="project" id="qa-49">
+            <div class="qa-question" onclick="toggleQA(this)">
+              <span class="qa-number">49</span>
+              <span class="qa-text">What is the time complexity of adding an event?</span>
+              <span class="qa-category-badge" data-cat="project">Project</span>
+              <span class="qa-toggle">▾</span>
+            </div>
+            <div class="qa-answer">
+              <div class="qa-answer-inner">
+                The time complexity of adding an event is <strong>O(n)</strong> in the worst and average case, and <strong>O(1)</strong> in the best case. Here's the breakdown: The event must be inserted in the correct chronological position to maintain the sorted order. This requires traversing the linked list to find the insertion point: <strong>Best case O(1)</strong> — the new event's timestamp is earlier than the head's timestamp, so it's inserted at the beginning without any traversal. <strong>Worst case O(n)</strong> — the new event has the latest timestamp and must be inserted at the end, requiring traversal of all n existing nodes. <strong>Average case O(n/2) = O(n)</strong> — on average, we traverse half the list. After finding the position, the actual insertion (pointer manipulation) is O(1). Additionally, pushing the operation onto the undo stack is O(1). So the overall complexity is dominated by the search phase: O(n).
+              </div>
+            </div>
+          </div>
+
+          <div class="qa-card reveal" data-category="project" id="qa-50">
+            <div class="qa-question" onclick="toggleQA(this)">
+              <span class="qa-number">50</span>
+              <span class="qa-text">How do you search for an event?</span>
+              <span class="qa-category-badge" data-cat="project">Project</span>
+              <span class="qa-toggle">▾</span>
+            </div>
+            <div class="qa-answer">
+              <div class="qa-answer-inner">
+                Event search in Digital Shadow uses <strong>linear search</strong> with string matching. The process: 1) Accept a search query string from the user. 2) Start from the head of the linked list. 3) At each node, compare the search query against the event's <code>title</code>, <code>category</code>, and <code>description</code> fields using <code>strstr()</code> for substring matching or <code>strcmp()</code> for exact matching. The comparison is case-insensitive (using <code>strcasecmp()</code> or converting both strings to lowercase). 4) If a match is found, display the event details and increment a match counter. 5) Continue to the next node until NULL. 6) Display the total number of matches found. Time complexity is <strong>O(n × m)</strong> where n is the number of events and m is the average string comparison cost. Since m is bounded by the fixed field sizes, it simplifies to <strong>O(n)</strong>.
+              </div>
+            </div>
+          </div>
+
+          <div class="qa-card reveal" data-category="project" id="qa-51">
+            <div class="qa-question" onclick="toggleQA(this)">
+              <span class="qa-number">51</span>
+              <span class="qa-text">What happens when you delete an event?</span>
+              <span class="qa-category-badge" data-cat="project">Project</span>
+              <span class="qa-toggle">▾</span>
+            </div>
+            <div class="qa-answer">
+              <div class="qa-answer-inner">
+                When an event is deleted: <strong>1) Search phase:</strong> The linked list is traversed to find the event with the matching ID, keeping track of the previous node. <strong>2) Undo backup:</strong> Before removing, a copy of the event's complete data is created and pushed onto the undo stack (so the deletion can be reversed). <strong>3) Pointer update:</strong> The previous node's <code>next</code> pointer is updated to skip the target node: <code>prev->next = target->next</code>. If the target is the head, the head pointer is updated to <code>head->next</code>. <strong>4) Memory deallocation:</strong> <code>free(target)</code> releases the node's heap memory back to the system. <strong>5) Confirmation:</strong> A success message is displayed. If the event ID is not found, an error message is shown instead. Total time complexity: O(n) for the search + O(1) for the deletion + O(1) for the undo push = <strong>O(n)</strong>.
+              </div>
+            </div>
+          </div>
+
+          <div class="qa-card reveal" data-category="project" id="qa-52">
+            <div class="qa-question" onclick="toggleQA(this)">
+              <span class="qa-number">52</span>
+              <span class="qa-text">How are statistics calculated?</span>
+              <span class="qa-category-badge" data-cat="project">Project</span>
+              <span class="qa-toggle">▾</span>
+            </div>
+            <div class="qa-answer">
+              <div class="qa-answer-inner">
+                Statistics are calculated by performing a <strong>single-pass traversal</strong> of the entire linked list, aggregating data as each node is visited: <strong>1) Total event count:</strong> A simple counter incremented at each node. <strong>2) Category distribution:</strong> An associative approach — maintain an array of category names and counts. For each event, check if its category already exists in the array; if so, increment the count; if not, add a new entry. <strong>3) Date range:</strong> Track the earliest and latest timestamps encountered during traversal by comparing each event's timestamp with the current min/max. <strong>4) Most active period:</strong> Parse timestamps to extract dates, count events per date, and identify the date with the highest count. All statistics are computed in <strong>O(n)</strong> time with a single traversal. The results are displayed in a formatted summary after the traversal completes. No additional sorting or restructuring of the linked list is needed.
+              </div>
+            </div>
+          </div>
+
+          <div class="qa-card reveal" data-category="project" id="qa-53">
+            <div class="qa-question" onclick="toggleQA(this)">
+              <span class="qa-number">53</span>
+              <span class="qa-text">What is the role of the timestamp in each event?</span>
+              <span class="qa-category-badge" data-cat="project">Project</span>
+              <span class="qa-toggle">▾</span>
+            </div>
+            <div class="qa-answer">
+              <div class="qa-answer-inner">
+                The timestamp serves multiple critical roles: <strong>1) Chronological ordering:</strong> It is the primary sort key for the linked list. When a new event is inserted, its timestamp is compared with existing events' timestamps using <code>strcmp()</code> (which works correctly for "YYYY-MM-DD HH:MM" format because lexicographic order matches chronological order). The event is inserted at the position that maintains sorted order. <strong>2) Timeline reconstruction:</strong> Timestamps enable the core purpose of the project — reconstructing when digital events occurred. <strong>3) Search criteria:</strong> Users can search for events by date or time range. <strong>4) Statistics:</strong> Timestamps are parsed to calculate date ranges, identify most active periods, and generate time-based analytics. <strong>5) Display context:</strong> When replaying or displaying events, the timestamp provides temporal context. The format "YYYY-MM-DD HH:MM" was chosen because it is human-readable and lexicographically sortable.
+              </div>
+            </div>
+          </div>
+
+          <div class="qa-card reveal" data-category="project" id="qa-54">
+            <div class="qa-question" onclick="toggleQA(this)">
+              <span class="qa-number">54</span>
+              <span class="qa-text">How would you improve this project?</span>
+              <span class="qa-category-badge" data-cat="project">Project</span>
+              <span class="qa-toggle">▾</span>
+            </div>
+            <div class="qa-answer">
+              <div class="qa-answer-inner">
+                Several improvements could enhance Digital Shadow: <strong>1) Persistent storage:</strong> Save events to files (CSV, JSON, or binary) so data survives between sessions. <strong>2) GUI:</strong> Replace the console interface with a graphical one using GTK, Qt, or a web-based frontend for better user experience. <strong>3) Better search:</strong> Implement a hash table or trie for O(1) average-case search instead of O(n) linear search. <strong>4) Multi-level undo:</strong> Add redo support with two stacks (undo stack and redo stack). <strong>5) Input validation:</strong> Robust checking of timestamp formats, string lengths, and special characters. <strong>6) Database backend:</strong> Use SQLite for structured storage with SQL query capabilities. <strong>7) Encryption:</strong> Protect sensitive event data with encryption at rest. <strong>8) Export features:</strong> Generate PDF or CSV reports of the timeline. <strong>9) Doubly linked list:</strong> Enable backward traversal for reverse chronological viewing. <strong>10) Unit tests:</strong> Add automated tests for all core functions.
+              </div>
+            </div>
+          </div>
+
+          <div class="qa-card reveal" data-category="project" id="qa-55">
+            <div class="qa-question" onclick="toggleQA(this)">
+              <span class="qa-number">55</span>
+              <span class="qa-text">Can this project work with a database instead of linked list?</span>
+              <span class="qa-category-badge" data-cat="project">Project</span>
+              <span class="qa-toggle">▾</span>
+            </div>
+            <div class="qa-answer">
+              <div class="qa-answer-inner">
+                <strong>Yes, absolutely.</strong> A database (like SQLite, MySQL, or PostgreSQL) could replace the linked list as the storage mechanism, and in a production application, this would be the preferred approach. <strong>Advantages of database:</strong> Persistent storage (data survives program restarts), indexed searching (O(log n) instead of O(n)), concurrent multi-user access, SQL queries for complex filtering and aggregation, built-in data integrity constraints, and scalability to millions of records. <strong>Trade-offs:</strong> Databases add external dependencies, complexity, and setup requirements. They also abstract away the data structure concepts that are the educational purpose of this project. <strong>Hybrid approach:</strong> You could use a linked list as an in-memory cache and periodically sync to a database. The core algorithms (sorted insertion, undo logic) would remain the same — only the storage layer would change. This separation of concerns is a key software engineering principle.
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- No Results -->
+        <div class="no-results" id="noResults">
+          <div class="no-results-icon">🔍</div>
+          <h3 style="color: var(--text-primary); font-family: 'Space Grotesk', sans-serif; margin-bottom: 0.5rem;">No questions found</h3>
+          <p>Try a different search term or category filter.</p>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-brand">
+        <span class="logo-icon">◈</span>
+        <span>Digital Shadow</span>
+      </div>
+      <p class="footer-tagline">Your Life Has a Memory, Even When You Don't.</p>
+      <div class="footer-links">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="visualization.html">Demo</a>
+        <a href="contact.html">Contact</a>
+      </div>
+      <p class="footer-copy">© 2026 Digital Shadow. Built with passion.</p>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script src="js/navbar.js"></script>
+  <script src="js/theme.js"></script>
+  <script src="js/particles.js"></script>
+  <script src="js/search.js"></script>
+  <script>
+    // Toggle Q&A Card
+    function toggleQA(element) {
+      const card = element.closest('.qa-card');
+      card.classList.toggle('open');
+    }
+
+    // Filter functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const filterBtns = document.querySelectorAll('.filter-btn');
+      const qaCards = document.querySelectorAll('.qa-card');
+      const searchInput = document.getElementById('vivaSearch');
+      const noResults = document.getElementById('noResults');
+      const visibleCount = document.getElementById('visibleCount');
+      let activeFilter = 'all';
+
+      function applyFilters() {
+        const searchTerm = searchInput.value.toLowerCase().trim();
+        let visible = 0;
+
+        qaCards.forEach(card => {
+          const category = card.getAttribute('data-category');
+          const questionText = card.querySelector('.qa-text').textContent.toLowerCase();
+          const answerText = card.querySelector('.qa-answer-inner').textContent.toLowerCase();
+
+          const matchesFilter = activeFilter === 'all' || category === activeFilter;
+          const matchesSearch = searchTerm === '' || questionText.includes(searchTerm) || answerText.includes(searchTerm);
+
+          if (matchesFilter && matchesSearch) {
+            card.classList.remove('hidden');
+            visible++;
+          } else {
+            card.classList.add('hidden');
+          }
+        });
+
+        visibleCount.textContent = visible;
+        noResults.classList.toggle('show', visible === 0);
+      }
+
+      filterBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+          filterBtns.forEach(b => b.classList.remove('active'));
+          this.classList.add('active');
+          activeFilter = this.getAttribute('data-filter');
+          applyFilters();
+        });
+      });
+
+      searchInput.addEventListener('input', applyFilters);
+    });
+  </script>
+</body>
+</html>

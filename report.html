@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Project Report — Digital Shadow</title>
+  <meta name="description" content="Complete project report for Digital Shadow — a Digital Life Timeline Reconstruction System using Linked List and Stack in C.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>◈</text></svg>">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/navbar.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/cards.css">
+  <link rel="stylesheet" href="css/timeline.css">
+  <link rel="stylesheet" href="css/compiler.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <link rel="stylesheet" href="css/darktheme.css">
+  <style>
+    /* ===== REPORT PAGE SPECIFIC STYLES ===== */
+    .report-layout {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 3rem;
+      align-items: start;
+    }
+
+    /* Table of Contents */
+    .toc-sidebar {
+      position: sticky;
+      top: 100px;
+      background: var(--surface);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      max-height: calc(100vh - 140px);
+      overflow-y: auto;
+    }
+
+    .toc-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--text-tertiary);
+      margin-bottom: 1rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--surface-border);
+    }
+
+    .toc-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .toc-list li {
+      margin-bottom: 0.15rem;
+    }
+
+    .toc-link {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.5rem 0.75rem;
+      border-radius: var(--radius-sm);
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.85rem;
+      transition: all 0.2s ease;
+      line-height: 1.4;
+    }
+
+    .toc-link:hover {
+      color: var(--text-primary);
+      background: var(--surface-hover);
+    }
+
+    .toc-link.active {
+      color: var(--primary-glow);
+      background: rgba(124, 92, 255, 0.1);
+    }
+
+    .toc-number {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 600;
+      font-size: 0.75rem;
+      color: var(--primary);
+      min-width: 22px;
+    }
+
+    /* Report Content */
+    .report-content {
+      min-width: 0;
+    }
+
+    .report-section {
+      background: var(--surface);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-lg);
+      padding: 2.5rem;
+      margin-bottom: 2rem;
+      transition: all 0.3s ease;
+      scroll-margin-top: 100px;
+    }
+
+    .report-section:hover {
+      border-color: var(--surface-border-hover);
+    }
+
+    .section-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-sm);
+      background: rgba(124, 92, 255, 0.1);
+      border: 1px solid rgba(124, 92, 255, 0.2);
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--primary-glow);
+      margin-bottom: 1rem;
+    }
+
+    .report-section-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(1.3rem, 2.5vw, 1.7rem);
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 1.25rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--surface-border);
+    }
+
+    .report-text {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      line-height: 1.8;
+      margin-bottom: 1rem;
+    }
+
+    .report-text:last-child {
+      margin-bottom: 0;
+    }
+
+    .report-list {
+      list-style: none;
+      padding: 0;
+      margin: 1rem 0;
+    }
+
+    .report-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding: 0.6rem 0;
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    .report-list li::before {
+      content: '▸';
+      color: var(--primary);
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .report-list.numbered li {
+      counter-increment: report-counter;
+    }
+
+    .report-list.numbered li::before {
+      content: counter(report-counter) '.';
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 600;
+      min-width: 24px;
+    }
+
+    .report-code {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-sm);
+      padding: 0.2rem 0.5rem;
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+      font-size: 0.85rem;
+      color: var(--accent);
+    }
+
+    .report-highlight {
+      background: rgba(124, 92, 255, 0.1);
+      border-left: 3px solid var(--primary);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      padding: 1rem 1.5rem;
+      margin: 1.25rem 0;
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      line-height: 1.7;
+    }
+
+    /* Download Button */
+    .download-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      background: var(--surface);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem 2rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .download-info {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    .download-info strong {
+      color: var(--text-primary);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.7rem 1.5rem;
+      border-radius: var(--radius-pill);
+      font-family: 'Inter', sans-serif;
+      font-weight: 500;
+      font-size: 0.9rem;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .btn-primary {
+      background: var(--gradient-primary);
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(124, 92, 255, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: scale(1.02);
+      box-shadow: 0 6px 25px rgba(124, 92, 255, 0.5);
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: -80px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--bg-tertiary);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-md);
+      padding: 1rem 2rem;
+      color: var(--text-primary);
+      font-size: 0.9rem;
+      font-family: 'Inter', sans-serif;
+      z-index: 10000;
+      transition: bottom 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      backdrop-filter: blur(20px);
+    }
+
+    .toast.show {
+      bottom: 30px;
+    }
+
+    .toast-icon {
+      font-size: 1.2rem;
+    }
+
+    /* Code block */
+    .code-block-report {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-md);
+      padding: 1.25rem 1.5rem;
+      margin: 1rem 0;
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+      font-size: 0.8rem;
+      line-height: 1.7;
+      color: var(--text-secondary);
+      overflow-x: auto;
+      white-space: pre;
+    }
+
+    .code-block-report .keyword {
+      color: var(--primary-glow);
+    }
+
+    .code-block-report .type {
+      color: var(--accent);
+    }
+
+    .code-block-report .comment {
+      color: var(--text-tertiary);
+    }
+
+    .code-block-report .string {
+      color: var(--warning);
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .report-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .toc-sidebar {
+        position: relative;
+        top: 0;
+        max-height: none;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .report-section {
+        padding: 1.5rem;
+      }
+
+      .download-bar {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="nav-logo">
+        <span class="logo-icon">◈</span>
+        <span class="logo-text">Digital Shadow</span>
+      </a>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="nav-menu" id="navMenu">
+        <div class="nav-links">
+          <a href="index.html" class="nav-link">Home</a>
+          <a href="about.html" class="nav-link">About</a>
+          <a href="problem.html" class="nav-link">Problem</a>
+          <a href="features.html" class="nav-link">Features</a>
+          <a href="architecture.html" class="nav-link">Architecture</a>
+          <div class="nav-dropdown">
+            <button class="nav-link dropdown-trigger">Data Structures <span class="dropdown-arrow">▾</span></button>
+            <div class="dropdown-menu">
+              <a href="linkedlist.html" class="dropdown-link">Linked List</a>
+              <a href="stack.html" class="dropdown-link">Stack</a>
+            </div>
+          </div>
+          <a href="flowchart.html" class="nav-link">Flowchart</a>
+          <a href="algorithm.html" class="nav-link">Algorithm</a>
+          <a href="visualization.html" class="nav-link">Visualization</a>
+          <a href="compiler.html" class="nav-link">Compiler</a>
+          <a href="statistics.html" class="nav-link">Statistics</a>
+          <a href="future.html" class="nav-link">Future</a>
+          <a href="viva.html" class="nav-link">Viva</a>
+          <a href="report.html" class="nav-link active">Report</a>
+          <a href="ppt.html" class="nav-link">PPT</a>
+          <a href="contact.html" class="nav-link">Contact</a>
+        </div>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+          <span class="theme-icon">🌙</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <div id="particles-container" class="particles-container"></div>
+
+  <main>
+    <section class="page-hero">
+      <div class="container">
+        <span class="section-badge">REPORT</span>
+        <h1 class="page-title">Project Report</h1>
+        <p class="page-subtitle">A comprehensive academic report documenting the design, development, and evaluation of Digital Shadow — a timeline reconstruction system built with linked lists and stacks in C.</p>
+      </div>
+    </section>
+
+    <section class="section" id="report-main">
+      <div class="container">
+        <!-- Download Bar -->
+        <div class="download-bar reveal">
+          <div class="download-info">
+            <strong>Digital Shadow — Project Report</strong><br>
+            Complete documentation • 9 Sections • Data Structures & Algorithms in C
+          </div>
+          <button class="btn btn-primary" id="downloadPdfBtn" onclick="showToast()">
+            <span>📥</span> Download PDF
+          </button>
+        </div>
+
+        <div class="report-layout">
+          <!-- Table of Contents Sidebar -->
+          <aside class="toc-sidebar reveal" id="tocSidebar">
+            <h3 class="toc-title">Table of Contents</h3>
+            <ol class="toc-list">
+              <li><a href="#sec-abstract" class="toc-link active" data-section="sec-abstract"><span class="toc-number">1</span> Abstract</a></li>
+              <li><a href="#sec-problem" class="toc-link" data-section="sec-problem"><span class="toc-number">2</span> Problem Statement</a></li>
+              <li><a href="#sec-objectives" class="toc-link" data-section="sec-objectives"><span class="toc-number">3</span> Objectives</a></li>
+              <li><a href="#sec-methodology" class="toc-link" data-section="sec-methodology"><span class="toc-number">4</span> Methodology</a></li>
+              <li><a href="#sec-implementation" class="toc-link" data-section="sec-implementation"><span class="toc-number">5</span> Implementation</a></li>
+              <li><a href="#sec-advantages" class="toc-link" data-section="sec-advantages"><span class="toc-number">6</span> Advantages</a></li>
+              <li><a href="#sec-limitations" class="toc-link" data-section="sec-limitations"><span class="toc-number">7</span> Limitations</a></li>
+              <li><a href="#sec-future" class="toc-link" data-section="sec-future"><span class="toc-number">8</span> Future Scope</a></li>
+              <li><a href="#sec-conclusion" class="toc-link" data-section="sec-conclusion"><span class="toc-number">9</span> Conclusion</a></li>
+            </ol>
+          </aside>
+
+          <!-- Report Content -->
+          <div class="report-content">
+            <!-- 1. Abstract -->
+            <article class="report-section reveal" id="sec-abstract">
+              <div class="section-number">1</div>
+              <h2 class="report-section-title">Abstract</h2>
+              <p class="report-text"><strong>Digital Shadow</strong> is a console-based application developed in the C programming language that enables users to construct, manage, and reconstruct a chronological timeline of digital life events. The system leverages fundamental data structures — specifically <em>singly linked lists</em> for sequential event storage and <em>stacks</em> for undo and replay functionality — to deliver an efficient and educational tool for timeline management.</p>
+              <p class="report-text">The project addresses the challenge of organizing and reconstructing scattered digital activities into a coherent, chronological narrative. Users can add timestamped events with categories, search through their timeline, delete specific entries, view statistical summaries, undo recent operations, and replay their entire timeline in sequence. The application demonstrates practical applications of data structures and algorithms taught in computer science curricula while solving a real-world information management problem.</p>
+              <div class="report-highlight">
+                <strong>Keywords:</strong> Linked List, Stack, Timeline Reconstruction, Data Structures, C Programming, Digital Forensics, Event Management, Dynamic Memory Allocation
+              </div>
+            </article>
+
+            <!-- 2. Problem Statement -->
+            <article class="report-section reveal" id="sec-problem">
+              <div class="section-number">2</div>
+              <h2 class="report-section-title">Problem Statement</h2>
+              <p class="report-text">In the modern digital age, individuals generate vast amounts of data across numerous platforms, devices, and applications daily. From social media interactions and browsing history to file modifications and communication logs, the digital footprint of a person is extensive yet fragmented. This fragmentation presents a significant challenge: <strong>reconstructing a coherent, chronological timeline of digital activities.</strong></p>
+              <p class="report-text">Digital forensics professionals, researchers, and even everyday users often need to piece together scattered digital events to understand sequences of actions, identify patterns, or recover lost information. However, without a dedicated system for organizing these events, users are left to manually sort through disjointed data — a process that is time-consuming, error-prone, and cognitively taxing.</p>
+              <p class="report-text">Furthermore, from an academic perspective, students learning data structures often struggle to see the practical application of concepts like linked lists and stacks beyond textbook exercises. There exists a gap between theoretical understanding and practical implementation that hinders deep learning.</p>
+              <div class="report-highlight">
+                <strong>Core Problem:</strong> There is no lightweight, educational tool that demonstrates linked list and stack operations through a practical, engaging application while simultaneously addressing the real-world challenge of digital timeline reconstruction.
+              </div>
+            </article>
+
+            <!-- 3. Objectives -->
+            <article class="report-section reveal" id="sec-objectives">
+              <div class="section-number">3</div>
+              <h2 class="report-section-title">Objectives</h2>
+              <p class="report-text">The primary objectives of the Digital Shadow project are as follows:</p>
+              <ul class="report-list">
+                <li>Design and implement a singly linked list to store and manage timestamped digital life events in chronological order, supporting efficient insertion, deletion, and traversal operations.</li>
+                <li>Implement a stack data structure to enable undo functionality, allowing users to reverse their most recent operations and restore the timeline to previous states.</li>
+                <li>Develop a replay feature using the stack that allows users to sequentially replay their recorded timeline events in chronological order for review and analysis.</li>
+                <li>Provide search functionality enabling users to locate specific events by keyword, category, or timestamp with efficient traversal algorithms.</li>
+                <li>Generate statistical summaries of the timeline, including total event counts, category distributions, and time-range analysis, demonstrating data aggregation over linked structures.</li>
+                <li>Create an intuitive, menu-driven console interface that guides users through all available operations with clear prompts and formatted output.</li>
+              </ul>
+            </article>
+
+            <!-- 4. Methodology -->
+            <article class="report-section reveal" id="sec-methodology">
+              <div class="section-number">4</div>
+              <h2 class="report-section-title">Methodology</h2>
+              <p class="report-text">The development of Digital Shadow followed a structured, iterative approach grounded in software engineering principles adapted for an educational C programming project.</p>
+
+              <p class="report-text"><strong>4.1 Data Structure Selection</strong></p>
+              <p class="report-text">The choice of data structures was driven by the nature of the problem domain. A <em>singly linked list</em> was selected as the primary storage structure for events because:</p>
+              <ul class="report-list">
+                <li>Events are inherently sequential and chronological, mapping naturally to a linear linked structure.</li>
+                <li>Dynamic memory allocation allows the timeline to grow and shrink without predefined size limits.</li>
+                <li>Insertion at various positions (head, tail, sorted by timestamp) is efficient with pointer manipulation.</li>
+                <li>Deletion of arbitrary nodes is straightforward without the costly shifting required in arrays.</li>
+              </ul>
+
+              <p class="report-text">A <em>stack</em> (implemented via a linked list) was chosen for undo and replay because:</p>
+              <ul class="report-list">
+                <li>The Last-In-First-Out (LIFO) property naturally models "undo" operations — the most recent action is undone first.</li>
+                <li>Push and pop operations execute in O(1) time complexity, ensuring responsive undo functionality.</li>
+                <li>The stack can store operation metadata (type, data, pointers) for complete state restoration.</li>
+              </ul>
+
+              <p class="report-text"><strong>4.2 Design Approach</strong></p>
+              <p class="report-text">The system was designed using a modular, function-based architecture. Each major feature (add, delete, search, undo, replay, statistics) was implemented as an independent function with clear interfaces. This separation of concerns ensures maintainability, testability, and readability. Memory management was handled manually using <span class="report-code">malloc()</span> and <span class="report-code">free()</span>, with careful attention to preventing memory leaks and dangling pointers.</p>
+
+              <p class="report-text"><strong>4.3 Development Process</strong></p>
+              <ul class="report-list">
+                <li><strong>Phase 1 — Core structures:</strong> Define the Event node struct and linked list operations (insert, delete, traverse).</li>
+                <li><strong>Phase 2 — Stack operations:</strong> Implement push/pop for undo history and replay queue.</li>
+                <li><strong>Phase 3 — Features:</strong> Build search, statistics, display, and category filtering functions.</li>
+                <li><strong>Phase 4 — Integration:</strong> Connect all modules through a menu-driven main loop with error handling.</li>
+                <li><strong>Phase 5 — Testing:</strong> Validate edge cases (empty list, single node, duplicate timestamps) and memory management.</li>
+              </ul>
+            </article>
+
+            <!-- 5. Implementation -->
+            <article class="report-section reveal" id="sec-implementation">
+              <div class="section-number">5</div>
+              <h2 class="report-section-title">Implementation</h2>
+              <p class="report-text"><strong>5.1 Core Data Structures</strong></p>
+              <p class="report-text">The event node structure forms the foundation of the system:</p>
+              <div class="code-block-report"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="type">Event</span> {
+    <span class="type">int</span> id;
+    <span class="type">char</span> title[<span class="string">100</span>];
+    <span class="type">char</span> category[<span class="string">50</span>];
+    <span class="type">char</span> description[<span class="string">256</span>];
+    <span class="type">char</span> timestamp[<span class="string">20</span>];     <span class="comment">// Format: "YYYY-MM-DD HH:MM"</span>
+    <span class="keyword">struct</span> <span class="type">Event</span> *next;       <span class="comment">// Pointer to next event</span>
+} <span class="type">Event</span>;</div>
+
+              <p class="report-text">The stack node for undo operations:</p>
+              <div class="code-block-report"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="type">UndoNode</span> {
+    <span class="type">int</span> operationType;       <span class="comment">// 1 = ADD, 2 = DELETE</span>
+    <span class="type">Event</span> *eventData;        <span class="comment">// Copy of affected event</span>
+    <span class="keyword">struct</span> <span class="type">UndoNode</span> *next;   <span class="comment">// Stack pointer</span>
+} <span class="type">UndoNode</span>;</div>
+
+              <p class="report-text"><strong>5.2 Key Functions</strong></p>
+              <ul class="report-list">
+                <li><span class="report-code">addEvent()</span> — Creates a new event node with user-provided data, allocates memory dynamically, and inserts it into the linked list in chronological order based on timestamp. Pushes the operation onto the undo stack.</li>
+                <li><span class="report-code">deleteEvent()</span> — Searches for an event by ID, removes the node from the linked list by updating pointers, pushes the deleted data onto the undo stack for potential restoration, and frees the memory.</li>
+                <li><span class="report-code">searchEvent()</span> — Traverses the linked list linearly, comparing each node's title, category, or timestamp against the search query using string matching functions. Returns all matching results.</li>
+                <li><span class="report-code">undoLastAction()</span> — Pops the top element from the undo stack, examines the operation type, and reverses it: if the last operation was an addition, it deletes the event; if it was a deletion, it re-inserts the event.</li>
+                <li><span class="report-code">replayTimeline()</span> — Traverses the linked list from head to tail, displaying each event with formatted output and brief pauses between entries to simulate a sequential playback experience.</li>
+                <li><span class="report-code">displayStatistics()</span> — Iterates through the entire linked list, aggregating data to compute total event count, events per category, date range coverage, and most active time periods.</li>
+              </ul>
+
+              <p class="report-text"><strong>5.3 Algorithms and Complexity</strong></p>
+              <ul class="report-list">
+                <li><strong>Sorted Insertion:</strong> O(n) — Linear traversal to find the correct chronological position.</li>
+                <li><strong>Deletion by ID:</strong> O(n) — Linear search followed by O(1) pointer update.</li>
+                <li><strong>Search:</strong> O(n) — Complete traversal with string comparison at each node.</li>
+                <li><strong>Undo (Push/Pop):</strong> O(1) — Constant time stack operations.</li>
+                <li><strong>Replay:</strong> O(n) — Complete traversal of the event list.</li>
+                <li><strong>Statistics:</strong> O(n) — Single pass aggregation with category counting.</li>
+              </ul>
+            </article>
+
+            <!-- 6. Advantages -->
+            <article class="report-section reveal" id="sec-advantages">
+              <div class="section-number">6</div>
+              <h2 class="report-section-title">Advantages</h2>
+              <p class="report-text">Digital Shadow offers several significant advantages as both a practical tool and an educational project:</p>
+              <ul class="report-list">
+                <li><strong>Dynamic Memory Utilization:</strong> Unlike array-based implementations, the linked list grows and shrinks as needed, using only as much memory as required by the current number of events. There is no wasted space from pre-allocated arrays and no arbitrary upper limit on event count.</li>
+                <li><strong>Efficient Insertion and Deletion:</strong> Adding or removing events requires only pointer manipulation rather than shifting large blocks of data. Insertion at any position in the sorted timeline operates in O(n) time for finding the position but O(1) for the actual insertion.</li>
+                <li><strong>Robust Undo Mechanism:</strong> The stack-based undo system provides reliable, constant-time operation reversal. Users can confidently modify their timeline knowing that any accidental changes can be instantly reversed.</li>
+                <li><strong>Educational Value:</strong> The project serves as a comprehensive, practical demonstration of linked lists, stacks, dynamic memory allocation, pointers, and structures in C — concepts that are often taught in isolation without real-world context.</li>
+                <li><strong>Modular Architecture:</strong> The separation of data structure operations into independent functions allows for easy testing, debugging, and future extension. New features can be added without modifying existing code.</li>
+                <li><strong>Low Resource Footprint:</strong> As a console-based C application, Digital Shadow runs efficiently on minimal hardware with no dependencies on external libraries, databases, or frameworks.</li>
+                <li><strong>Chronological Integrity:</strong> The sorted insertion algorithm ensures that events are always maintained in proper chronological order, regardless of the sequence in which they are entered by the user.</li>
+              </ul>
+            </article>
+
+            <!-- 7. Limitations -->
+            <article class="report-section reveal" id="sec-limitations">
+              <div class="section-number">7</div>
+              <h2 class="report-section-title">Limitations</h2>
+              <p class="report-text">Despite its strengths, the current implementation has several limitations that represent opportunities for future development:</p>
+              <ul class="report-list">
+                <li><strong>No Persistent Storage:</strong> All event data exists only in RAM during program execution. When the program terminates, all timeline data is lost. There is no file I/O or database integration for saving and loading timelines between sessions.</li>
+                <li><strong>Console-Only Interface:</strong> The current text-based interface, while functional, lacks the visual appeal and intuitive navigation of a graphical user interface. Users must navigate through numbered menu options rather than clicking buttons or interacting with visual elements.</li>
+                <li><strong>Single-User Design:</strong> The system supports only one user at a time with no authentication, user profiles, or multi-user data isolation. All events exist in a single shared timeline.</li>
+                <li><strong>Linear Search Performance:</strong> The search functionality relies on linear traversal of the linked list, resulting in O(n) time complexity. For very large timelines (thousands of events), this could become noticeably slow compared to indexed or hash-based search approaches.</li>
+                <li><strong>Limited Undo Depth:</strong> While the stack can theoretically store unlimited undo history, it consumes memory proportional to the number of operations. There is no configurable limit or garbage collection for old undo entries.</li>
+                <li><strong>No Data Validation:</strong> Input validation for timestamps, categories, and event descriptions is minimal. Malformed input could lead to inconsistent data in the timeline.</li>
+              </ul>
+            </article>
+
+            <!-- 8. Future Scope -->
+            <article class="report-section reveal" id="sec-future">
+              <div class="section-number">8</div>
+              <h2 class="report-section-title">Future Scope</h2>
+              <p class="report-text">Digital Shadow has significant potential for expansion and enhancement across multiple dimensions:</p>
+              <ul class="report-list">
+                <li><strong>Graphical User Interface:</strong> Implement a visual interface using GTK, Qt, or web technologies to replace the console-based interaction, providing drag-and-drop timeline management and visual event cards.</li>
+                <li><strong>Persistent Storage:</strong> Integrate file-based storage (CSV, JSON) or database systems (SQLite) to save and load timeline data across sessions, ensuring no data loss on program exit.</li>
+                <li><strong>Cloud Synchronization:</strong> Enable cloud-based storage and syncing so users can access their timelines from multiple devices seamlessly.</li>
+                <li><strong>AI and Machine Learning:</strong> Apply pattern recognition algorithms to detect recurring behaviors, predict future events, and provide intelligent insights about the user's digital habits.</li>
+                <li><strong>IoT Integration:</strong> Connect with smart devices and wearables to automatically capture and log events from the user's digital ecosystem without manual entry.</li>
+                <li><strong>Mobile Application:</strong> Develop companion mobile apps for iOS and Android, allowing on-the-go event logging with location tagging and photo attachments.</li>
+              </ul>
+            </article>
+
+            <!-- 9. Conclusion -->
+            <article class="report-section reveal" id="sec-conclusion">
+              <div class="section-number">9</div>
+              <h2 class="report-section-title">Conclusion</h2>
+              <p class="report-text">Digital Shadow successfully demonstrates that fundamental data structures — linked lists and stacks — can be applied to solve a practical, real-world problem in an engaging and educational manner. The project bridges the gap between theoretical computer science concepts and their practical application by providing a fully functional timeline reconstruction system implemented entirely in C.</p>
+              <p class="report-text">Through the development of this project, key learning outcomes were achieved: a deep understanding of dynamic memory management with <span class="report-code">malloc()</span> and <span class="report-code">free()</span>, proficiency in pointer manipulation for linked data structures, practical experience with LIFO stack operations for undo functionality, and modular software design principles in procedural programming.</p>
+              <p class="report-text">The system, while currently limited to console-based operation without persistent storage, provides a solid foundation upon which more sophisticated features can be built. The modular architecture ensures that future enhancements — whether a GUI, database integration, or AI capabilities — can be integrated without requiring a complete rewrite of the core logic.</p>
+              <div class="report-highlight">
+                Digital Shadow proves that even within the constraints of a first-year C programming project, it is possible to create a meaningful, well-architected application that both educates and solves a genuine problem. The project stands as a testament to the enduring relevance and power of fundamental data structures in modern software development.
+              </div>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="pdfToast">
+    <span class="toast-icon">📄</span>
+    <span>PDF generation coming soon! Feature under development.</span>
+  </div>
+
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-brand">
+        <span class="logo-icon">◈</span>
+        <span>Digital Shadow</span>
+      </div>
+      <p class="footer-tagline">Your Life Has a Memory, Even When You Don't.</p>
+      <div class="footer-links">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="visualization.html">Demo</a>
+        <a href="contact.html">Contact</a>
+      </div>
+      <p class="footer-copy">© 2026 Digital Shadow. Built with passion.</p>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script src="js/navbar.js"></script>
+  <script src="js/theme.js"></script>
+  <script src="js/particles.js"></script>
+  <script src="js/search.js"></script>
+  <script>
+    // Toast notification
+    function showToast() {
+      const toast = document.getElementById('pdfToast');
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    // Active TOC tracking on scroll
+    document.addEventListener('DOMContentLoaded', function() {
+      const tocLinks = document.querySelectorAll('.toc-link');
+      const sections = document.querySelectorAll('.report-section');
+
+      function updateActiveToc() {
+        let current = '';
+        sections.forEach(section => {
+          const sectionTop = section.offsetTop - 150;
+          if (window.scrollY >= sectionTop) {
+            current = section.getAttribute('id');
+          }
+        });
+
+        tocLinks.forEach(link => {
+          link.classList.remove('active');
+          if (link.getAttribute('data-section') === current) {
+            link.classList.add('active');
+          }
+        });
+      }
+
+      window.addEventListener('scroll', updateActiveToc);
+      updateActiveToc();
+
+      // Smooth scroll for TOC links
+      tocLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+          const targetId = this.getAttribute('href').substring(1);
+          const targetSection = document.getElementById(targetId);
+          if (targetSection) {
+            targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>

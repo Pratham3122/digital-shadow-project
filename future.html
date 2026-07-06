@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Future Scope — Digital Shadow</title>
+  <meta name="description" content="Explore the future roadmap of Digital Shadow — planned features, upcoming improvements, and long-term vision for the timeline reconstruction system.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>◈</text></svg>">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/navbar.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/cards.css">
+  <link rel="stylesheet" href="css/timeline.css">
+  <link rel="stylesheet" href="css/compiler.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <link rel="stylesheet" href="css/darktheme.css">
+  <style>
+    /* ===== FUTURE PAGE SPECIFIC STYLES ===== */
+    .roadmap-timeline {
+      position: relative;
+      padding: 3rem 0;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .roadmap-timeline::before {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: linear-gradient(to bottom, var(--primary), var(--accent), var(--primary-dim));
+      transform: translateX(-50%);
+      border-radius: 2px;
+      opacity: 0.5;
+    }
+
+    .roadmap-timeline::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 0;
+      width: 3px;
+      height: 0;
+      background: linear-gradient(to bottom, var(--primary), var(--accent));
+      transform: translateX(-50%);
+      border-radius: 2px;
+      animation: timelineGrow 3s ease-out forwards;
+      animation-delay: 0.5s;
+    }
+
+    @keyframes timelineGrow {
+      to { height: 100%; }
+    }
+
+    .timeline-phase {
+      position: relative;
+      margin-bottom: 4rem;
+    }
+
+    .timeline-phase:last-child {
+      margin-bottom: 0;
+    }
+
+    .phase-marker {
+      position: absolute;
+      left: 50%;
+      top: 2rem;
+      transform: translateX(-50%);
+      z-index: 3;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: #fff;
+      background: var(--bg-primary);
+      border: 3px solid var(--primary);
+      box-shadow: 0 0 20px rgba(124, 92, 255, 0.4), inset 0 0 15px rgba(124, 92, 255, 0.1);
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .timeline-phase:nth-child(2) .phase-marker {
+      border-color: var(--accent);
+      box-shadow: 0 0 20px rgba(0, 212, 170, 0.4), inset 0 0 15px rgba(0, 212, 170, 0.1);
+    }
+
+    .timeline-phase:nth-child(3) .phase-marker {
+      border-color: var(--warning);
+      box-shadow: 0 0 20px rgba(255, 184, 0, 0.4), inset 0 0 15px rgba(255, 184, 0, 0.1);
+    }
+
+    .phase-marker:hover {
+      transform: translateX(-50%) scale(1.15);
+    }
+
+    .phase-content {
+      width: 42%;
+      padding: 0;
+    }
+
+    .timeline-phase:nth-child(odd) .phase-content {
+      margin-left: 0;
+      margin-right: auto;
+      text-align: right;
+    }
+
+    .timeline-phase:nth-child(even) .phase-content {
+      margin-left: auto;
+      margin-right: 0;
+      text-align: left;
+    }
+
+    .phase-card {
+      background: var(--surface);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .phase-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--gradient-primary);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .timeline-phase:nth-child(2) .phase-card::before {
+      background: linear-gradient(135deg, var(--accent) 0%, #33ffd4 100%);
+    }
+
+    .timeline-phase:nth-child(3) .phase-card::before {
+      background: linear-gradient(135deg, var(--warning) 0%, #ffd54f 100%);
+    }
+
+    .phase-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--surface-border-hover);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .phase-card:hover::before {
+      opacity: 1;
+    }
+
+    .phase-header {
+      margin-bottom: 1.5rem;
+    }
+
+    .phase-badge {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      padding: 0.35rem 1rem;
+      border-radius: var(--radius-pill);
+      background: rgba(124, 92, 255, 0.15);
+      color: var(--primary-glow);
+      margin-bottom: 0.75rem;
+      border: 1px solid rgba(124, 92, 255, 0.2);
+    }
+
+    .timeline-phase:nth-child(2) .phase-badge {
+      background: rgba(0, 212, 170, 0.15);
+      color: var(--accent-glow);
+      border-color: rgba(0, 212, 170, 0.2);
+    }
+
+    .timeline-phase:nth-child(3) .phase-badge {
+      background: rgba(255, 184, 0, 0.15);
+      color: var(--warning);
+      border-color: rgba(255, 184, 0, 0.2);
+    }
+
+    .phase-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(1.3rem, 2.5vw, 1.6rem);
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 0;
+    }
+
+    .phase-timeline-label {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-top: 0.25rem;
+    }
+
+    .phase-features {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .phase-features li {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid var(--surface-border);
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      line-height: 1.5;
+      transition: color 0.3s ease;
+    }
+
+    .timeline-phase:nth-child(odd) .phase-features li {
+      flex-direction: row-reverse;
+    }
+
+    .phase-features li:last-child {
+      border-bottom: none;
+    }
+
+    .phase-features li:hover {
+      color: var(--text-primary);
+    }
+
+    .feature-icon {
+      flex-shrink: 0;
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      background: rgba(124, 92, 255, 0.1);
+      margin-top: 2px;
+    }
+
+    .timeline-phase:nth-child(2) .feature-icon {
+      background: rgba(0, 212, 170, 0.1);
+    }
+
+    .timeline-phase:nth-child(3) .feature-icon {
+      background: rgba(255, 184, 0, 0.1);
+    }
+
+    /* Connector dots */
+    .phase-connector {
+      position: absolute;
+      left: 50%;
+      top: 2.75rem;
+      transform: translateX(-50%);
+      width: 40px;
+      height: 2px;
+      z-index: 2;
+    }
+
+    .timeline-phase:nth-child(odd) .phase-connector {
+      transform: translateX(-100%);
+      left: calc(50% - 28px);
+    }
+
+    .timeline-phase:nth-child(even) .phase-connector {
+      left: calc(50% + 28px);
+      transform: none;
+    }
+
+    /* CTA Section */
+    .cta-section {
+      text-align: center;
+      padding: 4rem 0;
+    }
+
+    .cta-card {
+      background: var(--surface);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-xl);
+      padding: 3rem;
+      max-width: 700px;
+      margin: 0 auto;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(124, 92, 255, 0.06) 0%, transparent 60%);
+      animation: ctaPulse 6s ease-in-out infinite;
+    }
+
+    @keyframes ctaPulse {
+      0%, 100% { transform: scale(1); opacity: 0.5; }
+      50% { transform: scale(1.1); opacity: 1; }
+    }
+
+    .cta-card > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .cta-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(1.5rem, 3vw, 2rem);
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 1rem;
+    }
+
+    .cta-text {
+      color: var(--text-secondary);
+      font-size: 1rem;
+      line-height: 1.7;
+      margin-bottom: 2rem;
+    }
+
+    .cta-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.8rem 1.8rem;
+      border-radius: var(--radius-pill);
+      font-family: 'Inter', sans-serif;
+      font-weight: 500;
+      font-size: 0.95rem;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .btn-primary {
+      background: var(--gradient-primary);
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(124, 92, 255, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: scale(1.02);
+      box-shadow: 0 6px 25px rgba(124, 92, 255, 0.5);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--text-primary);
+      border: 1px solid var(--surface-border);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--surface-border-hover);
+      background: var(--surface-hover);
+      transform: scale(1.02);
+    }
+
+    /* Vision Cards */
+    .vision-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+      margin-top: 3rem;
+    }
+
+    .vision-card {
+      background: var(--surface);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      text-align: center;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .vision-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--surface-border-hover);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .vision-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      margin: 0 auto 1.25rem;
+      background: rgba(124, 92, 255, 0.1);
+      border: 1px solid rgba(124, 92, 255, 0.15);
+    }
+
+    .vision-card:nth-child(2) .vision-icon {
+      background: rgba(0, 212, 170, 0.1);
+      border-color: rgba(0, 212, 170, 0.15);
+    }
+
+    .vision-card:nth-child(3) .vision-icon {
+      background: rgba(255, 184, 0, 0.1);
+      border-color: rgba(255, 184, 0, 0.15);
+    }
+
+    .vision-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .vision-desc {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    .vision-stat {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 2rem;
+      font-weight: 700;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-top: 1rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .roadmap-timeline::before,
+      .roadmap-timeline::after {
+        left: 24px;
+      }
+
+      .phase-marker {
+        left: 24px;
+        width: 48px;
+        height: 48px;
+        font-size: 0.95rem;
+      }
+
+      .phase-content {
+        width: calc(100% - 72px);
+        margin-left: 72px !important;
+        margin-right: 0 !important;
+        text-align: left !important;
+      }
+
+      .timeline-phase:nth-child(odd) .phase-features li {
+        flex-direction: row;
+      }
+
+      .phase-connector {
+        display: none;
+      }
+
+      .vision-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="nav-logo">
+        <span class="logo-icon">◈</span>
+        <span class="logo-text">Digital Shadow</span>
+      </a>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="nav-menu" id="navMenu">
+        <div class="nav-links">
+          <a href="index.html" class="nav-link">Home</a>
+          <a href="about.html" class="nav-link">About</a>
+          <a href="problem.html" class="nav-link">Problem</a>
+          <a href="features.html" class="nav-link">Features</a>
+          <a href="architecture.html" class="nav-link">Architecture</a>
+          <div class="nav-dropdown">
+            <button class="nav-link dropdown-trigger">Data Structures <span class="dropdown-arrow">▾</span></button>
+            <div class="dropdown-menu">
+              <a href="linkedlist.html" class="dropdown-link">Linked List</a>
+              <a href="stack.html" class="dropdown-link">Stack</a>
+            </div>
+          </div>
+          <a href="flowchart.html" class="nav-link">Flowchart</a>
+          <a href="algorithm.html" class="nav-link">Algorithm</a>
+          <a href="visualization.html" class="nav-link">Visualization</a>
+          <a href="compiler.html" class="nav-link">Compiler</a>
+          <a href="statistics.html" class="nav-link">Statistics</a>
+          <a href="future.html" class="nav-link active">Future</a>
+          <a href="viva.html" class="nav-link">Viva</a>
+          <a href="report.html" class="nav-link">Report</a>
+          <a href="ppt.html" class="nav-link">PPT</a>
+          <a href="contact.html" class="nav-link">Contact</a>
+        </div>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+          <span class="theme-icon">🌙</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <div id="particles-container" class="particles-container"></div>
+
+  <main>
+    <section class="page-hero">
+      <div class="container">
+        <span class="section-badge">FUTURE</span>
+        <h1 class="page-title">Future Scope</h1>
+        <p class="page-subtitle">Where Digital Shadow is heading — a roadmap of ambitious features, intelligent integrations, and the next evolution of timeline reconstruction.</p>
+      </div>
+    </section>
+
+    <!-- Vision Overview -->
+    <section class="section" id="vision-overview">
+      <div class="container">
+        <div class="vision-grid">
+          <div class="vision-card reveal stagger-1">
+            <div class="vision-icon">🚀</div>
+            <h3 class="vision-title">Near Term</h3>
+            <p class="vision-desc">GUI interfaces, persistent file storage, and data export capabilities for immediate usability improvements.</p>
+            <div class="vision-stat">3 Features</div>
+          </div>
+          <div class="vision-card reveal stagger-2">
+            <div class="vision-icon">☁️</div>
+            <h3 class="vision-title">Mid Term</h3>
+            <p class="vision-desc">Multi-user collaboration, cloud sync, mobile companion app, and AI-based pattern detection engines.</p>
+            <div class="vision-stat">4 Features</div>
+          </div>
+          <div class="vision-card reveal stagger-3">
+            <div class="vision-icon">🧠</div>
+            <h3 class="vision-title">Long Term</h3>
+            <p class="vision-desc">IoT integration, machine learning predictions, voice interaction, cross-platform deployment, and open APIs.</p>
+            <div class="vision-stat">5 Features</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Roadmap Timeline -->
+    <section class="section" id="roadmap">
+      <div class="container">
+        <div style="text-align: center; margin-bottom: 3rem;">
+          <span class="section-badge">ROADMAP</span>
+          <h2 style="font-family: 'Space Grotesk', sans-serif; font-size: clamp(1.8rem, 3vw, 2.5rem); font-weight: 600; color: var(--text-primary); margin-top: 1rem;">Development Roadmap</h2>
+          <p style="color: var(--text-secondary); max-width: 600px; margin: 1rem auto 0; line-height: 1.7;">Our phased approach to building a comprehensive digital life management platform.</p>
+        </div>
+
+        <div class="roadmap-timeline">
+          <!-- Phase 1 -->
+          <div class="timeline-phase reveal reveal-left">
+            <div class="phase-marker">P1</div>
+            <div class="phase-content">
+              <div class="phase-card">
+                <div class="phase-header">
+                  <span class="phase-badge">Phase 1 — Near Term</span>
+                  <h3 class="phase-title">Foundation & Usability</h3>
+                  <p class="phase-timeline-label">Estimated: 1–3 months</p>
+                </div>
+                <ul class="phase-features">
+                  <li>
+                    <span class="feature-icon">🖥️</span>
+                    <span><strong>GUI Implementation</strong> — Build a graphical user interface using GTK or Qt framework, replacing the current terminal-based interaction with an intuitive, visual dashboard for event management.</span>
+                  </li>
+                  <li>
+                    <span class="feature-icon">💾</span>
+                    <span><strong>File-Based Persistent Storage</strong> — Implement file I/O operations to save and load event data from disk, enabling timelines to persist across program sessions using structured file formats like CSV or custom binary files.</span>
+                  </li>
+                  <li>
+                    <span class="feature-icon">📄</span>
+                    <span><strong>Export Timeline to PDF/CSV</strong> — Add export functionality allowing users to generate formatted PDF reports or CSV spreadsheets of their timeline data for sharing, printing, or external analysis.</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Phase 2 -->
+          <div class="timeline-phase reveal reveal-right">
+            <div class="phase-marker">P2</div>
+            <div class="phase-content">
+              <div class="phase-card">
+                <div class="phase-header">
+                  <span class="phase-badge">Phase 2 — Mid Term</span>
+                  <h3 class="phase-title">Connectivity & Intelligence</h3>
+                  <p class="phase-timeline-label">Estimated: 3–8 months</p>
+                </div>
+                <ul class="phase-features">
+                  <li>
+                    <span class="feature-icon">👥</span>
+                    <span><strong>Multi-User Support</strong> — Introduce user authentication and profile management, enabling multiple users to maintain separate timelines on the same system with role-based access controls.</span>
+                  </li>
+                  <li>
+                    <span class="feature-icon">☁️</span>
+                    <span><strong>Cloud Synchronization</strong> — Implement cloud storage integration (AWS, Firebase, or custom backend) to sync timelines across devices, enabling seamless access from anywhere.</span>
+                  </li>
+                  <li>
+                    <span class="feature-icon">📱</span>
+                    <span><strong>Mobile Companion App</strong> — Develop a lightweight mobile application (Android/iOS) that syncs with the desktop system, allowing users to log events on the go.</span>
+                  </li>
+                  <li>
+                    <span class="feature-icon">🤖</span>
+                    <span><strong>AI-Based Pattern Detection</strong> — Integrate machine learning algorithms to automatically detect recurring patterns, habits, and anomalies in the user's timeline data, providing intelligent insights.</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Phase 3 -->
+          <div class="timeline-phase reveal reveal-left">
+            <div class="phase-marker">P3</div>
+            <div class="phase-content">
+              <div class="phase-card">
+                <div class="phase-header">
+                  <span class="phase-badge">Phase 3 — Long Term</span>
+                  <h3 class="phase-title">Innovation & Ecosystem</h3>
+                  <p class="phase-timeline-label">Estimated: 8–18 months</p>
+                </div>
+                <ul class="phase-features">
+                  <li>
+                    <span class="feature-icon">📡</span>
+                    <span><strong>IoT Integration</strong> — Connect with smart home devices and wearables to automatically log events — fitness data from smartwatches, location data from phones, and activity data from smart home sensors.</span>
+                  </li>
+                  <li>
+                    <span class="feature-icon">🧠</span>
+                    <span><strong>Machine Learning for Behavior Prediction</strong> — Deploy trained ML models to predict future events and behaviors based on historical timeline data, offering proactive suggestions and reminders.</span>
+                  </li>
+                  <li>
+                    <span class="feature-icon">🎤</span>
+                    <span><strong>Voice-Activated Event Logging</strong> — Integrate speech recognition APIs to enable hands-free event creation through voice commands, making logging effortless and accessible.</span>
+                  </li>
+                  <li>
+                    <span class="feature-icon">💻</span>
+                    <span><strong>Cross-Platform Desktop Application</strong> — Package the application using Electron or similar frameworks for native deployment on Windows, macOS, and Linux with consistent UX.</span>
+                  </li>
+                  <li>
+                    <span class="feature-icon">🔌</span>
+                    <span><strong>API for Third-Party Integrations</strong> — Develop a RESTful API allowing external applications and services to read, write, and query timeline data, enabling an extensible ecosystem of plugins and integrations.</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Get Involved CTA -->
+    <section class="section" id="get-involved">
+      <div class="container">
+        <div class="cta-card reveal">
+          <h2 class="cta-title">Get Involved</h2>
+          <p class="cta-text">Digital Shadow is an evolving project with ambitious goals. Whether you're a developer, designer, or enthusiast — there are many ways to contribute. Help us build the future of personal timeline reconstruction and digital memory management.</p>
+          <div class="cta-buttons">
+            <a href="contact.html" class="btn btn-primary">
+              <span>✉️</span> Contact Us
+            </a>
+            <a href="report.html" class="btn btn-secondary">
+              <span>📄</span> Read the Report
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-brand">
+        <span class="logo-icon">◈</span>
+        <span>Digital Shadow</span>
+      </div>
+      <p class="footer-tagline">Your Life Has a Memory, Even When You Don't.</p>
+      <div class="footer-links">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="visualization.html">Demo</a>
+        <a href="contact.html">Contact</a>
+      </div>
+      <p class="footer-copy">© 2026 Digital Shadow. Built with passion.</p>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script src="js/navbar.js"></script>
+  <script src="js/theme.js"></script>
+  <script src="js/particles.js"></script>
+  <script src="js/search.js"></script>
+</body>
+</html>

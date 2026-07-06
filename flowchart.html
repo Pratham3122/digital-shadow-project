@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flowchart — Digital Shadow</title>
+  <meta name="description" content="Professional SVG flowchart of the Digital Shadow program flow. Visualize how every operation — Add, Delete, Search, Replay, Undo — is executed step by step.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>◈</text></svg>">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/navbar.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/cards.css">
+  <link rel="stylesheet" href="css/timeline.css">
+  <link rel="stylesheet" href="css/compiler.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <link rel="stylesheet" href="css/darktheme.css">
+  <style>
+    .flowchart-wrap {
+      width: 100%;
+      overflow-x: auto;
+      padding: 2rem 0;
+      display: flex;
+      justify-content: center;
+    }
+    .flowchart-wrap svg text {
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      fill: var(--text-primary);
+    }
+    .flowchart-wrap svg .flow-terminal rect {
+      fill: rgba(124,92,255,0.15);
+      stroke: #7c5cff;
+      stroke-width: 2;
+      rx: 24;
+      ry: 24;
+    }
+    .flowchart-wrap svg .flow-box rect {
+      fill: rgba(0,212,170,0.08);
+      stroke: #00d4aa;
+      stroke-width: 1.5;
+      rx: 10;
+      ry: 10;
+    }
+    .flowchart-wrap svg .flow-diamond polygon {
+      fill: rgba(255,184,0,0.1);
+      stroke: #ffb800;
+      stroke-width: 1.5;
+    }
+    .flowchart-wrap svg .flow-connector {
+      stroke: var(--text-tertiary, #555577);
+      stroke-width: 1.5;
+      fill: none;
+      marker-end: url(#arrowhead);
+    }
+    .flowchart-wrap svg .flow-box:hover rect {
+      stroke: #7c5cff;
+      stroke-width: 2.5;
+      filter: drop-shadow(0 0 8px rgba(124,92,255,0.4));
+    }
+    .flowchart-wrap svg .flow-diamond:hover polygon {
+      stroke: #7c5cff;
+      stroke-width: 2.5;
+      filter: drop-shadow(0 0 8px rgba(255,184,0,0.4));
+    }
+    .flowchart-wrap svg .flow-box, .flowchart-wrap svg .flow-diamond, .flowchart-wrap svg .flow-terminal {
+      cursor: pointer;
+      transition: filter 0.3s ease;
+    }
+    .flow-legend {
+      display: flex;
+      gap: 2rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 3rem;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+    .legend-swatch {
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+      border: 2px solid;
+    }
+    .legend-swatch.terminal { border-color: #7c5cff; background: rgba(124,92,255,0.15); border-radius: 12px; }
+    .legend-swatch.process { border-color: #00d4aa; background: rgba(0,212,170,0.08); }
+    .legend-swatch.decision { border-color: #ffb800; background: rgba(255,184,0,0.1); transform: rotate(45deg); width: 12px; height: 12px; }
+    .flow-explanations {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-top: 3rem;
+    }
+    .flow-explain-card {
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-lg, 16px);
+      padding: 1.5rem;
+      backdrop-filter: blur(20px);
+      transition: all 0.3s ease;
+    }
+    .flow-explain-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--surface-border-hover);
+      box-shadow: var(--shadow-md);
+    }
+    .flow-explain-card h4 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+    }
+    .flow-explain-card h4 span { margin-right: 0.5rem; }
+    .flow-explain-card p {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="nav-logo">
+        <span class="logo-icon">◈</span>
+        <span class="logo-text">Digital Shadow</span>
+      </a>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="nav-menu" id="navMenu">
+        <div class="nav-links">
+          <a href="index.html" class="nav-link">Home</a>
+          <a href="about.html" class="nav-link">About</a>
+          <a href="problem.html" class="nav-link">Problem</a>
+          <a href="features.html" class="nav-link">Features</a>
+          <a href="architecture.html" class="nav-link">Architecture</a>
+          <div class="nav-dropdown">
+            <button class="nav-link dropdown-trigger">Data Structures <span class="dropdown-arrow">▾</span></button>
+            <div class="dropdown-menu">
+              <a href="linkedlist.html" class="dropdown-link">Linked List</a>
+              <a href="stack.html" class="dropdown-link">Stack</a>
+            </div>
+          </div>
+          <a href="flowchart.html" class="nav-link">Flowchart</a>
+          <a href="algorithm.html" class="nav-link">Algorithm</a>
+          <a href="visualization.html" class="nav-link">Visualization</a>
+          <a href="compiler.html" class="nav-link">Compiler</a>
+          <a href="statistics.html" class="nav-link">Statistics</a>
+          <a href="future.html" class="nav-link">Future</a>
+          <a href="viva.html" class="nav-link">Viva</a>
+          <a href="report.html" class="nav-link">Report</a>
+          <a href="ppt.html" class="nav-link">PPT</a>
+          <a href="contact.html" class="nav-link">Contact</a>
+        </div>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+          <span class="theme-icon">🌙</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <div id="particles-container" class="particles-container"></div>
+
+  <main>
+    <section class="page-hero">
+      <div class="container">
+        <span class="section-badge">Flowchart</span>
+        <h1 class="page-title">Program Flow</h1>
+        <p class="page-subtitle">A visual map of every decision and operation inside Digital Shadow.</p>
+      </div>
+    </section>
+
+    <section class="section" id="flowchart-section">
+      <div class="container">
+        <div class="flow-legend reveal">
+          <div class="legend-item"><span class="legend-swatch terminal"></span> Start / End</div>
+          <div class="legend-item"><span class="legend-swatch process"></span> Process</div>
+          <div class="legend-item"><span class="legend-swatch decision"></span> Decision</div>
+        </div>
+
+        <div class="flowchart-wrap reveal">
+          <svg id="flowchart-svg" viewBox="0 0 900 1200" width="900" height="1200" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="var(--text-tertiary, #555577)"/></marker>
+            </defs>
+
+            <!-- Start -->
+            <g class="flow-terminal" data-operation="start">
+              <rect x="350" y="20" width="200" height="50" rx="24" ry="24"/>
+              <text x="450" y="50" text-anchor="middle" font-weight="600">START</text>
+            </g>
+            <line class="flow-connector" x1="450" y1="70" x2="450" y2="110"/>
+
+            <!-- Print Header -->
+            <g class="flow-box" data-operation="header">
+              <rect x="350" y="110" width="200" height="45" rx="10" ry="10"/>
+              <text x="450" y="137" text-anchor="middle">Print Welcome Header</text>
+            </g>
+            <line class="flow-connector" x1="450" y1="155" x2="450" y2="195"/>
+
+            <!-- Display Menu -->
+            <g class="flow-box" data-operation="menu">
+              <rect x="340" y="195" width="220" height="45" rx="10" ry="10"/>
+              <text x="450" y="222" text-anchor="middle">Display Menu Options</text>
+            </g>
+            <line class="flow-connector" x1="450" y1="240" x2="450" y2="280"/>
+
+            <!-- Read Choice -->
+            <g class="flow-diamond" data-operation="choice">
+              <polygon points="450,280 550,340 450,400 350,340"/>
+              <text x="450" y="337" text-anchor="middle" font-size="11">Read</text>
+              <text x="450" y="352" text-anchor="middle" font-size="11">Choice</text>
+            </g>
+
+            <!-- Branch lines from diamond -->
+            <!-- Left branches: Add(1), Delete(2), Edit(3), Search(4), Display(5) -->
+            <line class="flow-connector" x1="350" y1="340" x2="100" y2="340"/>
+            <line class="flow-connector" x1="100" y1="340" x2="100" y2="440"/>
+            <g class="flow-box" data-operation="add"><rect x="20" y="440" width="160" height="40" rx="10" ry="10"/><text x="100" y="464" text-anchor="middle">1. Add Event</text></g>
+            <line class="flow-connector" x1="100" y1="480" x2="100" y2="510"/>
+            <g class="flow-box" data-operation="add-detail"><rect x="20" y="510" width="160" height="40" rx="10" ry="10"/><text x="100" y="534" text-anchor="middle">malloc → Insert → Push</text></g>
+
+            <line class="flow-connector" x1="100" y1="340" x2="100" y2="340"/>
+            <line class="flow-connector" x1="350" y1="340" x2="250" y2="340"/>
+            <line class="flow-connector" x1="250" y1="340" x2="250" y2="600"/>
+            <g class="flow-box" data-operation="delete"><rect x="170" y="600" width="160" height="40" rx="10" ry="10"/><text x="250" y="624" text-anchor="middle">2. Delete Event</text></g>
+            <line class="flow-connector" x1="250" y1="640" x2="250" y2="670"/>
+            <g class="flow-box" data-operation="delete-detail"><rect x="170" y="670" width="160" height="40" rx="10" ry="10"/><text x="250" y="694" text-anchor="middle">Search → Unlink → free</text></g>
+
+            <!-- Bottom branch: Edit(3) -->
+            <line class="flow-connector" x1="450" y1="400" x2="450" y2="440"/>
+            <g class="flow-box" data-operation="edit"><rect x="370" y="440" width="160" height="40" rx="10" ry="10"/><text x="450" y="464" text-anchor="middle">3. Edit Event</text></g>
+            <line class="flow-connector" x1="450" y1="480" x2="450" y2="510"/>
+            <g class="flow-box" data-operation="edit-detail"><rect x="370" y="510" width="160" height="40" rx="10" ry="10"/><text x="450" y="534" text-anchor="middle">Find → Update Fields</text></g>
+
+            <!-- Right branches: Search(4), Display(5) -->
+            <line class="flow-connector" x1="550" y1="340" x2="650" y2="340"/>
+            <line class="flow-connector" x1="650" y1="340" x2="650" y2="440"/>
+            <g class="flow-box" data-operation="search"><rect x="570" y="440" width="160" height="40" rx="10" ry="10"/><text x="650" y="464" text-anchor="middle">4. Search Event</text></g>
+            <line class="flow-connector" x1="650" y1="480" x2="650" y2="510"/>
+            <g class="flow-box" data-operation="search-detail"><rect x="570" y="510" width="160" height="40" rx="10" ry="10"/><text x="650" y="534" text-anchor="middle">Traverse → Match</text></g>
+
+            <line class="flow-connector" x1="550" y1="340" x2="800" y2="340"/>
+            <line class="flow-connector" x1="800" y1="340" x2="800" y2="440"/>
+            <g class="flow-box" data-operation="display"><rect x="720" y="440" width="160" height="40" rx="10" ry="10"/><text x="800" y="464" text-anchor="middle">5. Display Timeline</text></g>
+            <line class="flow-connector" x1="800" y1="480" x2="800" y2="510"/>
+            <g class="flow-box" data-operation="display-detail"><rect x="720" y="510" width="160" height="40" rx="10" ry="10"/><text x="800" y="534" text-anchor="middle">Traverse → Print All</text></g>
+
+            <!-- Second row: Today(6), Replay(7), Undo(8), Stats(9), Exit(0) -->
+            <line class="flow-connector" x1="100" y1="550" x2="100" y2="780"/>
+            <line class="flow-connector" x1="100" y1="780" x2="100" y2="780"/>
+            <g class="flow-box" data-operation="today"><rect x="20" y="780" width="160" height="40" rx="10" ry="10"/><text x="100" y="804" text-anchor="middle">6. Today's Timeline</text></g>
+            <line class="flow-connector" x1="100" y1="820" x2="100" y2="850"/>
+            <g class="flow-box" data-operation="today-detail"><rect x="20" y="850" width="160" height="40" rx="10" ry="10"/><text x="100" y="874" text-anchor="middle">Filter by Date</text></g>
+
+            <g class="flow-box" data-operation="replay"><rect x="220" y="780" width="160" height="40" rx="10" ry="10"/><text x="300" y="804" text-anchor="middle">7. Replay Day</text></g>
+            <line class="flow-connector" x1="250" y1="710" x2="300" y2="780"/>
+            <line class="flow-connector" x1="300" y1="820" x2="300" y2="850"/>
+            <g class="flow-box" data-operation="replay-detail"><rect x="220" y="850" width="160" height="40" rx="10" ry="10"/><text x="300" y="874" text-anchor="middle">Push All → Pop All</text></g>
+
+            <g class="flow-box" data-operation="undo"><rect x="420" y="780" width="160" height="40" rx="10" ry="10"/><text x="500" y="804" text-anchor="middle">8. Undo Event</text></g>
+            <line class="flow-connector" x1="450" y1="550" x2="500" y2="780"/>
+            <line class="flow-connector" x1="500" y1="820" x2="500" y2="850"/>
+            <g class="flow-box" data-operation="undo-detail"><rect x="420" y="850" width="160" height="40" rx="10" ry="10"/><text x="500" y="874" text-anchor="middle">Pop → Delete from LL</text></g>
+
+            <g class="flow-box" data-operation="stats"><rect x="620" y="780" width="160" height="40" rx="10" ry="10"/><text x="700" y="804" text-anchor="middle">9. Statistics</text></g>
+            <line class="flow-connector" x1="650" y1="550" x2="700" y2="780"/>
+            <line class="flow-connector" x1="700" y1="820" x2="700" y2="850"/>
+            <g class="flow-box" data-operation="stats-detail"><rect x="620" y="850" width="160" height="40" rx="10" ry="10"/><text x="700" y="874" text-anchor="middle">Aggregate → Display</text></g>
+
+            <!-- All branches loop back to menu -->
+            <line class="flow-connector" x1="100" y1="890" x2="100" y2="960"/>
+            <line class="flow-connector" x1="100" y1="960" x2="300" y2="960"/>
+            <line class="flow-connector" x1="300" y1="890" x2="300" y2="960"/>
+            <line class="flow-connector" x1="500" y1="890" x2="500" y2="960"/>
+            <line class="flow-connector" x1="300" y1="960" x2="500" y2="960"/>
+            <line class="flow-connector" x1="700" y1="890" x2="700" y2="960"/>
+            <line class="flow-connector" x1="500" y1="960" x2="700" y2="960"/>
+            <line class="flow-connector" x1="800" y1="550" x2="800" y2="960"/>
+            <line class="flow-connector" x1="700" y1="960" x2="800" y2="960"/>
+
+            <!-- Loop back label -->
+            <g class="flow-box" data-operation="loop">
+              <rect x="350" y="970" width="200" height="40" rx="10" ry="10"/>
+              <text x="450" y="994" text-anchor="middle">Loop Back to Menu</text>
+            </g>
+            <path class="flow-connector" d="M450,1010 L450,1040 Q450,1060 430,1060 L50,1060 Q30,1060 30,1040 L30,220 Q30,200 50,200 L340,200" />
+
+            <!-- Exit branch -->
+            <line class="flow-connector" x1="800" y1="960" x2="850" y2="960"/>
+            <line class="flow-connector" x1="850" y1="960" x2="850" y2="1080"/>
+            <g class="flow-box" data-operation="exit"><rect x="770" y="1080" width="160" height="40" rx="10" ry="10"/><text x="850" y="1104" text-anchor="middle">0. Exit</text></g>
+            <line class="flow-connector" x1="850" y1="1120" x2="850" y2="1140"/>
+            <g class="flow-box" data-operation="cleanup"><rect x="770" y="1140" width="160" height="35" rx="10" ry="10"/><text x="850" y="1162" text-anchor="middle">Free All Memory</text></g>
+            <line class="flow-connector" x1="850" y1="1175" x2="450" y2="1175"/>
+
+            <!-- End terminal -->
+            <g class="flow-terminal" data-operation="end">
+              <rect x="370" y="1160" width="160" height="35" rx="24" ry="24"/>
+              <text x="450" y="1182" text-anchor="middle" font-weight="600">END</text>
+            </g>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="flow-explanations">
+      <div class="container">
+        <h2 class="section-title" style="font-family:'Space Grotesk',sans-serif;font-size:clamp(1.8rem,3vw,2.5rem);font-weight:600;color:var(--text-primary);text-align:center;margin-bottom:3rem;">Understanding Each Step</h2>
+        <div class="flow-explanations">
+          <div class="flow-explain-card reveal stagger-1"><h4><span>▶</span> Start & Welcome</h4><p>The program initialises global pointers (head = NULL, stack_top = NULL) and prints a styled ASCII welcome banner before entering the main menu loop.</p></div>
+          <div class="flow-explain-card reveal stagger-2"><h4><span>📋</span> Display Menu</h4><p>A formatted menu of 10 operations (1–9 and 0) is printed. The user enters their choice which is read via scanf and passed to a switch statement.</p></div>
+          <div class="flow-explain-card reveal stagger-3"><h4><span>◆</span> Read Choice</h4><p>The decision diamond branches execution to the chosen operation. Invalid inputs fall through to a default error message before looping back.</p></div>
+          <div class="flow-explain-card reveal stagger-4"><h4><span>➕</span> Add Event</h4><p>Allocates a new node with malloc(), fills in the event name, category, and auto-generates the timestamp. The node is appended at the tail of the linked list and pushed onto the undo stack.</p></div>
+          <div class="flow-explain-card reveal stagger-5"><h4><span>🗑️</span> Delete Event</h4><p>Searches for the node by ID, adjusts the previous node's next pointer to skip the target, and calls free() to release memory. Handles head, middle, and tail deletions.</p></div>
+          <div class="flow-explain-card reveal stagger-6"><h4><span>✏️</span> Edit Event</h4><p>Traverses the list to find the node by ID, then prompts for a new name and category. The existing fields are overwritten in place — no reallocation needed.</p></div>
+          <div class="flow-explain-card reveal stagger-1"><h4><span>🔍</span> Search Event</h4><p>Performs a case-insensitive partial match using strstr() + tolower(). Every matching node is displayed, providing Google-like fuzzy search behaviour.</p></div>
+          <div class="flow-explain-card reveal stagger-2"><h4><span>📋</span> Display Timeline</h4><p>A simple head-to-tail traversal printing each node's ID, name, category, date, and time in a formatted table row.</p></div>
+          <div class="flow-explain-card reveal stagger-3"><h4><span>📅</span> Today's Timeline</h4><p>Gets the current date and filters the linked list, displaying only nodes whose date matches today.</p></div>
+          <div class="flow-explain-card reveal stagger-4"><h4><span>🔁</span> Replay Day</h4><p>Pushes every event onto a temporary stack, then pops and prints them all. This demonstrates the LIFO property — events appear in reverse chronological order.</p></div>
+          <div class="flow-explain-card reveal stagger-5"><h4><span>↩️</span> Undo Event</h4><p>Pops the most recent event from the undo stack and deletes the corresponding node from the linked list by its ID.</p></div>
+          <div class="flow-explain-card reveal stagger-6"><h4><span>📊</span> Statistics</h4><p>Single-pass aggregation: counts total events, today's events, category frequencies, and identifies the most frequent category. Also displays the first and last events.</p></div>
+          <div class="flow-explain-card reveal stagger-1"><h4><span>🚪</span> Exit & Cleanup</h4><p>Traverses both the linked list and the stack, calling free() on every node to prevent memory leaks. Then prints a goodbye message and returns 0.</p></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-brand">
+        <span class="logo-icon">◈</span>
+        <span>Digital Shadow</span>
+      </div>
+      <p class="footer-tagline">Your Life Has a Memory, Even When You Don't.</p>
+      <div class="footer-links">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="visualization.html">Demo</a>
+        <a href="contact.html">Contact</a>
+      </div>
+      <p class="footer-copy">© 2026 Digital Shadow. Built with passion.</p>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script src="js/navbar.js"></script>
+  <script src="js/theme.js"></script>
+  <script src="js/particles.js"></script>
+  <script src="js/search.js"></script>
+  <script src="js/flow.js"></script>
+</body>
+</html>

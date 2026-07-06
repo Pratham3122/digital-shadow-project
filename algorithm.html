@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Algorithms — Digital Shadow</title>
+  <meta name="description" content="Step-by-step algorithms for every Digital Shadow operation with pseudo code, time complexity, and space complexity analysis.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>◈</text></svg>">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/navbar.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/cards.css">
+  <link rel="stylesheet" href="css/timeline.css">
+  <link rel="stylesheet" href="css/compiler.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <link rel="stylesheet" href="css/darktheme.css">
+  <style>
+    .algo-grid { display: flex; flex-direction: column; gap: 1.5rem; }
+    .algo-card {
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-lg, 16px);
+      overflow: hidden;
+      backdrop-filter: blur(20px);
+      transition: all 0.3s ease;
+    }
+    .algo-card:hover { border-color: var(--surface-border-hover); }
+    .algo-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.25rem 1.5rem;
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.2s ease;
+    }
+    .algo-card-header:hover { background: var(--surface-hover); }
+    .algo-card-left { display: flex; align-items: center; gap: 1rem; }
+    .algo-card-icon {
+      width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;
+      border-radius: var(--radius-md, 12px); background: rgba(124,92,255,0.1); font-size: 1.3rem;
+    }
+    .algo-card-title { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 1.05rem; color: var(--text-primary); }
+    .algo-card-right { display: flex; align-items: center; gap: 0.75rem; }
+    .complexity-badge {
+      padding: 0.25rem 0.75rem; border-radius: var(--radius-pill, 50px);
+      font-family: 'Inter', sans-serif; font-size: 0.7rem; font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+    .complexity-badge.time { background: rgba(124,92,255,0.12); color: #9d7dff; }
+    .complexity-badge.space { background: rgba(0,212,170,0.12); color: #00d4aa; }
+    .algo-chevron {
+      font-size: 1rem; color: var(--text-tertiary); transition: transform 0.3s ease;
+    }
+    .algo-card.algo-expanded .algo-chevron { transform: rotate(180deg); }
+    .algo-card-body {
+      max-height: 0; overflow: hidden; transition: max-height 0.4s ease, padding 0.3s ease;
+      padding: 0 1.5rem;
+    }
+    .algo-card.algo-expanded .algo-card-body {
+      max-height: 600px; padding: 0 1.5rem 1.5rem;
+    }
+    .algo-card-body h5 {
+      font-family: 'Space Grotesk', sans-serif; font-size: 0.9rem; font-weight: 600;
+      color: var(--primary, #7c5cff); margin: 1rem 0 0.5rem;
+    }
+    .algo-card-body ol {
+      padding-left: 1.25rem; color: var(--text-secondary); font-size: 0.88rem;
+      line-height: 1.8; font-family: 'Inter', sans-serif;
+    }
+    .algo-card-body pre {
+      background: var(--bg-primary, #07070f); border: 1px solid var(--surface-border);
+      border-radius: var(--radius-md, 12px); padding: 1rem 1.25rem; overflow-x: auto;
+      font-size: 0.82rem; line-height: 1.7; color: var(--text-primary);
+    }
+    .algo-card-body code { font-family: 'Courier New', monospace; }
+    .algo-summary {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem; margin-bottom: 3rem;
+    }
+    .algo-summary-card {
+      background: var(--surface); border: 1px solid var(--surface-border);
+      border-radius: var(--radius-lg, 16px); padding: 1.5rem; text-align: center;
+      backdrop-filter: blur(20px);
+    }
+    .algo-summary-card .number { font-family: 'Space Grotesk', sans-serif; font-size: 2.5rem; font-weight: 700; background: var(--gradient-primary, linear-gradient(135deg,#7c5cff,#00d4aa)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .algo-summary-card .label { font-family: 'Inter', sans-serif; font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.25rem; }
+    @media (max-width: 640px) {
+      .algo-card-right { flex-wrap: wrap; gap: 0.4rem; }
+      .algo-card-header { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar" id="navbar"><div class="nav-container"><a href="index.html" class="nav-logo"><span class="logo-icon">◈</span><span class="logo-text">Digital Shadow</span></a><button class="nav-toggle" id="navToggle" aria-label="Toggle navigation"><span></span><span></span><span></span></button><div class="nav-menu" id="navMenu"><div class="nav-links"><a href="index.html" class="nav-link">Home</a><a href="about.html" class="nav-link">About</a><a href="problem.html" class="nav-link">Problem</a><a href="features.html" class="nav-link">Features</a><a href="architecture.html" class="nav-link">Architecture</a><div class="nav-dropdown"><button class="nav-link dropdown-trigger">Data Structures <span class="dropdown-arrow">▾</span></button><div class="dropdown-menu"><a href="linkedlist.html" class="dropdown-link">Linked List</a><a href="stack.html" class="dropdown-link">Stack</a></div></div><a href="flowchart.html" class="nav-link">Flowchart</a><a href="algorithm.html" class="nav-link">Algorithm</a><a href="visualization.html" class="nav-link">Visualization</a><a href="compiler.html" class="nav-link">Compiler</a><a href="statistics.html" class="nav-link">Statistics</a><a href="future.html" class="nav-link">Future</a><a href="viva.html" class="nav-link">Viva</a><a href="report.html" class="nav-link">Report</a><a href="ppt.html" class="nav-link">PPT</a><a href="contact.html" class="nav-link">Contact</a></div><button class="theme-toggle" id="themeToggle" aria-label="Toggle theme"><span class="theme-icon">🌙</span></button></div></div></nav>
+
+  <div id="particles-container" class="particles-container"></div>
+
+  <main>
+    <section class="page-hero">
+      <div class="container">
+        <span class="section-badge">Algorithms</span>
+        <h1 class="page-title">Algorithms & Complexity</h1>
+        <p class="page-subtitle">Every operation broken down — step-by-step logic, pseudo code, and Big-O analysis.</p>
+      </div>
+    </section>
+
+    <section class="section" id="algo-summary-section">
+      <div class="container">
+        <div class="algo-summary reveal">
+          <div class="algo-summary-card"><div class="number">10</div><div class="label">Operations</div></div>
+          <div class="algo-summary-card"><div class="number">O(n)</div><div class="label">Worst-Case Time</div></div>
+          <div class="algo-summary-card"><div class="number">O(1)</div><div class="label">Typical Space</div></div>
+          <div class="algo-summary-card"><div class="number">2</div><div class="label">Data Structures</div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="algo-cards-section">
+      <div class="container">
+        <div class="algo-grid">
+
+          <!-- 1. Add Event -->
+          <div class="algo-card reveal" id="algo-add">
+            <div class="algo-card-header" onclick="this.parentElement.classList.toggle('algo-expanded')">
+              <div class="algo-card-left"><div class="algo-card-icon">➕</div><span class="algo-card-title">Add Event</span></div>
+              <div class="algo-card-right"><span class="complexity-badge time">Time: O(n)</span><span class="complexity-badge space">Space: O(1)</span><span class="algo-chevron">▼</span></div>
+            </div>
+            <div class="algo-card-body">
+              <h5>Algorithm</h5>
+              <ol><li>Prompt user for event name and category.</li><li>Allocate a new node using malloc().</li><li>Fill in name, category, auto-generate date and time.</li><li>Assign incremented ID to the node.</li><li>If list is empty, set head = newNode.</li><li>Else traverse to the last node (temp→next == NULL).</li><li>Set lastNode→next = newNode.</li><li>Push newNode onto the undo stack.</li><li>Increment event_count.</li></ol>
+              <h5>Pseudo Code</h5>
+              <pre><code>function addEvent():
+    newNode ← allocate Event
+    newNode.name ← input()
+    newNode.category ← input()
+    newNode.date ← getCurrentDate()
+    newNode.time ← getCurrentTime()
+    newNode.id ← next_id++
+    newNode.next ← NULL
+
+    if head == NULL:
+        head ← newNode
+    else:
+        temp ← head
+        while temp.next ≠ NULL:
+            temp ← temp.next
+        temp.next ← newNode
+
+    pushToStack(newNode)
+    event_count++</code></pre>
+            </div>
+          </div>
+
+          <!-- 2. Delete Event -->
+          <div class="algo-card reveal" id="algo-delete">
+            <div class="algo-card-header" onclick="this.parentElement.classList.toggle('algo-expanded')">
+              <div class="algo-card-left"><div class="algo-card-icon">🗑️</div><span class="algo-card-title">Delete Event</span></div>
+              <div class="algo-card-right"><span class="complexity-badge time">Time: O(n)</span><span class="complexity-badge space">Space: O(1)</span><span class="algo-chevron">▼</span></div>
+            </div>
+            <div class="algo-card-body">
+              <h5>Algorithm</h5>
+              <ol><li>Prompt user for event ID.</li><li>If head is NULL, print "empty list" and return.</li><li>If head→id matches, set head = head→next, free old head.</li><li>Else traverse with prev and current pointers.</li><li>When current→id matches, set prev→next = current→next.</li><li>Free the matched node.</li><li>Decrement event_count.</li></ol>
+              <h5>Pseudo Code</h5>
+              <pre><code>function deleteEvent(id):
+    if head == NULL: return "Empty"
+
+    if head.id == id:
+        temp ← head
+        head ← head.next
+        free(temp)
+        event_count--
+        return
+
+    prev ← head
+    curr ← head.next
+    while curr ≠ NULL:
+        if curr.id == id:
+            prev.next ← curr.next
+            free(curr)
+            event_count--
+            return
+        prev ← curr
+        curr ← curr.next
+
+    print "Not found"</code></pre>
+            </div>
+          </div>
+
+          <!-- 3. Edit Event -->
+          <div class="algo-card reveal" id="algo-edit">
+            <div class="algo-card-header" onclick="this.parentElement.classList.toggle('algo-expanded')">
+              <div class="algo-card-left"><div class="algo-card-icon">✏️</div><span class="algo-card-title">Edit Event</span></div>
+              <div class="algo-card-right"><span class="complexity-badge time">Time: O(n)</span><span class="complexity-badge space">Space: O(1)</span><span class="algo-chevron">▼</span></div>
+            </div>
+            <div class="algo-card-body">
+              <h5>Algorithm</h5>
+              <ol><li>Prompt user for event ID.</li><li>Traverse linked list searching for matching ID.</li><li>If found, prompt for new name and category.</li><li>Overwrite the existing fields.</li><li>If not found, display error.</li></ol>
+              <h5>Pseudo Code</h5>
+              <pre><code>function editEvent(id):
+    temp ← head
+    while temp ≠ NULL:
+        if temp.id == id:
+            temp.name ← input("New name")
+            temp.category ← input("New category")
+            return
+        temp ← temp.next
+    print "Not found"</code></pre>
+            </div>
+          </div>
+
+          <!-- 4. Search Event -->
+          <div class="algo-card reveal" id="algo-search">
+            <div class="algo-card-header" onclick="this.parentElement.classList.toggle('algo-expanded')">
+              <div class="algo-card-left"><div class="algo-card-icon">🔍</div><span class="algo-card-title">Search Event</span></div>
+              <div class="algo-card-right"><span class="complexity-badge time">Time: O(n)</span><span class="complexity-badge space">Space: O(1)</span><span class="algo-chevron">▼</span></div>
+            </div>
+            <div class="algo-card-body">
+              <h5>Algorithm</h5>
+              <ol><li>Prompt user for search keyword.</li><li>Convert keyword to lowercase.</li><li>Traverse the list; for each node, convert name to lowercase.</li><li>Use substring matching (strstr) for partial matches.</li><li>Display all matching events.</li><li>If none found, print "No results".</li></ol>
+              <h5>Pseudo Code</h5>
+              <pre><code>function searchEvent(keyword):
+    found ← 0
+    temp ← head
+    key ← toLower(keyword)
+    while temp ≠ NULL:
+        name ← toLower(temp.name)
+        if name contains key:
+            display(temp)
+            found++
+        temp ← temp.next
+    if found == 0:
+        print "No results"</code></pre>
+            </div>
+          </div>
+
+          <!-- 5. Display Timeline -->
+          <div class="algo-card reveal" id="algo-display">
+            <div class="algo-card-header" onclick="this.parentElement.classList.toggle('algo-expanded')">
+              <div class="algo-card-left"><div class="algo-card-icon">📋</div><span class="algo-card-title">Display Timeline</span></div>
+              <div class="algo-card-right"><span class="complexity-badge time">Time: O(n)</span><span class="complexity-badge space">Space: O(1)</span><span class="algo-chevron">▼</span></div>
+            </div>
+            <div class="algo-card-body">
+              <h5>Algorithm</h5>
+              <ol><li>Check if head is NULL; if yes, print "No events".</li><li>Print table header row.</li><li>Set temp = head.</li><li>While temp ≠ NULL, print event details.</li><li>Advance temp = temp→next.</li></ol>
+              <h5>Pseudo Code</h5>
+              <pre><code>function displayTimeline():
+    if head == NULL:
+        print "No events"
+        return
+    print "ID | Name | Category | Date | Time"
+    temp ← head
+    while temp ≠ NULL:
+        print temp.id, temp.name, temp.category,
+              temp.date, temp.time
+        temp ← temp.next</code></pre>
+            </div>
+          </div>
+
+          <!-- 6. Today's Timeline -->
+          <div class="algo-card reveal" id="algo-today">
+            <div class="algo-card-header" onclick="this.parentElement.classList.toggle('algo-expanded')">
+              <div class="algo-card-left"><div class="algo-card-icon">📅</div><span class="algo-card-title">Today's Timeline</span></div>
+              <div class="algo-card-right"><span class="complexity-badge time">Time: O(n)</span><span class="complexity-badge space">Space: O(1)</span><span class="algo-chevron">▼</span></div>
+            </div>
+            <div class="algo-card-body">
+              <h5>Algorithm</h5>
+              <ol><li>Get today's date string.</li><li>Traverse the linked list.</li><li>Compare each node's date with today.</li><li>If match, display the event.</li><li>Count matches; if zero, show "No events today".</li></ol>
+              <h5>Pseudo Code</h5>
+              <pre><code>function displayTodayTimeline():
+    today ← getCurrentDate()
+    count ← 0
+    temp ← head
+    while temp ≠ NULL:
+        if temp.date == today:
+            display(temp)
+            count++
+        temp ← temp.next
+    if count == 0:
+        print "No events today"</code></pre>
+            </div>
+          </div>
+
+          <!-- 7. Replay Day -->
+          <div class="algo-card reveal" id="algo-replay">
+            <div class="algo-card-header" onclick="this.parentElement.classList.toggle('algo-expanded')">
+              <div class="algo-card-left"><div class="algo-card-icon">🔁</div><span class="algo-card-title">Replay Day</span></div>
+              <div class="algo-card-right"><span class="complexity-badge time">Time: O(n)</span><span class="complexity-badge space">Space: O(n)</span><span class="algo-chevron">▼</span></div>
+            </div>
+            <div class="algo-card-body">
+              <h5>Algorithm</h5>
+              <ol><li>Create a temporary stack.</li><li>Traverse entire linked list, pushing each event onto the temp stack.</li><li>Pop every element from the temp stack and display it.</li><li>This shows events in reverse order (LIFO).</li><li>Free the temporary stack.</li></ol>
+              <h5>Pseudo Code</h5>
+              <pre><code>function replayDay():
+    tempStack ← empty
+    temp ← head
+    while temp ≠ NULL:
+        push(tempStack, temp)
+        temp ← temp.next
+
+    print "=== Replay (Reverse Order) ==="
+    while tempStack not empty:
+        event ← pop(tempStack)
+        display(event)
+    freeStack(tempStack)</code></pre>
+            </div>
+          </div>
+
+          <!-- 8. Undo Event -->
+          <div class="algo-card reveal" id="algo-undo">
+            <div class="algo-card-header" onclick="this.parentElement.classList.toggle('algo-expanded')">
+              <div class="algo-card-left"><div class="algo-card-icon">↩️</div><span class="algo-card-title">Undo Event</span></div>
+              <div class="algo-card-right"><span class="complexity-badge time">Time: O(n)</span><span class="complexity-badge space">Space: O(1)</span><span class="algo-chevron">▼</span></div>
+            </div>
+            <div class="algo-card-body">
+              <h5>Algorithm</h5>
+              <ol><li>Check if undo stack is empty; if yes, print "Nothing to undo".</li><li>Pop the top event from the stack.</li><li>Extract its ID.</li><li>Search the linked list for that ID and delete the node.</li><li>Free the stack node and the popped event copy.</li></ol>
+              <h5>Pseudo Code</h5>
+              <pre><code>function undoLastEvent():
+    if stack_top == NULL:
+        print "Nothing to undo"
+        return
+    event ← popFromStack()
+    deleteEventById(event.id)
+    free(event)
+    print "Event undone"</code></pre>
+            </div>
+          </div>
+
+          <!-- 9. Statistics -->
+          <div class="algo-card reveal" id="algo-stats">
+            <div class="algo-card-header" onclick="this.parentElement.classList.toggle('algo-expanded')">
+              <div class="algo-card-left"><div class="algo-card-icon">📊</div><span class="algo-card-title">Statistics</span></div>
+              <div class="algo-card-right"><span class="complexity-badge time">Time: O(n)</span><span class="complexity-badge space">Space: O(1)</span><span class="algo-chevron">▼</span></div>
+            </div>
+            <div class="algo-card-body">
+              <h5>Algorithm</h5>
+              <ol><li>Initialise counters for each category to zero.</li><li>Get today's date.</li><li>Traverse the linked list in a single pass.</li><li>For each node, increment the matching category counter and check date for today's count.</li><li>Track the last node for "last event".</li><li>Find the category with the maximum count.</li><li>Display all statistics.</li></ol>
+              <h5>Pseudo Code</h5>
+              <pre><code>function showStatistics():
+    categories[] ← {Phone:0, Travel:0, ...}
+    todayCount ← 0
+    today ← getCurrentDate()
+    temp ← head
+    last ← NULL
+
+    while temp ≠ NULL:
+        categories[temp.category]++
+        if temp.date == today: todayCount++
+        last ← temp
+        temp ← temp.next
+
+    maxCat ← max(categories)
+    print "Total:", event_count
+    print "Today:", todayCount
+    print "Most Frequent:", maxCat
+    print "First:", head.name
+    print "Last:", last.name</code></pre>
+            </div>
+          </div>
+
+          <!-- 10. Exit -->
+          <div class="algo-card reveal" id="algo-exit">
+            <div class="algo-card-header" onclick="this.parentElement.classList.toggle('algo-expanded')">
+              <div class="algo-card-left"><div class="algo-card-icon">🚪</div><span class="algo-card-title">Exit & Cleanup</span></div>
+              <div class="algo-card-right"><span class="complexity-badge time">Time: O(n)</span><span class="complexity-badge space">Space: O(1)</span><span class="algo-chevron">▼</span></div>
+            </div>
+            <div class="algo-card-body">
+              <h5>Algorithm</h5>
+              <ol><li>Traverse the linked list from head.</li><li>For each node, save next pointer, then free the current node.</li><li>Traverse the stack from top.</li><li>For each stack node, free the event data copy, then free the stack node.</li><li>Set head = NULL, stack_top = NULL.</li><li>Print goodbye message.</li></ol>
+              <h5>Pseudo Code</h5>
+              <pre><code>function cleanup():
+    // Free linked list
+    temp ← head
+    while temp ≠ NULL:
+        next ← temp.next
+        free(temp)
+        temp ← next
+    head ← NULL
+
+    // Free stack
+    sTemp ← stack_top
+    while sTemp ≠ NULL:
+        sNext ← sTemp.next
+        free(sTemp.event_data)
+        free(sTemp)
+        sTemp ← sNext
+    stack_top ← NULL</code></pre>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer"><div class="footer-content"><div class="footer-brand"><span class="logo-icon">◈</span><span>Digital Shadow</span></div><p class="footer-tagline">Your Life Has a Memory, Even When You Don't.</p><div class="footer-links"><a href="index.html">Home</a><a href="about.html">About</a><a href="visualization.html">Demo</a><a href="contact.html">Contact</a></div><p class="footer-copy">© 2026 Digital Shadow. Built with passion.</p></div></footer>
+
+  <script src="js/main.js"></script>
+  <script src="js/navbar.js"></script>
+  <script src="js/theme.js"></script>
+  <script src="js/particles.js"></script>
+  <script src="js/search.js"></script>
+</body>
+</html>

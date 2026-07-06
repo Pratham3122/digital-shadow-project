@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About — Digital Shadow</title>
+  <meta name="description" content="Learn about Digital Shadow — a digital life timeline reconstruction system that captures, stores, and replays your digital footprint using Linked List and Stack.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>◈</text></svg>">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/navbar.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/cards.css">
+  <link rel="stylesheet" href="css/timeline.css">
+  <link rel="stylesheet" href="css/compiler.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <link rel="stylesheet" href="css/darktheme.css">
+  <style>
+    /* ===== CONCEPT SECTION ===== */
+    .concept-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+    }
+    .concept-text h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(1.5rem, 2.5vw, 2rem);
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 1.5rem;
+    }
+    .concept-text p {
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      color: var(--text-secondary);
+      line-height: 1.8;
+      margin-bottom: 1.25rem;
+    }
+    .concept-text .highlight {
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    /* CSS-drawn timeline device graphic */
+    .concept-illustration {
+      position: relative;
+      height: 380px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .device-frame {
+      width: 280px;
+      height: 360px;
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: 28px;
+      padding: 1.5rem 1rem;
+      position: relative;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      overflow: hidden;
+    }
+    .device-frame::before {
+      content: '';
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 5px;
+      background: var(--surface-border);
+      border-radius: 10px;
+    }
+    .device-timeline {
+      margin-top: 1.5rem;
+      position: relative;
+      padding-left: 1.5rem;
+    }
+    .device-timeline::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: linear-gradient(to bottom, var(--primary), var(--accent));
+    }
+    .device-event {
+      position: relative;
+      padding: 0.5rem 0 0.8rem 1rem;
+      animation: fadeInSequence 3s ease-in-out infinite;
+    }
+    .device-event:nth-child(2) { animation-delay: 0.3s; }
+    .device-event:nth-child(3) { animation-delay: 0.6s; }
+    .device-event:nth-child(4) { animation-delay: 0.9s; }
+    .device-event:nth-child(5) { animation-delay: 1.2s; }
+    .device-event:nth-child(6) { animation-delay: 1.5s; }
+    .device-event:nth-child(7) { animation-delay: 1.8s; }
+    @keyframes fadeInSequence {
+      0%, 100% { opacity: 0.6; }
+      50% { opacity: 1; }
+    }
+    .device-event::before {
+      content: '';
+      position: absolute;
+      left: -1.5rem;
+      top: 0.65rem;
+      width: 8px;
+      height: 8px;
+      background: var(--primary);
+      border-radius: 50%;
+      transform: translateX(-3px);
+    }
+    .device-event .ev-time {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.65rem;
+      color: var(--text-tertiary);
+      display: block;
+    }
+    .device-event .ev-name {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.8rem;
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+    .device-glow {
+      position: absolute;
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(124,92,255,0.15) 0%, transparent 70%);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      animation: pulse-glow 3s ease-in-out infinite;
+    }
+    @keyframes pulse-glow {
+      0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); }
+      50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+    }
+
+    /* ===== PROCESS STEPS ===== */
+    .process-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2rem;
+      counter-reset: step-counter;
+    }
+    .process-step {
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-lg);
+      padding: 2.5rem 2rem;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      text-align: center;
+      position: relative;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      counter-increment: step-counter;
+    }
+    .process-step:hover {
+      transform: translateY(-4px);
+      border-color: var(--primary);
+      box-shadow: 0 0 30px rgba(124,92,255,0.2);
+    }
+    .process-step::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      right: -1.2rem;
+      width: 20px;
+      height: 2px;
+      background: var(--primary);
+      opacity: 0.5;
+    }
+    .process-step:last-child::after { display: none; }
+    .step-num {
+      width: 52px;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-circle);
+      background: linear-gradient(135deg, #7c5cff 0%, #00d4aa 100%);
+      color: #fff;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin: 0 auto 1.5rem;
+      box-shadow: 0 4px 20px rgba(124,92,255,0.3);
+    }
+    .process-step h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.75rem;
+    }
+    .process-step p {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+
+    /* ===== UTILITY CARDS ===== */
+    .utility-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+    }
+    .utility-card {
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-lg);
+      padding: 2.5rem 2rem;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+    .utility-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--gradient-primary);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .utility-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--surface-border-hover);
+      box-shadow: var(--shadow-md);
+    }
+    .utility-card:hover::before { opacity: 1; }
+    .utility-icon {
+      font-size: 2.5rem;
+      margin-bottom: 1.25rem;
+      display: block;
+    }
+    .utility-card h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.75rem;
+    }
+    .utility-card p {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+
+    /* ===== COMPARISON TABLE ===== */
+    .comparison-wrapper {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .comparison-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+    .comparison-table thead th {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      padding: 1.5rem 2rem;
+      text-align: left;
+      border-bottom: 1px solid var(--surface-border);
+      background: rgba(124,92,255,0.05);
+    }
+    .comparison-table thead th:first-child {
+      color: var(--text-secondary);
+    }
+    .comparison-table thead th:nth-child(3) {
+      background: rgba(0,212,170,0.05);
+      color: var(--accent);
+    }
+    .comparison-table tbody td {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      padding: 1.1rem 2rem;
+      border-bottom: 1px solid var(--surface-border);
+      transition: background 0.2s ease;
+    }
+    .comparison-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+    .comparison-table tbody tr:hover td {
+      background: var(--surface-hover);
+    }
+    .comparison-table tbody td:first-child {
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+    .comparison-table .check {
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .comparison-table .cross {
+      color: var(--error);
+      font-weight: 600;
+    }
+
+    /* Section header */
+    .section-header {
+      text-align: center;
+      margin-bottom: 4rem;
+    }
+    .section-header .section-badge {
+      display: inline-block;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--primary);
+      margin-bottom: 1rem;
+      padding: 0.4rem 1rem;
+      background: rgba(124,92,255,0.1);
+      border-radius: var(--radius-pill);
+    }
+    .section-header h2 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(1.8rem, 3vw, 2.5rem);
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 1rem;
+    }
+    .section-header p {
+      font-family: 'Inter', sans-serif;
+      font-size: 1.05rem;
+      color: var(--text-secondary);
+      max-width: 600px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .concept-layout { grid-template-columns: 1fr; gap: 2rem; }
+      .concept-illustration { height: 300px; }
+      .process-grid { grid-template-columns: repeat(2, 1fr); }
+      .process-step::after { display: none; }
+    }
+    @media (max-width: 768px) {
+      .utility-grid { grid-template-columns: 1fr; }
+      .process-grid { grid-template-columns: 1fr; }
+      .comparison-table { font-size: 0.85rem; }
+      .comparison-table thead th,
+      .comparison-table tbody td { padding: 0.9rem 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="nav-logo">
+        <span class="logo-icon">◈</span>
+        <span class="logo-text">Digital Shadow</span>
+      </a>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="nav-menu" id="navMenu">
+        <div class="nav-links">
+          <a href="index.html" class="nav-link">Home</a>
+          <a href="about.html" class="nav-link">About</a>
+          <a href="problem.html" class="nav-link">Problem</a>
+          <a href="features.html" class="nav-link">Features</a>
+          <a href="architecture.html" class="nav-link">Architecture</a>
+          <div class="nav-dropdown">
+            <button class="nav-link dropdown-trigger">Data Structures <span class="dropdown-arrow">▾</span></button>
+            <div class="dropdown-menu">
+              <a href="linkedlist.html" class="dropdown-link">Linked List</a>
+              <a href="stack.html" class="dropdown-link">Stack</a>
+            </div>
+          </div>
+          <a href="flowchart.html" class="nav-link">Flowchart</a>
+          <a href="algorithm.html" class="nav-link">Algorithm</a>
+          <a href="visualization.html" class="nav-link">Visualization</a>
+          <a href="compiler.html" class="nav-link">Compiler</a>
+          <a href="statistics.html" class="nav-link">Statistics</a>
+          <a href="future.html" class="nav-link">Future</a>
+          <a href="viva.html" class="nav-link">Viva</a>
+          <a href="report.html" class="nav-link">Report</a>
+          <a href="ppt.html" class="nav-link">PPT</a>
+          <a href="contact.html" class="nav-link">Contact</a>
+        </div>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+          <span class="theme-icon">🌙</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <div id="particles-container" class="particles-container"></div>
+
+  <main>
+    <!-- PAGE HERO -->
+    <section class="page-hero">
+      <div class="container">
+        <span class="section-badge">ABOUT</span>
+        <h1 class="page-title">What is Digital Shadow?</h1>
+        <p class="page-subtitle">A systematic reconstruction engine for the timeline of your digital existence — not a diary, but an intelligent memory system.</p>
+      </div>
+    </section>
+
+    <!-- THE CONCEPT -->
+    <section class="section" id="the-concept">
+      <div class="container">
+        <div class="concept-layout">
+          <div class="concept-text reveal">
+            <h3>The Concept</h3>
+            <p>Digital Shadow is a <span class="highlight">digital life timeline reconstruction system</span> — a purpose-built engine that captures every meaningful event in your digital existence and organizes them into a navigable, analyzable timeline.</p>
+            <p>Unlike a diary, which relies on subjective memory and manual writing, Digital Shadow operates as a <span class="highlight">structured data pipeline</span>. Each event is captured with precise timestamps, categorized automatically, and linked to previous and subsequent events using a doubly linked list data structure.</p>
+            <p>Think of it as the difference between writing a paragraph about your day and having a high-resolution recording of every digital action. The system doesn't interpret or editorialise — it reconstructs the raw sequence of events exactly as they occurred, giving you the power to navigate, search, undo, and analyze your digital footprint.</p>
+            <p>Built in C using fundamental data structures, Digital Shadow demonstrates that powerful systems can be created with elegant simplicity — a linked list for chronological storage, a stack for undo and replay, and a console interface for interaction.</p>
+          </div>
+          <div class="concept-illustration reveal reveal-right" id="conceptIllustration">
+            <div class="device-glow"></div>
+            <div class="device-frame">
+              <div class="device-timeline">
+                <div class="device-event">
+                  <span class="ev-time">08:15 AM</span>
+                  <span class="ev-name">📱 Phone Unlocked</span>
+                </div>
+                <div class="device-event">
+                  <span class="ev-time">08:22 AM</span>
+                  <span class="ev-name">📧 Email Checked</span>
+                </div>
+                <div class="device-event">
+                  <span class="ev-time">09:00 AM</span>
+                  <span class="ev-name">🏠 Left Home</span>
+                </div>
+                <div class="device-event">
+                  <span class="ev-time">09:30 AM</span>
+                  <span class="ev-name">🎓 Reached College</span>
+                </div>
+                <div class="device-event">
+                  <span class="ev-time">09:35 AM</span>
+                  <span class="ev-name">📶 Wi-Fi Connected</span>
+                </div>
+                <div class="device-event">
+                  <span class="ev-time">10:15 AM</span>
+                  <span class="ev-name">💳 Cafeteria Payment</span>
+                </div>
+                <div class="device-event">
+                  <span class="ev-time">12:00 PM</span>
+                  <span class="ev-name">📸 Photo Taken</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HOW DOES IT WORK -->
+    <section class="section" id="how-it-works">
+      <div class="container">
+        <div class="section-header reveal">
+          <span class="section-badge">Process</span>
+          <h2>How Does It Work?</h2>
+          <p>A four-stage pipeline from event occurrence to timeline reconstruction and analysis.</p>
+        </div>
+        <div class="process-grid">
+          <div class="process-step reveal stagger-1" id="processStep1">
+            <div class="step-num">1</div>
+            <h3>Event Occurs</h3>
+            <p>A digital action happens in your life — unlocking your phone, connecting to Wi-Fi, making a payment, or receiving a message. Each action is a potential timeline node.</p>
+          </div>
+          <div class="process-step reveal stagger-2" id="processStep2">
+            <div class="step-num">2</div>
+            <h3>Capture & Store</h3>
+            <p>The system captures the event with its timestamp, category, and description, then inserts it into the doubly linked list at the correct chronological position.</p>
+          </div>
+          <div class="process-step reveal stagger-3" id="processStep3">
+            <div class="step-num">3</div>
+            <h3>Stack Tracking</h3>
+            <p>Every insertion and modification is pushed onto a stack, enabling powerful undo operations and complete day replay. No action is ever truly lost.</p>
+          </div>
+          <div class="process-step reveal stagger-4" id="processStep4">
+            <div class="step-num">4</div>
+            <h3>Reconstruct & Analyze</h3>
+            <p>Traverse the linked list to reconstruct the full timeline. Filter by date, search by keyword, generate statistics, and gain insights into behavioral patterns.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- WHY IS IT USEFUL -->
+    <section class="section" id="why-useful">
+      <div class="container">
+        <div class="section-header reveal">
+          <span class="section-badge">Benefits</span>
+          <h2>Why Is It Useful?</h2>
+          <p>Beyond simple event logging — Digital Shadow provides actionable intelligence about your digital behavior.</p>
+        </div>
+        <div class="utility-grid">
+          <div class="utility-card reveal stagger-1" id="utilMemory">
+            <span class="utility-icon">🧠</span>
+            <h3>Memory Reconstruction</h3>
+            <p>Human memory is inherently unreliable for sequential recall. We forget the order of events, the timing between actions, and the connections between disparate activities. Digital Shadow reconstructs the precise sequence, allowing you to answer questions like "What did I do between 2 PM and 4 PM last Tuesday?" with complete accuracy.</p>
+          </div>
+          <div class="utility-card reveal stagger-2" id="utilPattern">
+            <span class="utility-icon">📈</span>
+            <h3>Pattern Analysis</h3>
+            <p>By examining your digital timeline over days and weeks, patterns emerge that are invisible to conscious awareness. You might discover that you check social media 47 times a day, that your productivity peaks between 10 AM and noon, or that your spending increases every Friday. These insights enable conscious behavioral change.</p>
+          </div>
+          <div class="utility-card reveal stagger-3" id="utilFootprint">
+            <span class="utility-icon">👁️</span>
+            <h3>Digital Footprint Awareness</h3>
+            <p>Most people have no idea how extensive their digital trail is. Digital Shadow makes the invisible visible — showing you exactly how many events you generate, what categories dominate your activity, and how your digital behavior shapes a detailed profile of your daily life. Awareness is the first step to digital mindfulness.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DIARY VS DIGITAL SHADOW -->
+    <section class="section" id="comparison">
+      <div class="container">
+        <div class="section-header reveal">
+          <span class="section-badge">Comparison</span>
+          <h2>How Is It Different From a Diary?</h2>
+          <p>Digital Shadow isn't journaling — it's systematic digital archaeology.</p>
+        </div>
+        <div class="comparison-wrapper reveal">
+          <table class="comparison-table" id="comparisonTable">
+            <thead>
+              <tr>
+                <th>Aspect</th>
+                <th>📓 Traditional Diary</th>
+                <th>◈ Digital Shadow</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Input Method</td>
+                <td>Manual text entry</td>
+                <td class="check">Structured event capture ✓</td>
+              </tr>
+              <tr>
+                <td>Data Format</td>
+                <td>Free-form prose</td>
+                <td class="check">Structured data with timestamp, category, metadata ✓</td>
+              </tr>
+              <tr>
+                <td>Accuracy</td>
+                <td class="cross">Subject to memory bias ✗</td>
+                <td class="check">Precise and objective ✓</td>
+              </tr>
+              <tr>
+                <td>Undo Capability</td>
+                <td class="cross">Not possible ✗</td>
+                <td class="check">Stack-based undo ✓</td>
+              </tr>
+              <tr>
+                <td>Day Replay</td>
+                <td class="cross">Not possible ✗</td>
+                <td class="check">Full sequential replay ✓</td>
+              </tr>
+              <tr>
+                <td>Search</td>
+                <td class="cross">Manual reading ✗</td>
+                <td class="check">Keyword and category search ✓</td>
+              </tr>
+              <tr>
+                <td>Analytics</td>
+                <td class="cross">No built-in analysis ✗</td>
+                <td class="check">Statistics dashboard ✓</td>
+              </tr>
+              <tr>
+                <td>Event Ordering</td>
+                <td>Approximate recall</td>
+                <td class="check">Chronologically linked ✓</td>
+              </tr>
+              <tr>
+                <td>Navigation</td>
+                <td>Page by page</td>
+                <td class="check">Forward/backward traversal ✓</td>
+              </tr>
+              <tr>
+                <td>Consistency</td>
+                <td class="cross">Depends on motivation ✗</td>
+                <td class="check">Systematic capture ✓</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-brand">
+        <span class="logo-icon">◈</span>
+        <span>Digital Shadow</span>
+      </div>
+      <p class="footer-tagline">Your Life Has a Memory, Even When You Don't.</p>
+      <div class="footer-links">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="visualization.html">Demo</a>
+        <a href="contact.html">Contact</a>
+      </div>
+      <p class="footer-copy">© 2026 Digital Shadow. Built with passion.</p>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script src="js/navbar.js"></script>
+  <script src="js/theme.js"></script>
+  <script src="js/particles.js"></script>
+  <script src="js/search.js"></script>
+</body>
+</html>

@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Features — Digital Shadow</title>
+  <meta name="description" content="Explore the powerful features of Digital Shadow — event management, timeline reconstruction, stack-based undo, analytics, and a professional console interface.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>◈</text></svg>">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/navbar.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/cards.css">
+  <link rel="stylesheet" href="css/timeline.css">
+  <link rel="stylesheet" href="css/compiler.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <link rel="stylesheet" href="css/darktheme.css">
+  <style>
+    /* ===== FEATURE CARDS GRID ===== */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+    }
+    .feat-card {
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-lg);
+      padding: 2.5rem 2rem;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      cursor: default;
+    }
+    .feat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--gradient-primary);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .feat-card::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle at center, rgba(124,92,255,0.06) 0%, transparent 50%);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      pointer-events: none;
+    }
+    .feat-card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(124,92,255,0.3);
+      box-shadow: 0 0 40px rgba(124,92,255,0.15), 0 8px 32px rgba(0,0,0,0.3);
+    }
+    .feat-card:hover::before { opacity: 1; }
+    .feat-card:hover::after { opacity: 1; }
+    .feat-card:hover .feat-icon {
+      transform: scale(1.1);
+      box-shadow: 0 0 20px rgba(124,92,255,0.3);
+    }
+
+    .feat-icon {
+      width: 64px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-md);
+      background: rgba(124,92,255,0.1);
+      border: 1px solid rgba(124,92,255,0.15);
+      margin-bottom: 1.5rem;
+      font-size: 1.8rem;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .feat-card h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.75rem;
+    }
+    .feat-card p {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.75;
+    }
+    .feat-tag {
+      display: inline-block;
+      margin-top: 1.25rem;
+      padding: 0.3rem 0.75rem;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border-radius: var(--radius-pill);
+      background: rgba(0,212,170,0.1);
+      color: var(--accent);
+      border: 1px solid rgba(0,212,170,0.15);
+    }
+    .feat-tag.ds-tag {
+      background: rgba(124,92,255,0.1);
+      color: var(--primary-glow);
+      border-color: rgba(124,92,255,0.15);
+    }
+    .feat-tag.ui-tag {
+      background: rgba(255,184,0,0.1);
+      color: var(--warning);
+      border-color: rgba(255,184,0,0.15);
+    }
+
+    /* ===== CTA ===== */
+    .features-cta {
+      text-align: center;
+      position: relative;
+    }
+    .features-cta::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 500px;
+      height: 500px;
+      transform: translate(-50%, -50%);
+      background: radial-gradient(circle, rgba(124,92,255,0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .cta-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(1.8rem, 3vw, 2.5rem);
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 1rem;
+    }
+    .cta-text {
+      font-family: 'Inter', sans-serif;
+      font-size: 1.05rem;
+      color: var(--text-secondary);
+      max-width: 550px;
+      margin: 0 auto 2rem;
+      line-height: 1.7;
+    }
+    .cta-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.85rem 2rem;
+      border-radius: 50px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 500;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #7c5cff 0%, #00d4aa 100%);
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(124,92,255,0.3);
+    }
+    .btn-primary:hover {
+      transform: scale(1.02) translateY(-2px);
+      box-shadow: 0 8px 30px rgba(124,92,255,0.45);
+    }
+    .btn-secondary {
+      background: transparent;
+      color: var(--text-primary);
+      border: 1px solid var(--surface-border);
+    }
+    .btn-secondary:hover {
+      border-color: var(--primary);
+      background: rgba(124,92,255,0.08);
+      transform: scale(1.02) translateY(-2px);
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 4rem;
+    }
+    .section-header .section-badge {
+      display: inline-block;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--primary);
+      margin-bottom: 1rem;
+      padding: 0.4rem 1rem;
+      background: rgba(124,92,255,0.1);
+      border-radius: 50px;
+    }
+    .section-header h2 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(1.8rem, 3vw, 2.5rem);
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 1rem;
+    }
+    .section-header p {
+      font-family: 'Inter', sans-serif;
+      font-size: 1.05rem;
+      color: var(--text-secondary);
+      max-width: 600px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+
+    @media (max-width: 1024px) {
+      .features-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 600px) {
+      .features-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="nav-logo">
+        <span class="logo-icon">◈</span>
+        <span class="logo-text">Digital Shadow</span>
+      </a>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="nav-menu" id="navMenu">
+        <div class="nav-links">
+          <a href="index.html" class="nav-link">Home</a>
+          <a href="about.html" class="nav-link">About</a>
+          <a href="problem.html" class="nav-link">Problem</a>
+          <a href="features.html" class="nav-link">Features</a>
+          <a href="architecture.html" class="nav-link">Architecture</a>
+          <div class="nav-dropdown">
+            <button class="nav-link dropdown-trigger">Data Structures <span class="dropdown-arrow">▾</span></button>
+            <div class="dropdown-menu">
+              <a href="linkedlist.html" class="dropdown-link">Linked List</a>
+              <a href="stack.html" class="dropdown-link">Stack</a>
+            </div>
+          </div>
+          <a href="flowchart.html" class="nav-link">Flowchart</a>
+          <a href="algorithm.html" class="nav-link">Algorithm</a>
+          <a href="visualization.html" class="nav-link">Visualization</a>
+          <a href="compiler.html" class="nav-link">Compiler</a>
+          <a href="statistics.html" class="nav-link">Statistics</a>
+          <a href="future.html" class="nav-link">Future</a>
+          <a href="viva.html" class="nav-link">Viva</a>
+          <a href="report.html" class="nav-link">Report</a>
+          <a href="ppt.html" class="nav-link">PPT</a>
+          <a href="contact.html" class="nav-link">Contact</a>
+        </div>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+          <span class="theme-icon">🌙</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <div id="particles-container" class="particles-container"></div>
+
+  <main>
+    <!-- PAGE HERO -->
+    <section class="page-hero">
+      <div class="container">
+        <span class="section-badge">FEATURES</span>
+        <h1 class="page-title">Powerful Features</h1>
+        <p class="page-subtitle">Ten core capabilities that make Digital Shadow a complete timeline reconstruction and analysis system.</p>
+      </div>
+    </section>
+
+    <!-- FEATURES GRID -->
+    <section class="section" id="features-list">
+      <div class="container">
+        <div class="features-grid">
+          <!-- Feature 1: Add Event -->
+          <div class="feat-card reveal stagger-1" id="featAdd">
+            <div class="feat-icon">➕</div>
+            <h3>Add Event</h3>
+            <p>Add timestamped events to your digital timeline with automatic chronological ordering. Each event captures the exact time, a descriptive title, and a category classification. The linked list structure ensures events are always inserted at the correct position, maintaining temporal integrity.</p>
+            <span class="feat-tag ds-tag">Linked List</span>
+          </div>
+
+          <!-- Feature 2: Delete Event -->
+          <div class="feat-card reveal stagger-2" id="featDelete">
+            <div class="feat-icon">🗑️</div>
+            <h3>Delete Event</h3>
+            <p>Remove events from your timeline when they're no longer relevant or were entered incorrectly. The doubly linked list enables efficient deletion from any position — head, tail, or middle — by simply relinking adjacent nodes without shifting data.</p>
+            <span class="feat-tag ds-tag">Linked List</span>
+          </div>
+
+          <!-- Feature 3: Edit Event -->
+          <div class="feat-card reveal stagger-3" id="featEdit">
+            <div class="feat-icon">✏️</div>
+            <h3>Edit Event</h3>
+            <p>Modify existing events to correct descriptions, update categories, or adjust timestamps. The edit operation preserves the node's position in the list while allowing content changes, and the previous state is pushed to the undo stack for recovery.</p>
+            <span class="feat-tag">Core Feature</span>
+          </div>
+
+          <!-- Feature 4: Search Event -->
+          <div class="feat-card reveal stagger-4" id="featSearch">
+            <div class="feat-icon">🔍</div>
+            <h3>Search Event</h3>
+            <p>Find any event in your timeline using keyword-based search. The system traverses the linked list and performs string matching on event descriptions and categories, returning all matching events with their timestamps and positions in the timeline.</p>
+            <span class="feat-tag">Core Feature</span>
+          </div>
+
+          <!-- Feature 5: Display Timeline -->
+          <div class="feat-card reveal stagger-5" id="featDisplay">
+            <div class="feat-icon">📋</div>
+            <h3>Display Timeline</h3>
+            <p>View your complete digital timeline in a beautifully formatted chronological display. The forward traversal of the doubly linked list presents every event with its timestamp, category, and description, giving you a comprehensive view of your digital day.</p>
+            <span class="feat-tag ds-tag">Linked List</span>
+          </div>
+
+          <!-- Feature 6: Today's Timeline -->
+          <div class="feat-card reveal stagger-6" id="featToday">
+            <div class="feat-icon">📅</div>
+            <h3>Today's Timeline</h3>
+            <p>Filter your timeline to show only today's events, providing a focused view of your current day's digital activity. This filtered traversal skips events from other dates, giving you an instant snapshot of what you've done so far today.</p>
+            <span class="feat-tag">Core Feature</span>
+          </div>
+
+          <!-- Feature 7: Replay Day -->
+          <div class="feat-card reveal stagger-1" id="featReplay">
+            <div class="feat-icon">🔁</div>
+            <h3>Replay Day</h3>
+            <p>Replay your entire day's events in sequence using the stack data structure. Events are popped from the stack one by one, reconstructing the flow of your day in reverse chronological order — like rewinding a tape of your digital life.</p>
+            <span class="feat-tag ds-tag">Stack</span>
+          </div>
+
+          <!-- Feature 8: Undo Event -->
+          <div class="feat-card reveal stagger-2" id="featUndo">
+            <div class="feat-icon">↩️</div>
+            <h3>Undo Event</h3>
+            <p>Reverse the most recent action using the stack's Last-In-First-Out (LIFO) principle. Whether you accidentally added, deleted, or modified an event, the undo operation pops the previous state from the stack and restores your timeline to its former state.</p>
+            <span class="feat-tag ds-tag">Stack</span>
+          </div>
+
+          <!-- Feature 9: Statistics -->
+          <div class="feat-card reveal stagger-3" id="featStats">
+            <div class="feat-icon">📊</div>
+            <h3>Statistics</h3>
+            <p>Access a comprehensive analytics dashboard that traverses your entire timeline to generate insights. View total event counts, category distributions, most active time periods, daily averages, and trend analysis — turning raw events into actionable intelligence.</p>
+            <span class="feat-tag">Core Feature</span>
+          </div>
+
+          <!-- Feature 10: Console UI -->
+          <div class="feat-card reveal stagger-4" id="featConsole">
+            <div class="feat-icon">💻</div>
+            <h3>Professional Console UI</h3>
+            <p>Interact with Digital Shadow through an elegant, professionally designed console interface. Color-coded output, formatted tables, progress indicators, and intuitive menu navigation make the terminal experience feel modern and polished.</p>
+            <span class="feat-tag ui-tag">Interface</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="section features-cta" id="features-cta">
+      <div class="container">
+        <div class="reveal">
+          <h2 class="cta-title">See It in Action</h2>
+          <p class="cta-text">All these features come together in a seamless experience. Try the live visualization demo or explore the underlying architecture.</p>
+          <div class="cta-buttons">
+            <a href="visualization.html" class="btn btn-primary" id="ctaDemo">Try Live Demo ↗</a>
+            <a href="architecture.html" class="btn btn-secondary" id="ctaArch">View Architecture →</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-brand">
+        <span class="logo-icon">◈</span>
+        <span>Digital Shadow</span>
+      </div>
+      <p class="footer-tagline">Your Life Has a Memory, Even When You Don't.</p>
+      <div class="footer-links">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="visualization.html">Demo</a>
+        <a href="contact.html">Contact</a>
+      </div>
+      <p class="footer-copy">© 2026 Digital Shadow. Built with passion.</p>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script src="js/navbar.js"></script>
+  <script src="js/theme.js"></script>
+  <script src="js/particles.js"></script>
+  <script src="js/search.js"></script>
+</body>
+</html>

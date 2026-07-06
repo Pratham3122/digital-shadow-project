@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Problem Statement — Digital Shadow</title>
+  <meta name="description" content="Understanding the problem: why human memory fails at reconstructing digital timelines, and why a systematic solution is needed.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>◈</text></svg>">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/navbar.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/cards.css">
+  <link rel="stylesheet" href="css/timeline.css">
+  <link rel="stylesheet" href="css/compiler.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <link rel="stylesheet" href="css/darktheme.css">
+  <style>
+    /* ===== STATS BAR ===== */
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2rem;
+      margin-bottom: 1rem;
+    }
+    .stat-item {
+      text-align: center;
+      padding: 2rem 1rem;
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-lg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .stat-item:hover {
+      transform: translateY(-4px);
+      border-color: var(--primary);
+      box-shadow: var(--shadow-glow);
+    }
+    .stat-number {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 700;
+      background: linear-gradient(135deg, #7c5cff 0%, #00d4aa 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+    .stat-label {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    /* ===== MEMORY PROBLEM SECTION ===== */
+    .memory-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+    }
+    .memory-text h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(1.5rem, 2.5vw, 2rem);
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 1.5rem;
+    }
+    .memory-text p {
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      color: var(--text-secondary);
+      line-height: 1.8;
+      margin-bottom: 1.25rem;
+    }
+    .memory-text .accent-text {
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    /* CSS Brain Illustration */
+    .brain-illustration {
+      position: relative;
+      height: 360px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .brain-core {
+      width: 180px;
+      height: 200px;
+      border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+      background: linear-gradient(135deg, rgba(124,92,255,0.15) 0%, rgba(0,212,170,0.1) 100%);
+      border: 2px solid rgba(124,92,255,0.3);
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .brain-core::before {
+      content: '🧠';
+      font-size: 4rem;
+    }
+    .brain-pulse {
+      position: absolute;
+      width: 200px;
+      height: 220px;
+      border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+      border: 1px solid rgba(124,92,255,0.2);
+      animation: brain-expand 3s ease-in-out infinite;
+    }
+    .brain-pulse:nth-child(2) { animation-delay: 1s; }
+    .brain-pulse:nth-child(3) { animation-delay: 2s; }
+    @keyframes brain-expand {
+      0% { transform: scale(1); opacity: 0.6; }
+      100% { transform: scale(1.8); opacity: 0; }
+    }
+    .memory-particle {
+      position: absolute;
+      font-size: 1.2rem;
+      animation: float-away 4s ease-out infinite;
+      opacity: 0;
+    }
+    .memory-particle:nth-child(4) { top: 20%; left: 10%; animation-delay: 0s; }
+    .memory-particle:nth-child(5) { top: 10%; right: 15%; animation-delay: 0.8s; }
+    .memory-particle:nth-child(6) { bottom: 25%; left: 15%; animation-delay: 1.6s; }
+    .memory-particle:nth-child(7) { bottom: 15%; right: 10%; animation-delay: 2.4s; }
+    .memory-particle:nth-child(8) { top: 40%; left: 5%; animation-delay: 3.2s; }
+    @keyframes float-away {
+      0% { opacity: 0; transform: translate(0, 0) scale(1); }
+      30% { opacity: 0.8; }
+      100% { opacity: 0; transform: translate(var(--tx, 30px), var(--ty, -40px)) scale(0.5); }
+    }
+    .memory-particle:nth-child(4) { --tx: -50px; --ty: -60px; }
+    .memory-particle:nth-child(5) { --tx: 50px; --ty: -50px; }
+    .memory-particle:nth-child(6) { --tx: -40px; --ty: 50px; }
+    .memory-particle:nth-child(7) { --tx: 60px; --ty: 40px; }
+    .memory-particle:nth-child(8) { --tx: -60px; --ty: -30px; }
+
+    /* ===== FOOTPRINT CARDS ===== */
+    .footprint-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 1.5rem;
+    }
+    .footprint-card {
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-lg);
+      padding: 2rem 1.25rem;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      text-align: center;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+    .footprint-card::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--gradient-primary);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .footprint-card:hover {
+      transform: translateY(-6px);
+      border-color: var(--surface-border-hover);
+      box-shadow: 0 8px 30px rgba(124,92,255,0.15);
+    }
+    .footprint-card:hover::after { opacity: 1; }
+    .footprint-icon {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      display: block;
+    }
+    .footprint-card h4 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+    }
+    .footprint-card p {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+    .footprint-count {
+      display: block;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--accent);
+      margin-top: 0.75rem;
+    }
+
+    /* ===== RECONSTRUCTION SECTION ===== */
+    .recon-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+    }
+    .recon-text h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(1.5rem, 2.5vw, 2rem);
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 1.5rem;
+    }
+    .recon-text p {
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      color: var(--text-secondary);
+      line-height: 1.8;
+      margin-bottom: 1.25rem;
+    }
+    .recon-visual {
+      position: relative;
+    }
+    .recon-timeline {
+      padding-left: 2rem;
+      position: relative;
+    }
+    .recon-timeline::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: linear-gradient(to bottom, var(--primary), var(--accent), var(--primary));
+    }
+    .recon-node {
+      position: relative;
+      padding: 1rem 0 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .recon-node::before {
+      content: '';
+      position: absolute;
+      left: -2rem;
+      top: 50%;
+      transform: translateY(-50%) translateX(-3px);
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--primary);
+      box-shadow: 0 0 10px rgba(124,92,255,0.5);
+    }
+    .recon-node.faded {
+      opacity: 0.35;
+    }
+    .recon-node.faded::before {
+      background: var(--text-tertiary);
+      box-shadow: none;
+    }
+    .recon-node-content {
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-md);
+      padding: 0.8rem 1.2rem;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.85rem;
+      color: var(--text-primary);
+      flex: 1;
+    }
+    .recon-node.faded .recon-node-content {
+      border-style: dashed;
+      color: var(--text-tertiary);
+    }
+    .recon-missing-label {
+      font-size: 0.7rem;
+      color: var(--error);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      display: block;
+      margin-top: 0.25rem;
+    }
+
+    /* ===== SOLUTION BRIDGE ===== */
+    .solution-bridge {
+      text-align: center;
+      position: relative;
+    }
+    .solution-bridge::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 500px;
+      height: 500px;
+      transform: translate(-50%, -50%);
+      background: radial-gradient(circle, rgba(0,212,170,0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .solution-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(2rem, 4vw, 2.8rem);
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 1rem;
+    }
+    .solution-text {
+      font-family: 'Inter', sans-serif;
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+      max-width: 650px;
+      margin: 0 auto 2.5rem;
+      line-height: 1.8;
+    }
+    .solution-links {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.85rem 2rem;
+      border-radius: 50px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 500;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #7c5cff 0%, #00d4aa 100%);
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(124,92,255,0.3);
+    }
+    .btn-primary:hover {
+      transform: scale(1.02) translateY(-2px);
+      box-shadow: 0 8px 30px rgba(124,92,255,0.45);
+    }
+    .btn-secondary {
+      background: transparent;
+      color: var(--text-primary);
+      border: 1px solid var(--surface-border);
+    }
+    .btn-secondary:hover {
+      border-color: var(--primary);
+      background: rgba(124,92,255,0.08);
+      transform: scale(1.02) translateY(-2px);
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 4rem;
+    }
+    .section-header .section-badge {
+      display: inline-block;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--primary);
+      margin-bottom: 1rem;
+      padding: 0.4rem 1rem;
+      background: rgba(124,92,255,0.1);
+      border-radius: 50px;
+    }
+    .section-header h2 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(1.8rem, 3vw, 2.5rem);
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 1rem;
+    }
+    .section-header p {
+      font-family: 'Inter', sans-serif;
+      font-size: 1.05rem;
+      color: var(--text-secondary);
+      max-width: 600px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+
+    @media (max-width: 1024px) {
+      .memory-layout, .recon-layout { grid-template-columns: 1fr; gap: 2rem; }
+      .stats-bar { grid-template-columns: repeat(2, 1fr); }
+      .footprint-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 768px) {
+      .footprint-grid { grid-template-columns: repeat(2, 1fr); }
+      .stats-bar { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 480px) {
+      .footprint-grid { grid-template-columns: 1fr; }
+      .stats-bar { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="nav-logo">
+        <span class="logo-icon">◈</span>
+        <span class="logo-text">Digital Shadow</span>
+      </a>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="nav-menu" id="navMenu">
+        <div class="nav-links">
+          <a href="index.html" class="nav-link">Home</a>
+          <a href="about.html" class="nav-link">About</a>
+          <a href="problem.html" class="nav-link">Problem</a>
+          <a href="features.html" class="nav-link">Features</a>
+          <a href="architecture.html" class="nav-link">Architecture</a>
+          <div class="nav-dropdown">
+            <button class="nav-link dropdown-trigger">Data Structures <span class="dropdown-arrow">▾</span></button>
+            <div class="dropdown-menu">
+              <a href="linkedlist.html" class="dropdown-link">Linked List</a>
+              <a href="stack.html" class="dropdown-link">Stack</a>
+            </div>
+          </div>
+          <a href="flowchart.html" class="nav-link">Flowchart</a>
+          <a href="algorithm.html" class="nav-link">Algorithm</a>
+          <a href="visualization.html" class="nav-link">Visualization</a>
+          <a href="compiler.html" class="nav-link">Compiler</a>
+          <a href="statistics.html" class="nav-link">Statistics</a>
+          <a href="future.html" class="nav-link">Future</a>
+          <a href="viva.html" class="nav-link">Viva</a>
+          <a href="report.html" class="nav-link">Report</a>
+          <a href="ppt.html" class="nav-link">PPT</a>
+          <a href="contact.html" class="nav-link">Contact</a>
+        </div>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+          <span class="theme-icon">🌙</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <div id="particles-container" class="particles-container"></div>
+
+  <main>
+    <!-- PAGE HERO -->
+    <section class="page-hero">
+      <div class="container">
+        <span class="section-badge">PROBLEM</span>
+        <h1 class="page-title">Why Digital Shadow?</h1>
+        <p class="page-subtitle">Understanding the gap between the data we generate and our ability to remember it.</p>
+      </div>
+    </section>
+
+    <!-- STATS BAR -->
+    <section class="section" id="stats">
+      <div class="container">
+        <div class="stats-bar">
+          <div class="stat-item reveal stagger-1" id="stat1">
+            <span class="stat-number" data-target="10000">0</span>
+            <span class="stat-label">Digital events generated per person daily</span>
+          </div>
+          <div class="stat-item reveal stagger-2" id="stat2">
+            <span class="stat-number" data-target="90">0</span>
+            <span class="stat-label">Percent of event sequences forgotten within 24 hours</span>
+          </div>
+          <div class="stat-item reveal stagger-3" id="stat3">
+            <span class="stat-number" data-target="150">0</span>
+            <span class="stat-label">Average daily phone unlocks per person</span>
+          </div>
+          <div class="stat-item reveal stagger-4" id="stat4">
+            <span class="stat-number" data-target="2617">0</span>
+            <span class="stat-label">Daily screen touches on average smartphone</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HUMAN MEMORY PROBLEM -->
+    <section class="section" id="memory-problem">
+      <div class="container">
+        <div class="memory-layout">
+          <div class="memory-text reveal">
+            <h3>The Human Memory Problem</h3>
+            <p>Human brains are remarkable at many things — pattern recognition, creative thinking, emotional processing. But they are <span class="accent-text">notoriously unreliable at sequential recall</span>. We cannot accurately remember the precise order of events, the exact timing of actions, or the gaps between activities.</p>
+            <p>Research in cognitive psychology has repeatedly demonstrated that human memory is reconstructive, not reproductive. When you try to remember what you did yesterday, your brain doesn't play back a recording — it <span class="accent-text">constructs a narrative from fragments</span>, filling gaps with assumptions and expectations.</p>
+            <p>This means that your "memory" of yesterday's events is more like a story your brain wrote than a factual account. Events get reordered, durations get distorted, and minor activities disappear entirely. For most daily purposes, this approximation works fine. But when accuracy matters — for understanding your digital habits, optimizing your time, or simply answering "what exactly did I do between 3 PM and 5 PM?" — human memory falls short.</p>
+            <p>Digital Shadow addresses this fundamental limitation by creating an external, objective, systematically organized timeline that complements your natural memory.</p>
+          </div>
+          <div class="brain-illustration reveal reveal-right" id="brainIllustration">
+            <div class="brain-pulse"></div>
+            <div class="brain-pulse"></div>
+            <div class="brain-pulse"></div>
+            <span class="memory-particle">📱</span>
+            <span class="memory-particle">💳</span>
+            <span class="memory-particle">📧</span>
+            <span class="memory-particle">📍</span>
+            <span class="memory-particle">📸</span>
+            <div class="brain-core"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DIGITAL FOOTPRINTS -->
+    <section class="section" id="footprints">
+      <div class="container">
+        <div class="section-header reveal">
+          <span class="section-badge">Footprints</span>
+          <h2>Digital Footprints Are Everywhere</h2>
+          <p>Every interaction with technology leaves a trace. Here are the major categories of digital events you generate daily.</p>
+        </div>
+        <div class="footprint-grid">
+          <div class="footprint-card reveal stagger-1" id="fpPhone">
+            <span class="footprint-icon">📱</span>
+            <h4>Phone Activity</h4>
+            <p>Unlocks, app launches, notifications, calls, texts — your phone records everything.</p>
+            <span class="footprint-count">~150 unlocks/day</span>
+          </div>
+          <div class="footprint-card reveal stagger-2" id="fpWifi">
+            <span class="footprint-icon">📶</span>
+            <h4>Network Connections</h4>
+            <p>Wi-Fi connects and disconnects, Bluetooth pairings, cellular tower handoffs.</p>
+            <span class="footprint-count">~50 connections/day</span>
+          </div>
+          <div class="footprint-card reveal stagger-3" id="fpPayment">
+            <span class="footprint-icon">💳</span>
+            <h4>Financial Transactions</h4>
+            <p>UPI payments, card swipes, online purchases, subscription charges.</p>
+            <span class="footprint-count">~8 transactions/day</span>
+          </div>
+          <div class="footprint-card reveal stagger-4" id="fpLocation">
+            <span class="footprint-icon">📍</span>
+            <h4>Location Data</h4>
+            <p>GPS tracking, check-ins, navigation usage, geofence entries and exits.</p>
+            <span class="footprint-count">~200 pings/day</span>
+          </div>
+          <div class="footprint-card reveal stagger-5" id="fpApps">
+            <span class="footprint-icon">📲</span>
+            <h4>App Usage</h4>
+            <p>Social media sessions, productivity apps, streaming, gaming — every session logged.</p>
+            <span class="footprint-count">~80 sessions/day</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RECONSTRUCTION CHALLENGE -->
+    <section class="section" id="reconstruction">
+      <div class="container">
+        <div class="recon-layout">
+          <div class="recon-visual reveal" id="reconVisual">
+            <div class="recon-timeline">
+              <div class="recon-node">
+                <div class="recon-node-content">08:15 — 📱 Phone Unlocked</div>
+              </div>
+              <div class="recon-node faded">
+                <div class="recon-node-content">
+                  ??? — Missing Event
+                  <span class="recon-missing-label">Memory gap</span>
+                </div>
+              </div>
+              <div class="recon-node">
+                <div class="recon-node-content">09:00 — 🎓 Reached College</div>
+              </div>
+              <div class="recon-node faded">
+                <div class="recon-node-content">
+                  ??? — Missing Event
+                  <span class="recon-missing-label">Memory gap</span>
+                </div>
+              </div>
+              <div class="recon-node faded">
+                <div class="recon-node-content">
+                  ??? — Missing Event
+                  <span class="recon-missing-label">Memory gap</span>
+                </div>
+              </div>
+              <div class="recon-node">
+                <div class="recon-node-content">12:30 — 🍕 Lunch Break</div>
+              </div>
+              <div class="recon-node faded">
+                <div class="recon-node-content">
+                  ??? — Missing Event
+                  <span class="recon-missing-label">Memory gap</span>
+                </div>
+              </div>
+              <div class="recon-node">
+                <div class="recon-node-content">06:00 — 🏠 Reached Home</div>
+              </div>
+            </div>
+          </div>
+          <div class="recon-text reveal reveal-right">
+            <h3>The Reconstruction Challenge</h3>
+            <p>Try this exercise: list every digital action you performed yesterday, in order, with approximate times. Most people can recall perhaps 10-15 major events. The actual number is typically in the hundreds or thousands.</p>
+            <p>The gap between what actually happened and what you can recall represents a massive loss of information. This isn't just about curiosity — these lost sequences contain valuable behavioral patterns. When did you switch from productive work to social media? How long did you actually spend studying versus browsing? What triggered your afternoon energy dip?</p>
+            <p>Timeline reconstruction matters because <span class="accent-text">understanding behavior requires understanding sequence</span>. An event in isolation tells you nothing. The same event, placed in the context of what came before and after it, reveals patterns, habits, and triggers.</p>
+            <p>Without systematic recording, this context is permanently lost. Digital Shadow solves this by maintaining the complete sequence in a linked list structure, preserving not just individual events but the relationships between them.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- OUR SOLUTION BRIDGE -->
+    <section class="section solution-bridge" id="solution">
+      <div class="container">
+        <div class="reveal">
+          <h2 class="solution-title">Our Solution</h2>
+          <p class="solution-text">Digital Shadow bridges the gap between the data you generate and the memory you lose. Using a linked list for chronological storage and a stack for undo and replay, it creates a complete, navigable, analyzable record of your digital life.</p>
+          <div class="solution-links">
+            <a href="features.html" class="btn btn-primary" id="solFeatures">Explore Features ↗</a>
+            <a href="architecture.html" class="btn btn-secondary" id="solArch">View Architecture →</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-brand">
+        <span class="logo-icon">◈</span>
+        <span>Digital Shadow</span>
+      </div>
+      <p class="footer-tagline">Your Life Has a Memory, Even When You Don't.</p>
+      <div class="footer-links">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="visualization.html">Demo</a>
+        <a href="contact.html">Contact</a>
+      </div>
+      <p class="footer-copy">© 2026 Digital Shadow. Built with passion.</p>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script src="js/navbar.js"></script>
+  <script src="js/theme.js"></script>
+  <script src="js/particles.js"></script>
+  <script src="js/search.js"></script>
+
+  <!-- Animated Counter Script -->
+  <script>
+    (function() {
+      function animateCounter(el, target, suffix) {
+        let current = 0;
+        const duration = 2000;
+        const increment = target / (duration / 16);
+        function step() {
+          current += increment;
+          if (current >= target) {
+            current = target;
+            el.textContent = target.toLocaleString() + (suffix || '');
+            return;
+          }
+          el.textContent = Math.floor(current).toLocaleString() + (suffix || '');
+          requestAnimationFrame(step);
+        }
+        step();
+      }
+
+      const observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            const statNumbers = entry.target.querySelectorAll('.stat-number[data-target]');
+            statNumbers.forEach(function(el) {
+              const target = parseInt(el.getAttribute('data-target'));
+              const suffix = el.closest('#stat2') ? '%' : '+';
+              animateCounter(el, target, suffix);
+            });
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.3 });
+
+      const statsSection = document.getElementById('stats');
+      if (statsSection) observer.observe(statsSection);
+    })();
+  </script>
+</body>
+</html>

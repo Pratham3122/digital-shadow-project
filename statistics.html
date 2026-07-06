@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Statistics — Digital Shadow</title>
+  <meta name="description" content="Analytics dashboard for Digital Shadow showing event statistics, category distributions, and timeline metrics with animated charts.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>◈</text></svg>">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/navbar.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/cards.css">
+  <link rel="stylesheet" href="css/timeline.css">
+  <link rel="stylesheet" href="css/compiler.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <link rel="stylesheet" href="css/darktheme.css">
+  <style>
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      margin-bottom: 3rem;
+    }
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-lg, 16px);
+      padding: 2rem;
+      backdrop-filter: blur(20px);
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+    .stat-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--surface-border-hover);
+      box-shadow: var(--shadow-md);
+    }
+    .stat-card-icon {
+      font-size: 2rem;
+      margin-bottom: 0.75rem;
+      display: block;
+    }
+    .stat-number {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 2.5rem;
+      font-weight: 700;
+      background: var(--gradient-primary, linear-gradient(135deg, #7c5cff, #00d4aa));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.25rem;
+    }
+    .stat-label {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+    .stat-detail {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.8rem;
+      color: var(--text-tertiary);
+      margin-top: 0.25rem;
+    }
+    .charts-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+    .chart-card {
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-lg, 16px);
+      padding: 2rem;
+      backdrop-filter: blur(20px);
+    }
+    .chart-card h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 1.5rem;
+    }
+    .bar-chart {
+      display: flex;
+      align-items: flex-end;
+      gap: 1rem;
+      height: 200px;
+      padding-bottom: 2rem;
+      position: relative;
+    }
+    .bar-chart::after {
+      content: '';
+      position: absolute;
+      bottom: 1.75rem;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: var(--surface-border);
+    }
+    .bar-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .bar-fill {
+      width: 100%;
+      max-width: 48px;
+      border-radius: 6px 6px 0 0;
+      transition: height 1.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+      height: 0;
+      position: relative;
+    }
+    .bar-fill.animated { /* height set by JS */ }
+    .bar-value {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    .bar-label {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+      text-align: center;
+    }
+    .progress-section { margin-top: 2rem; }
+    .progress-item {
+      margin-bottom: 1.25rem;
+    }
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.4rem;
+    }
+    .progress-name {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.85rem;
+      color: var(--text-primary);
+    }
+    .progress-percent {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--primary);
+    }
+    .progress-track {
+      height: 8px;
+      background: var(--bg-tertiary, #141428);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 1.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+      width: 0;
+    }
+    .line-chart-wrap {
+      height: 200px;
+      position: relative;
+    }
+    .line-chart-wrap svg {
+      width: 100%;
+      height: 100%;
+    }
+    @media (max-width: 768px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .charts-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 480px) {
+      .stats-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar" id="navbar"><div class="nav-container"><a href="index.html" class="nav-logo"><span class="logo-icon">◈</span><span class="logo-text">Digital Shadow</span></a><button class="nav-toggle" id="navToggle" aria-label="Toggle navigation"><span></span><span></span><span></span></button><div class="nav-menu" id="navMenu"><div class="nav-links"><a href="index.html" class="nav-link">Home</a><a href="about.html" class="nav-link">About</a><a href="problem.html" class="nav-link">Problem</a><a href="features.html" class="nav-link">Features</a><a href="architecture.html" class="nav-link">Architecture</a><div class="nav-dropdown"><button class="nav-link dropdown-trigger">Data Structures <span class="dropdown-arrow">▾</span></button><div class="dropdown-menu"><a href="linkedlist.html" class="dropdown-link">Linked List</a><a href="stack.html" class="dropdown-link">Stack</a></div></div><a href="flowchart.html" class="nav-link">Flowchart</a><a href="algorithm.html" class="nav-link">Algorithm</a><a href="visualization.html" class="nav-link">Visualization</a><a href="compiler.html" class="nav-link">Compiler</a><a href="statistics.html" class="nav-link">Statistics</a><a href="future.html" class="nav-link">Future</a><a href="viva.html" class="nav-link">Viva</a><a href="report.html" class="nav-link">Report</a><a href="ppt.html" class="nav-link">PPT</a><a href="contact.html" class="nav-link">Contact</a></div><button class="theme-toggle" id="themeToggle" aria-label="Toggle theme"><span class="theme-icon">🌙</span></button></div></div></nav>
+
+  <div id="particles-container" class="particles-container"></div>
+
+  <main>
+    <section class="page-hero">
+      <div class="container">
+        <span class="section-badge">Statistics</span>
+        <h1 class="page-title">Analytics Dashboard</h1>
+        <p class="page-subtitle">Real-time metrics and visual breakdowns of your digital timeline data.</p>
+      </div>
+    </section>
+
+    <section class="section" id="stats-cards">
+      <div class="container">
+        <div class="stats-grid">
+          <div class="stat-card reveal stagger-1">
+            <span class="stat-card-icon">📊</span>
+            <div class="stat-number" data-count="15">0</div>
+            <div class="stat-label">Total Events</div>
+          </div>
+          <div class="stat-card reveal stagger-2">
+            <span class="stat-card-icon">📅</span>
+            <div class="stat-number" data-count="8">0</div>
+            <div class="stat-label">Today's Events</div>
+          </div>
+          <div class="stat-card reveal stagger-3">
+            <span class="stat-card-icon">🏆</span>
+            <div class="stat-number" style="-webkit-text-fill-color:var(--text-primary);font-size:1.8rem;">College</div>
+            <div class="stat-label">Most Frequent Category</div>
+            <div class="stat-detail">4 events</div>
+          </div>
+          <div class="stat-card reveal stagger-4">
+            <span class="stat-card-icon">🌅</span>
+            <div class="stat-number" style="-webkit-text-fill-color:var(--text-primary);font-size:1.4rem;">Phone Unlocked</div>
+            <div class="stat-label">First Event</div>
+            <div class="stat-detail">08:00 AM</div>
+          </div>
+          <div class="stat-card reveal stagger-5">
+            <span class="stat-card-icon">🌙</span>
+            <div class="stat-number" style="-webkit-text-fill-color:var(--text-primary);font-size:1.4rem;">Assignment Done</div>
+            <div class="stat-label">Last Event</div>
+            <div class="stat-detail">11:30 PM</div>
+          </div>
+          <div class="stat-card reveal stagger-6">
+            <span class="stat-card-icon">⏱️</span>
+            <div class="stat-number" style="font-size:2rem;">15h 30m</div>
+            <div class="stat-label">Timeline Length</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="charts">
+      <div class="container">
+        <div class="charts-grid">
+          <div class="chart-card reveal">
+            <h3>📊 Category Distribution</h3>
+            <div id="barChart" class="bar-chart"></div>
+          </div>
+          <div class="chart-card reveal">
+            <h3>📈 Events by Hour</h3>
+            <div id="lineChart" class="line-chart-wrap"></div>
+          </div>
+        </div>
+        <div class="chart-card reveal">
+          <h3>📋 Category Breakdown</h3>
+          <div id="progressBars" class="progress-section"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer"><div class="footer-content"><div class="footer-brand"><span class="logo-icon">◈</span><span>Digital Shadow</span></div><p class="footer-tagline">Your Life Has a Memory, Even When You Don't.</p><div class="footer-links"><a href="index.html">Home</a><a href="about.html">About</a><a href="visualization.html">Demo</a><a href="contact.html">Contact</a></div><p class="footer-copy">© 2026 Digital Shadow. Built with passion.</p></div></footer>
+
+  <script src="js/main.js"></script>
+  <script src="js/navbar.js"></script>
+  <script src="js/theme.js"></script>
+  <script src="js/particles.js"></script>
+  <script src="js/search.js"></script>
+  <script src="js/animations.js"></script>
+  <script src="js/statistics.js"></script>
+</body>
+</html>

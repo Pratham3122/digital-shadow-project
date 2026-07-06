@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>System Architecture — Digital Shadow</title>
+  <meta name="description" content="Explore the system architecture of Digital Shadow — a digital life timeline reconstruction system using Linked List and Stack in C.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>◈</text></svg>">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/navbar.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/cards.css">
+  <link rel="stylesheet" href="css/timeline.css">
+  <link rel="stylesheet" href="css/compiler.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <link rel="stylesheet" href="css/darktheme.css">
+  <style>
+    /* ── Architecture Page Styles ── */
+    .arch-flow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+      padding: 3rem 0;
+      position: relative;
+    }
+
+    .arch-node {
+      background: var(--surface);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--surface-border);
+      border-radius: 16px;
+      padding: 2rem 2.5rem;
+      width: 100%;
+      max-width: 480px;
+      text-align: center;
+      position: relative;
+      z-index: 2;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      opacity: 0;
+      transform: translateY(30px);
+    }
+
+    .arch-node.revealed {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .arch-node:hover {
+      transform: translateY(-4px);
+      border-color: var(--surface-border-hover);
+      box-shadow: var(--shadow-glow);
+    }
+
+    .arch-node-icon {
+      font-size: 2.5rem;
+      margin-bottom: 0.75rem;
+      display: block;
+    }
+
+    .arch-node-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.25rem;
+    }
+
+    .arch-node-sub {
+      font-size: 0.8rem;
+      color: var(--primary);
+      font-weight: 500;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+
+    .arch-node-desc {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* Animated Arrow Connector */
+    .arch-arrow {
+      width: 3px;
+      height: 70px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1;
+    }
+
+    .arch-arrow::before {
+      content: '';
+      position: absolute;
+      width: 3px;
+      height: 100%;
+      background: linear-gradient(180deg, var(--primary), var(--accent));
+      border-radius: 2px;
+      opacity: 0.5;
+    }
+
+    .arch-arrow::after {
+      content: '';
+      position: absolute;
+      width: 3px;
+      height: 30px;
+      background: linear-gradient(180deg, var(--primary-glow), var(--accent-glow));
+      border-radius: 2px;
+      animation: arrowPulse 2s ease-in-out infinite;
+      box-shadow: 0 0 10px var(--primary), 0 0 20px var(--accent);
+    }
+
+    .arch-arrow-head {
+      position: absolute;
+      bottom: -6px;
+      width: 0;
+      height: 0;
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-top: 10px solid var(--accent);
+      filter: drop-shadow(0 0 6px var(--accent));
+    }
+
+    @keyframes arrowPulse {
+      0% { top: -10px; opacity: 0; }
+      20% { opacity: 1; }
+      80% { opacity: 1; }
+      100% { top: calc(100% - 20px); opacity: 0; }
+    }
+
+    .arch-arrow:nth-child(4)::after { animation-delay: 0.3s; }
+    .arch-arrow:nth-child(6)::after { animation-delay: 0.6s; }
+    .arch-arrow:nth-child(8)::after { animation-delay: 0.9s; }
+    .arch-arrow:nth-child(10)::after { animation-delay: 1.2s; }
+
+    /* ── Component Detail Cards ── */
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 2rem;
+      margin-top: 3rem;
+    }
+
+    .detail-card {
+      background: var(--surface);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--surface-border);
+      border-radius: 16px;
+      padding: 2rem;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .detail-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--surface-border-hover);
+      box-shadow: var(--shadow-glow);
+    }
+
+    .detail-card-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .detail-card-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+
+    .detail-card-icon.user-icon { background: rgba(124,92,255,0.15); }
+    .detail-card-icon.ui-icon { background: rgba(0,212,170,0.15); }
+    .detail-card-icon.ll-icon { background: rgba(255,184,0,0.15); }
+    .detail-card-icon.stack-icon { background: rgba(255,77,106,0.15); }
+    .detail-card-icon.analytics-icon { background: rgba(124,92,255,0.15); }
+    .detail-card-icon.output-icon { background: rgba(0,212,170,0.15); }
+
+    .detail-card h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .detail-card p {
+      color: var(--text-secondary);
+      font-size: 0.925rem;
+      line-height: 1.7;
+    }
+
+    .detail-card ul {
+      list-style: none;
+      padding: 0;
+      margin: 0.75rem 0 0;
+    }
+
+    .detail-card ul li {
+      padding: 0.35rem 0;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+
+    .detail-card ul li::before {
+      content: '▸';
+      color: var(--primary);
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    /* ── Data Flow Diagram ── */
+    .data-flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 0;
+      padding: 2rem 0;
+    }
+
+    .df-step {
+      background: var(--surface);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--surface-border);
+      border-radius: 12px;
+      padding: 1rem 1.5rem;
+      text-align: center;
+      min-width: 140px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .df-step:hover {
+      transform: translateY(-3px);
+      border-color: var(--primary);
+      box-shadow: 0 0 20px rgba(124,92,255,0.2);
+    }
+
+    .df-step-icon {
+      font-size: 1.5rem;
+      display: block;
+      margin-bottom: 0.4rem;
+    }
+
+    .df-step-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .df-step-detail {
+      font-size: 0.7rem;
+      color: var(--text-tertiary);
+      margin-top: 0.2rem;
+    }
+
+    .df-connector {
+      display: flex;
+      align-items: center;
+      padding: 0 0.3rem;
+      color: var(--accent);
+      font-size: 1.5rem;
+      font-weight: 700;
+      animation: dfPulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes dfPulse {
+      0%, 100% { opacity: 0.4; transform: translateX(0); }
+      50% { opacity: 1; transform: translateX(4px); }
+    }
+
+    .df-connector:nth-child(4) { animation-delay: 0.2s; }
+    .df-connector:nth-child(6) { animation-delay: 0.4s; }
+    .df-connector:nth-child(8) { animation-delay: 0.6s; }
+    .df-connector:nth-child(10) { animation-delay: 0.8s; }
+    .df-connector:nth-child(12) { animation-delay: 1.0s; }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      .arch-node {
+        padding: 1.5rem;
+        max-width: 100%;
+      }
+      .data-flow {
+        flex-direction: column;
+        gap: 0;
+      }
+      .df-connector {
+        transform: rotate(90deg);
+      }
+      .detail-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .section-intro {
+      text-align: center;
+      max-width: 700px;
+      margin: 0 auto 2rem;
+    }
+
+    .section-intro p {
+      color: var(--text-secondary);
+      font-size: 1.05rem;
+      line-height: 1.7;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="nav-logo">
+        <span class="logo-icon">◈</span>
+        <span class="logo-text">Digital Shadow</span>
+      </a>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="nav-menu" id="navMenu">
+        <div class="nav-links">
+          <a href="index.html" class="nav-link">Home</a>
+          <a href="about.html" class="nav-link">About</a>
+          <a href="problem.html" class="nav-link">Problem</a>
+          <a href="features.html" class="nav-link">Features</a>
+          <a href="architecture.html" class="nav-link">Architecture</a>
+          <div class="nav-dropdown">
+            <button class="nav-link dropdown-trigger">Data Structures <span class="dropdown-arrow">▾</span></button>
+            <div class="dropdown-menu">
+              <a href="linkedlist.html" class="dropdown-link">Linked List</a>
+              <a href="stack.html" class="dropdown-link">Stack</a>
+            </div>
+          </div>
+          <a href="flowchart.html" class="nav-link">Flowchart</a>
+          <a href="algorithm.html" class="nav-link">Algorithm</a>
+          <a href="visualization.html" class="nav-link">Visualization</a>
+          <a href="compiler.html" class="nav-link">Compiler</a>
+          <a href="statistics.html" class="nav-link">Statistics</a>
+          <a href="future.html" class="nav-link">Future</a>
+          <a href="viva.html" class="nav-link">Viva</a>
+          <a href="report.html" class="nav-link">Report</a>
+          <a href="ppt.html" class="nav-link">PPT</a>
+          <a href="contact.html" class="nav-link">Contact</a>
+        </div>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+          <span class="theme-icon">🌙</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <div id="particles-container" class="particles-container"></div>
+
+  <main>
+    <!-- ── PAGE HERO ── -->
+    <section class="page-hero">
+      <div class="container">
+        <span class="section-badge">Architecture</span>
+        <h1 class="page-title">System Design</h1>
+        <p class="page-subtitle">A layered architecture where every life event flows through carefully orchestrated data structures — from input to persistent memory.</p>
+      </div>
+    </section>
+
+    <!-- ── ARCHITECTURE FLOW ── -->
+    <section class="section" id="system-flow">
+      <div class="container">
+        <div class="section-intro reveal">
+          <span class="section-badge">System Flow</span>
+          <h2 class="gradient-text">How Data Flows Through Digital Shadow</h2>
+          <p>Every user interaction passes through six interconnected layers, each powered by purpose-built C data structures.</p>
+        </div>
+
+        <div class="arch-flow" id="archFlow">
+          <!-- Layer 1: User -->
+          <div class="arch-node reveal stagger-1" id="arch-user">
+            <span class="arch-node-icon">👤</span>
+            <div class="arch-node-sub">Layer 1 — Input</div>
+            <div class="arch-node-title">User</div>
+            <div class="arch-node-desc">The human operator interacting with the Digital Shadow system via keyboard commands and menu selections.</div>
+          </div>
+
+          <div class="arch-arrow"><div class="arch-arrow-head"></div></div>
+
+          <!-- Layer 2: UI -->
+          <div class="arch-node reveal stagger-2" id="arch-ui">
+            <span class="arch-node-icon">🖥️</span>
+            <div class="arch-node-sub">Layer 2 — Interface</div>
+            <div class="arch-node-title">Console Interface (UI)</div>
+            <div class="arch-node-desc">A menu-driven console application that captures user input, validates data, and dispatches commands to the appropriate subsystem.</div>
+          </div>
+
+          <div class="arch-arrow"><div class="arch-arrow-head"></div></div>
+
+          <!-- Layer 3: Linked List -->
+          <div class="arch-node reveal stagger-3" id="arch-ll">
+            <span class="arch-node-icon">🔗</span>
+            <div class="arch-node-sub">Layer 3 — Storage</div>
+            <div class="arch-node-title">Linked List (Event Storage)</div>
+            <div class="arch-node-desc">A singly linked list that dynamically stores every life event. Nodes are allocated with malloc() and linked via pointers, enabling efficient insertion and deletion.</div>
+          </div>
+
+          <div class="arch-arrow"><div class="arch-arrow-head"></div></div>
+
+          <!-- Layer 4: Stack -->
+          <div class="arch-node reveal stagger-4" id="arch-stack">
+            <span class="arch-node-icon">📚</span>
+            <div class="arch-node-sub">Layer 4 — Undo & Replay</div>
+            <div class="arch-node-title">Stack (Undo / Replay)</div>
+            <div class="arch-node-desc">A LIFO stack that records operations for undo capability and enables reverse-chronological replay of daily events using push and pop operations.</div>
+          </div>
+
+          <div class="arch-arrow"><div class="arch-arrow-head"></div></div>
+
+          <!-- Layer 5: Analytics -->
+          <div class="arch-node reveal stagger-5" id="arch-analytics">
+            <span class="arch-node-icon">📊</span>
+            <div class="arch-node-sub">Layer 5 — Processing</div>
+            <div class="arch-node-title">Analytics (Statistics Engine)</div>
+            <div class="arch-node-desc">A single-pass aggregation engine that traverses the linked list to compute statistics: total events, events per day, category breakdown, and timeline density.</div>
+          </div>
+
+          <div class="arch-arrow"><div class="arch-arrow-head"></div></div>
+
+          <!-- Layer 6: Output -->
+          <div class="arch-node reveal stagger-6" id="arch-output">
+            <span class="arch-node-icon">📋</span>
+            <div class="arch-node-sub">Layer 6 — Presentation</div>
+            <div class="arch-node-title">Output (Timeline Display)</div>
+            <div class="arch-node-desc">Formatted console output that renders the event timeline chronologically, presenting dates, times, event descriptions, and categories in a readable format.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── COMPONENT DETAILS ── -->
+    <section class="section" id="component-details">
+      <div class="container">
+        <div class="section-intro reveal">
+          <span class="section-badge">Components</span>
+          <h2 class="gradient-text">Component Deep Dive</h2>
+          <p>Each architectural layer is purpose-built with specific responsibilities, data structures, and algorithmic guarantees.</p>
+        </div>
+
+        <div class="detail-grid">
+          <!-- User -->
+          <div class="detail-card reveal stagger-1">
+            <div class="detail-card-header">
+              <div class="detail-card-icon user-icon">👤</div>
+              <h3>User Layer</h3>
+            </div>
+            <p>The entry point of the system. The user interacts through a numbered menu, providing event details like description, date, time, and category.</p>
+            <ul>
+              <li>Keyboard-driven input via scanf() and fgets()</li>
+              <li>Menu choices routed via switch-case dispatcher</li>
+              <li>Input validation prevents malformed data entry</li>
+              <li>Error messages guide correction of invalid input</li>
+            </ul>
+          </div>
+
+          <!-- Console UI -->
+          <div class="detail-card reveal stagger-2">
+            <div class="detail-card-header">
+              <div class="detail-card-icon ui-icon">🖥️</div>
+              <h3>Console Interface</h3>
+            </div>
+            <p>The UI layer presents a clear menu of 10 operations and handles all I/O formatting. It acts as the bridge between human intention and machine execution.</p>
+            <ul>
+              <li>10-option main menu with numbered selection</li>
+              <li>Structured prompts for event data collection</li>
+              <li>Color-coded output using ANSI escape sequences</li>
+              <li>Confirmation prompts before destructive operations</li>
+            </ul>
+          </div>
+
+          <!-- Linked List -->
+          <div class="detail-card reveal stagger-3">
+            <div class="detail-card-header">
+              <div class="detail-card-icon ll-icon">🔗</div>
+              <h3>Linked List Storage</h3>
+            </div>
+            <p>The core data structure. Each node holds one life event and a pointer to the next. The list grows and shrinks dynamically using heap memory allocation.</p>
+            <ul>
+              <li>Singly linked list with head pointer</li>
+              <li>O(1) insertion at head, O(n) at tail</li>
+              <li>Dynamic memory via malloc() and free()</li>
+              <li>Linear traversal for search, display, and statistics</li>
+              <li>No fixed capacity — grows with user activity</li>
+            </ul>
+          </div>
+
+          <!-- Stack -->
+          <div class="detail-card reveal stagger-4">
+            <div class="detail-card-header">
+              <div class="detail-card-icon stack-icon">📚</div>
+              <h3>Stack (Undo / Replay)</h3>
+            </div>
+            <p>The stack provides LIFO ordering for two critical features: undoing the last operation and replaying a day's events in reverse chronological order.</p>
+            <ul>
+              <li>Array-based stack with top pointer</li>
+              <li>O(1) push and pop operations</li>
+              <li>Replay: push all day events, then pop to reverse</li>
+              <li>Undo: pop last action and reverse its effect on the list</li>
+              <li>Overflow/underflow protection with clear messages</li>
+            </ul>
+          </div>
+
+          <!-- Analytics -->
+          <div class="detail-card reveal stagger-5">
+            <div class="detail-card-header">
+              <div class="detail-card-icon analytics-icon">📊</div>
+              <h3>Analytics Engine</h3>
+            </div>
+            <p>A stateless computation module that performs single-pass analysis over the linked list to extract meaningful statistics about the user's digital life.</p>
+            <ul>
+              <li>Total event count computed in O(n)</li>
+              <li>Events grouped by date for daily density</li>
+              <li>Category frequency breakdown</li>
+              <li>Most active day and time range identification</li>
+              <li>No additional data structures — aggregates in-place</li>
+            </ul>
+          </div>
+
+          <!-- Output -->
+          <div class="detail-card reveal stagger-6">
+            <div class="detail-card-header">
+              <div class="detail-card-icon output-icon">📋</div>
+              <h3>Timeline Display</h3>
+            </div>
+            <p>The presentation layer formats raw linked list data into a human-readable timeline, grouping events by date and displaying them with clear formatting.</p>
+            <ul>
+              <li>Chronological display with date headers</li>
+              <li>Formatted output: [Time] Event — Category</li>
+              <li>Today's view filters by current system date</li>
+              <li>Empty state messaging when no events exist</li>
+              <li>Replay view shows reverse-order playback</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── DATA FLOW DIAGRAM ── -->
+    <section class="section" id="data-flow">
+      <div class="container">
+        <div class="section-intro reveal">
+          <span class="section-badge">Data Flow</span>
+          <h2 class="gradient-text">Event Lifecycle</h2>
+          <p>Follow the journey of a single life event from user input to on-screen display — every step involves a deliberate data structure operation.</p>
+        </div>
+
+        <div class="data-flow reveal">
+          <div class="df-step">
+            <span class="df-step-icon">⌨️</span>
+            <div class="df-step-title">Event Input</div>
+            <div class="df-step-detail">scanf / fgets</div>
+          </div>
+          <div class="df-connector">→</div>
+
+          <div class="df-step">
+            <span class="df-step-icon">🧱</span>
+            <div class="df-step-title">Node Creation</div>
+            <div class="df-step-detail">malloc(sizeof(Node))</div>
+          </div>
+          <div class="df-connector">→</div>
+
+          <div class="df-step">
+            <span class="df-step-icon">🔗</span>
+            <div class="df-step-title">Insert into List</div>
+            <div class="df-step-detail">tail→next = new</div>
+          </div>
+          <div class="df-connector">→</div>
+
+          <div class="df-step">
+            <span class="df-step-icon">📚</span>
+            <div class="df-step-title">Push to Stack</div>
+            <div class="df-step-detail">stack[++top] = event</div>
+          </div>
+          <div class="df-connector">→</div>
+
+          <div class="df-step">
+            <span class="df-step-icon">⚙️</span>
+            <div class="df-step-title">Process</div>
+            <div class="df-step-detail">validate + compute</div>
+          </div>
+          <div class="df-connector">→</div>
+
+          <div class="df-step">
+            <span class="df-step-icon">📋</span>
+            <div class="df-step-title">Display</div>
+            <div class="df-step-detail">printf formatted</div>
+          </div>
+        </div>
+
+        <!-- Memory Lifecycle -->
+        <div class="section-intro reveal" style="margin-top: 4rem;">
+          <h2 class="gradient-text">Memory Lifecycle</h2>
+          <p>Digital Shadow carefully manages heap memory — every node that is created is eventually freed, preventing memory leaks.</p>
+        </div>
+
+        <div class="detail-grid">
+          <div class="detail-card reveal stagger-1">
+            <div class="detail-card-header">
+              <div class="detail-card-icon ui-icon">🟢</div>
+              <h3>Allocation</h3>
+            </div>
+            <p>When an event is added, the system calls <code>malloc(sizeof(struct Event))</code> to allocate a block of memory on the heap. The returned pointer becomes the address of the new node.</p>
+            <ul>
+              <li>Each node occupies ~128 bytes (struct size)</li>
+              <li>Pointer validity checked (NULL = allocation failure)</li>
+              <li>Node fields populated before linking into list</li>
+            </ul>
+          </div>
+
+          <div class="detail-card reveal stagger-2">
+            <div class="detail-card-header">
+              <div class="detail-card-icon ll-icon">🔗</div>
+              <h3>Linking</h3>
+            </div>
+            <p>The new node's <code>next</code> pointer is set to NULL, and the previous tail's <code>next</code> is updated to point to this new node. The list grows by one element.</p>
+            <ul>
+              <li>Head insertion: new→next = head; head = new</li>
+              <li>Tail insertion: traverse to end, tail→next = new</li>
+              <li>Pointer reassignment is O(1) after reaching position</li>
+            </ul>
+          </div>
+
+          <div class="detail-card reveal stagger-3">
+            <div class="detail-card-header">
+              <div class="detail-card-icon stack-icon">🔴</div>
+              <h3>Deallocation</h3>
+            </div>
+            <p>When an event is deleted or the program exits, <code>free()</code> returns the memory to the operating system. The pointer is set to NULL to prevent dangling references.</p>
+            <ul>
+              <li>Predecessor's next updated before free()</li>
+              <li>Exit routine walks entire list, freeing every node</li>
+              <li>Stack memory freed separately from list memory</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── ARCHITECTURE PRINCIPLES ── -->
+    <section class="section" id="principles">
+      <div class="container">
+        <div class="section-intro reveal">
+          <span class="section-badge">Principles</span>
+          <h2 class="gradient-text">Design Principles</h2>
+          <p>The architecture of Digital Shadow follows software engineering principles adapted for systems-level C programming.</p>
+        </div>
+
+        <div class="detail-grid">
+          <div class="detail-card reveal stagger-1">
+            <div class="detail-card-header">
+              <div class="detail-card-icon user-icon">🏗️</div>
+              <h3>Separation of Concerns</h3>
+            </div>
+            <p>Each module handles one responsibility. The UI knows nothing about memory management. The linked list has no knowledge of console formatting. The stack operates independently of analytics.</p>
+          </div>
+
+          <div class="detail-card reveal stagger-2">
+            <div class="detail-card-header">
+              <div class="detail-card-icon ui-icon">🧩</div>
+              <h3>Modular Design</h3>
+            </div>
+            <p>Functions are grouped by purpose into logical modules: event operations, stack operations, statistics computation, and display formatting. Each can be tested and modified independently.</p>
+          </div>
+
+          <div class="detail-card reveal stagger-3">
+            <div class="detail-card-header">
+              <div class="detail-card-icon ll-icon">💾</div>
+              <h3>Manual Memory Management</h3>
+            </div>
+            <p>Without garbage collection, Digital Shadow explicitly manages every byte of heap memory using malloc() and free(), ensuring zero memory leaks through disciplined pointer management.</p>
+          </div>
+
+          <div class="detail-card reveal stagger-4">
+            <div class="detail-card-header">
+              <div class="detail-card-icon stack-icon">🛡️</div>
+              <h3>Defensive Programming</h3>
+            </div>
+            <p>Every pointer is checked before dereference. Every allocation is verified. Every user input is validated. Edge cases like empty lists and full stacks are handled gracefully.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-brand">
+        <span class="logo-icon">◈</span>
+        <span>Digital Shadow</span>
+      </div>
+      <p class="footer-tagline">Your Life Has a Memory, Even When You Don't.</p>
+      <div class="footer-links">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="visualization.html">Demo</a>
+        <a href="contact.html">Contact</a>
+      </div>
+      <p class="footer-copy">© 2026 Digital Shadow. Built with passion.</p>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script src="js/navbar.js"></script>
+  <script src="js/theme.js"></script>
+  <script src="js/particles.js"></script>
+  <script src="js/search.js"></script>
+  <script>
+    // Animate architecture nodes on scroll
+    document.addEventListener('DOMContentLoaded', () => {
+      const nodes = document.querySelectorAll('.arch-node');
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry, i) => {
+          if (entry.isIntersecting) {
+            setTimeout(() => {
+              entry.target.classList.add('revealed');
+            }, i * 150);
+          }
+        });
+      }, { threshold: 0.2 });
+
+      nodes.forEach(node => observer.observe(node));
+    });
+  </script>
+</body>
+</html>
