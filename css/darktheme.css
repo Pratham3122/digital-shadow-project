@@ -1,0 +1,276 @@
+/* ============================================================
+   DIGITAL SHADOW — Dark/Light Theme
+   darktheme.css — Light theme overrides & theme transitions
+   ============================================================ */
+
+/* -------------------------------------------------------
+   Theme Transition — smooth color changes on toggle
+   ------------------------------------------------------- */
+html,
+body,
+.navbar,
+.navbar.scrolled,
+.glass-card,
+.feature-card,
+.info-card,
+.stat-card,
+.viva-card,
+.slide-card,
+.algo-card,
+.timeline-content,
+.explanation-step,
+.footer,
+.btn,
+.btn-primary,
+.btn-secondary,
+.section-badge,
+.dropdown-menu,
+.theme-toggle,
+.code-editor,
+.code-output,
+.editor-toolbar,
+.output-toolbar {
+  transition: background-color 0.4s ease,
+              color 0.4s ease,
+              border-color 0.4s ease,
+              box-shadow 0.4s ease;
+}
+
+/* -------------------------------------------------------
+   Light Theme Overrides
+   ------------------------------------------------------- */
+[data-theme="light"] {
+  --bg-primary: #f5f5fa;
+  --bg-secondary: #eeeef5;
+  --bg-tertiary: #e4e4ee;
+  --surface: rgba(255, 255, 255, 0.7);
+  --surface-hover: rgba(255, 255, 255, 0.9);
+  --surface-border: rgba(0, 0, 0, 0.08);
+  --surface-border-hover: rgba(0, 0, 0, 0.15);
+  --text-primary: #1a1a2e;
+  --text-secondary: #555577;
+  --text-tertiary: #8888aa;
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 16px 64px rgba(0, 0, 0, 0.12);
+  --shadow-glow: 0 0 30px rgba(124, 92, 255, 0.15);
+  --gradient-hero: radial-gradient(ellipse at 50% 0%, rgba(124, 92, 255, 0.08) 0%, transparent 60%);
+}
+
+/* -------------------------------------------------------
+   Light Theme — Navbar
+   ------------------------------------------------------- */
+[data-theme="light"] .navbar.scrolled {
+  background: rgba(245, 245, 250, 0.85);
+  border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="light"] .dropdown-menu {
+  background: rgba(245, 245, 250, 0.97);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .dropdown-link:hover {
+  background: rgba(124, 92, 255, 0.06);
+}
+
+/* -------------------------------------------------------
+   Light Theme — Logo
+   ------------------------------------------------------- */
+[data-theme="light"] .logo-text {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* -------------------------------------------------------
+   Light Theme — Code Editor
+   ------------------------------------------------------- */
+[data-theme="light"] .code-editor {
+  background: #f8f8fc;
+}
+
+[data-theme="light"] .code-output {
+  background: #f8f8fc;
+}
+
+[data-theme="light"] .editor-toolbar {
+  background: rgba(230, 230, 240, 0.9);
+}
+
+[data-theme="light"] .output-toolbar {
+  background: rgba(230, 230, 240, 0.9);
+}
+
+[data-theme="light"] .code-content {
+  color: #1a1a2e;
+}
+
+[data-theme="light"] .code-textarea {
+  color: #1a1a2e;
+}
+
+[data-theme="light"] .code-line-numbers {
+  background: rgba(230, 230, 240, 0.5);
+}
+
+[data-theme="light"] .code-input {
+  background: rgba(230, 230, 240, 0.6);
+}
+
+/* Light syntax colors */
+[data-theme="light"] .syntax-keyword {
+  color: #7c3aed;
+}
+
+[data-theme="light"] .syntax-type {
+  color: #2563eb;
+}
+
+[data-theme="light"] .syntax-function {
+  color: #2563eb;
+}
+
+[data-theme="light"] .syntax-string {
+  color: #16a34a;
+}
+
+[data-theme="light"] .syntax-number {
+  color: #ea580c;
+}
+
+[data-theme="light"] .syntax-comment {
+  color: #94a3b8;
+}
+
+[data-theme="light"] .syntax-preprocessor {
+  color: #0891b2;
+}
+
+[data-theme="light"] .syntax-operator {
+  color: #0891b2;
+}
+
+/* -------------------------------------------------------
+   Light Theme — Code / Pre blocks
+   ------------------------------------------------------- */
+[data-theme="light"] code {
+  background: rgba(124, 92, 255, 0.08);
+  color: #6d28d9;
+  border-color: rgba(124, 92, 255, 0.12);
+}
+
+[data-theme="light"] pre {
+  background: #eeeef5;
+  border-color: rgba(0, 0, 0, 0.08);
+  color: #1a1a2e;
+}
+
+/* -------------------------------------------------------
+   Light Theme — Scrollbar
+   ------------------------------------------------------- */
+[data-theme="light"] ::-webkit-scrollbar-track {
+  background: #eeeef5;
+}
+
+[data-theme="light"] ::-webkit-scrollbar-thumb {
+  background: #b8b8d0;
+}
+
+[data-theme="light"] ::-webkit-scrollbar-thumb:hover {
+  background: #9898b8;
+}
+
+[data-theme="light"] * {
+  scrollbar-color: #b8b8d0 #eeeef5;
+}
+
+/* -------------------------------------------------------
+   Light Theme — Selection
+   ------------------------------------------------------- */
+[data-theme="light"] ::selection {
+  background: rgba(124, 92, 255, 0.2);
+  color: #1a1a2e;
+}
+
+[data-theme="light"] ::-moz-selection {
+  background: rgba(124, 92, 255, 0.2);
+  color: #1a1a2e;
+}
+
+/* -------------------------------------------------------
+   Light Theme — Mobile Nav
+   ------------------------------------------------------- */
+@media (max-width: 1024px) {
+  [data-theme="light"] .nav-menu {
+    background: rgba(245, 245, 250, 0.97);
+  }
+
+  [data-theme="light"] .dropdown-menu {
+    background: rgba(228, 228, 238, 0.5);
+  }
+}
+
+/* -------------------------------------------------------
+   Light Theme — Timeline
+   ------------------------------------------------------- */
+[data-theme="light"] .timeline-node {
+  background: var(--bg-primary);
+}
+
+[data-theme="light"] .timeline-date {
+  background: var(--bg-primary);
+}
+
+/* -------------------------------------------------------
+   Light Theme — Buttons
+   ------------------------------------------------------- */
+[data-theme="light"] .btn-secondary {
+  border-color: rgba(0, 0, 0, 0.12);
+}
+
+[data-theme="light"] .btn-secondary:hover {
+  border-color: var(--primary);
+  background: rgba(124, 92, 255, 0.04);
+}
+
+/* -------------------------------------------------------
+   Light Theme — Section Badge
+   ------------------------------------------------------- */
+[data-theme="light"] .section-badge {
+  background: rgba(124, 92, 255, 0.08);
+  border-color: rgba(124, 92, 255, 0.15);
+}
+
+/* -------------------------------------------------------
+   Light Theme — Footer
+   ------------------------------------------------------- */
+[data-theme="light"] .footer {
+  background: var(--bg-secondary);
+  border-top-color: rgba(0, 0, 0, 0.06);
+}
+
+/* -------------------------------------------------------
+   Light Theme — Compiler
+   ------------------------------------------------------- */
+[data-theme="light"] .compiler-layout {
+  background: var(--bg-tertiary);
+}
+
+[data-theme="light"] .compiler-left {
+  border-right-color: rgba(0, 0, 0, 0.08);
+}
+
+/* -------------------------------------------------------
+   Light Theme — Viva/Algo cards
+   ------------------------------------------------------- */
+[data-theme="light"] .viva-card-header:hover,
+[data-theme="light"] .algo-card-header:hover {
+  background: rgba(124, 92, 255, 0.03);
+}
+
+[data-theme="light"] .viva-card-toggle,
+[data-theme="light"] .algo-card-expand {
+  border-color: rgba(0, 0, 0, 0.1);
+}
